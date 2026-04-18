@@ -1,31 +1,79 @@
-# ad-engine — Maven's Video Ad Pipeline
+# ad-engine — Maven's Video Ad + Ecommerce Connector Pipeline
 
-This directory is a **clone** of the Shopify-Ad-Engine (`C:\Users\User\APPS\shopify-ad-engine`) brought into CMO-Agent so Maven owns the full Remotion + Meta Ads rendering stack directly.
+This directory is a **clone** of the Shopify-Ad-Engine (`C:\Users\User\APPS\shopify-ad-engine`) brought into CMO-Agent so Maven owns the full Remotion + Meta Ads + Shopify rendering stack directly.
 
 ## What This Is
-- **Remotion 4.0+** video ad templates (cinematic reveals, UGC, comparisons, countdown sales, product showcases)
-- **Meta Ads posting engine** (`scripts/meta_ads_engine.py`)
-- **Rendering batch runner** (`scripts/render_batch.js`)
-- **5 production templates** in `templates/` — reusable across ANY brand Maven manages (OASIS, PropFlow, Nostalgic, SunBiz, CC personal brand)
 
-## Relationship to Shopify-Ad-Engine
-The original Shopify-Ad-Engine (`APPS/shopify-ad-engine`) remains a standalone Shopify-integration app with `shopify_sync.js` tying into the Shopify Storefront/Admin APIs. That's a product specific to Shopify workflows.
+Maven's full marketing execution toolkit:
 
-Maven's `ad-engine/` is the **multi-brand rendering pipeline** — same Remotion foundation, no Shopify dependency. When Maven needs to render an ad for OASIS AI, PropFlow, etc., it runs from here.
+| Capability | File | What it does |
+|-----------|------|--------------|
+| **Remotion studio** | `src/`, `templates/` | 5 production video ad templates (cinematic-reveal, comparison, countdown-sale, product-showcase, ugc-testimonial) |
+| **Meta Ads API** | `scripts/meta_ads_engine.py` | Post videos to Facebook / Instagram as ads via Meta Marketing API |
+| **Shopify Storefront API** | `scripts/shopify_sync.js` | Pull products + images from any Shopify store → `products.json` for use in ad templates |
+| **Batch render** | `scripts/render_batch.js` | Render multiple ads in parallel |
 
-## Evolution Protocol
-- **Maven owns this directly.** Evolve templates, add new compositions, tune rendering params as brand needs dictate.
-- If Shopify-Ad-Engine adds a useful template, port it here via manual diff (don't two-way-sync — they're divergent products by design).
-- `shopify_sync.js` is deliberately excluded — no Shopify dependency in Maven's ad-engine.
+## Why Maven Has This (Scope)
+
+Maven manages marketing for **multiple brands** in CC's portfolio:
+
+- **OASIS AI** — CC's B2B AI agency (primary revenue)
+- **CC personal brand (Conaugh McKenna)** — top-of-funnel content engine
+- **PropFlow** — real estate SaaS (launch campaign pending)
+- **Nostalgic Requests** — DJ/music SaaS
+- **SunBiz Funding** — legacy client, compliance-sensitive
+
+Any of these brands could run Shopify (Nostalgic already does; OASIS and PropFlow might add storefronts). **Maven needs direct Shopify + Meta connectivity** without having to reach across to another codebase.
+
+The original Shopify-Ad-Engine (`APPS/shopify-ad-engine`) remains a standalone sandbox for Shopify-specific experiments. Maven's `ad-engine/` is the multi-brand production pipeline.
 
 ## Setup for First Use
+
 ```bash
 cd ad-engine
 npm install
-npx remotion studio   # opens Remotion editor on localhost:3000
 ```
 
+Then add to `.env` (in the ad-engine directory, or use Maven's root `.env.agents`):
+
+```
+# Shopify (if using)
+SHOPIFY_STORE=your-store-handle
+SHOPIFY_ACCESS_TOKEN=your-storefront-api-token
+
+# Meta Ads (if using)
+META_APP_ID=...
+META_ACCESS_TOKEN=...
+META_AD_ACCOUNT_ID=...
+```
+
+## Running
+
+```bash
+# Preview + edit templates
+npx remotion studio         # opens localhost:3000 in browser
+
+# Pull Shopify products into products.json
+npm run shopify:sync        # or: npm run shopify:sync -- --limit 10
+
+# Render a single composition
+npx remotion render <composition-id>
+
+# Batch render all templates
+npm run render:all
+
+# Post a rendered video as a Meta ad
+npm run meta:post
+```
+
+## Evolution Protocol
+
+- **Maven owns this directly.** Evolve templates, tune rendering params, add new compositions as brands need.
+- Shopify-Ad-Engine (`APPS/shopify-ad-engine`) remains a separate standalone app. If it adds a useful template, port it here via manual diff — no two-way sync.
+- New ad templates should be added under `templates/{name}/`.
+
 ## Why the Clone (not a symlink or submodule)
-- **Isolation**: template changes for OASIS shouldn't risk breaking Shopify integrations
-- **Maven sovereignty**: CMO-Agent repo is self-contained; no external runtime dependency
-- **Diff-friendly**: we can see clearly when Maven's pipeline diverges from Shopify's
+
+- **Isolation**: template tweaks for OASIS don't risk breaking the standalone Shopify engine
+- **Maven sovereignty**: CMO-Agent is self-contained; no external runtime dependency
+- **Diff-friendly**: Maven's pipeline can diverge from the original over time

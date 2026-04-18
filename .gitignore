@@ -1,9 +1,15 @@
 node_modules/
 .next/
 dist/
+# ─── Credential files (NEVER commit values) ─────────────────────────
 .env
-.env.local
+.env.*
+*.env
 .env.agents
+.env.agents.*
+# BUT allow the committable template (structure only, no values)
+!.env.agents.template
+!.env.example
 *.log
 .DS_Store
 __pycache__/

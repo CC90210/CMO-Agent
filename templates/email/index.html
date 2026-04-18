@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SunBiz Funding — Email Template Library</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, #001F54 0%, #0a2d6e 50%, #001F54 100%);
+      border-bottom: 4px solid #D4A843;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+    .header h1 span { color: #D4A843; }
+    .header p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 1px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #334155;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: #D4A843;
+    }
+    .card-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .badge-growth { background: #10b981; color: #fff; }
+    .badge-consolidation { background: #FF6B35; color: #fff; }
+    .badge-urgency { background: #ef4444; color: #fff; }
+    .badge-trust { background: #3b82f6; color: #fff; }
+    .badge-premium { background: #D4A843; color: #001F54; }
+    .badge-problem { background: #f59e0b; color: #001F54; }
+    .badge-minimal { background: #64748b; color: #fff; }
+    .badge-seasonal { background: #22c55e; color: #fff; }
+    .badge-industry { background: #8b5cf6; color: #fff; }
+    .badge-compare { background: #001F54; color: #D4A843; }
+    .badge-tiers { background: #D4A843; color: #001F54; }
+    .card-body { padding: 20px; }
+    .card-body h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .card-body p {
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .card-features {
+      list-style: none;
+      margin-bottom: 16px;
+    }
+    .card-features li {
+      font-size: 11px;
+      color: #cbd5e1;
+      padding: 2px 0;
+    }
+    .card-features li::before {
+      content: ">";
+      color: #D4A843;
+      font-weight: 700;
+      margin-right: 6px;
+    }
+    .btn-preview {
+      display: inline-block;
+      background: #FF6B35;
+      color: #fff;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 20px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .btn-preview:hover { background: #e55a2b; }
+    .btn-new-tab {
+      display: inline-block;
+      background: transparent;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      margin-left: 6px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-new-tab:hover { border-color: #D4A843; color: #D4A843; }
+    .btn-download {
+      display: inline-block;
+      background: transparent;
+      color: #10b981;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border: 1px solid #10b981;
+      border-radius: 6px;
+      margin-left: 6px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-download:hover { background: #10b981; color: #fff; }
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #475569;
+      font-size: 12px;
+    }
+    .footer span { color: #D4A843; }
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #D4A843;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #334155;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>SUN<span>BIZ</span> FUNDING</h1>
+  <p>EMAIL TEMPLATE LIBRARY &mdash; 16 PRODUCTION-READY TEMPLATES</p>
+</div>
+
+<div style="background:#1e293b;border-bottom:1px solid #334155;padding:12px 20px;text-align:center;">
+  <a href="index.html" style="color:#D4A843;text-decoration:none;font-size:13px;font-weight:600;padding:8px 20px;border-radius:6px;background:rgba(212,168,67,0.15);border:1px solid #D4A843;margin:0 4px;">Email Templates</a>
+  <a href="ads.html" style="color:#94a3b8;text-decoration:none;font-size:13px;font-weight:600;padding:8px 20px;border-radius:6px;margin:0 4px;">Ad Creatives</a>
+</div>
+
+<div class="container">
+
+  <!-- ===== GENERAL GROWTH ===== -->
+  <p class="section-title">General Growth Capital</p>
+  <div class="grid" style="margin-bottom: 36px;">
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-growth">Flagship</span>
+        <h3>SunBiz Funding (Main)</h3>
+        <p>The core template. Funding grid ($5K&ndash;$100K) with weekly payments, green gradient header, qualification requirements, value props.</p>
+        <ul class="card-features">
+          <li>3x2 clickable funding grid</li>
+          <li>Personalized greeting + business name</li>
+          <li>Requirements box</li>
+        </ul>
+        <a href="sunbiz_funding.html" class="btn-preview">Preview</a>
+        <a href="sunbiz_funding.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('sunbiz_funding.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-premium">Premium</span>
+        <h3>Executive High-Ticket</h3>
+        <p>Elegant serif typography, navy CTA, consultation-style. For $50K+ prospects. Goldman Sachs energy.</p>
+        <ul class="card-features">
+          <li>2x2 refined benefit cards</li>
+          <li>Navy CTA (premium feel)</li>
+          <li>CEO testimonial blockquote</li>
+        </ul>
+        <a href="premium_executive.html" class="btn-preview">Preview</a>
+        <a href="premium_executive.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('premium_executive.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-minimal">Personal</span>
+        <h3>Minimal Clean Letter</h3>
+        <p>Reads like a personal email from a funding advisor. Serif body, no heavy graphics. Maximum authenticity.</p>
+        <ul class="card-features">
+          <li>Personal letter format</li>
+          <li>No grids or cards</li>
+          <li>Phone + email sign-off</li>
+        </ul>
+        <a href="minimal_clean.html" class="btn-preview">Preview</a>
+        <a href="minimal_clean.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('minimal_clean.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== INDUSTRY-TARGETED GRIDS ===== -->
+  <p class="section-title">Industry-Targeted (Funding Grid)</p>
+  <div class="grid" style="margin-bottom: 36px;">
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-industry">Restaurant</span>
+        <h3>Restaurant &amp; Hospitality</h3>
+        <p>Kitchen equipment, inventory, renovations, staffing. Targeted for restaurant and hospitality business owners.</p>
+        <ul class="card-features">
+          <li>$5K&ndash;$100K funding grid</li>
+          <li>Restaurant-specific use cases</li>
+          <li>Industry testimonial</li>
+        </ul>
+        <a href="grid_restaurant_hospitality.html" class="btn-preview">Preview</a>
+        <a href="grid_restaurant_hospitality.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('grid_restaurant_hospitality.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-industry">Construction</span>
+        <h3>Construction &amp; Trades</h3>
+        <p>Equipment, materials, payroll bridge, project startup. Higher amounts ($10K&ndash;$250K) for contractors.</p>
+        <ul class="card-features">
+          <li>Higher funding grid for trades</li>
+          <li>Contractor-specific messaging</li>
+          <li>Equipment &amp; project focus</li>
+        </ul>
+        <a href="grid_construction_trades.html" class="btn-preview">Preview</a>
+        <a href="grid_construction_trades.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('grid_construction_trades.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-industry">Retail</span>
+        <h3>Retail &amp; E-Commerce</h3>
+        <p>Inventory, marketing, store expansion, e-commerce platforms. For brick-and-mortar and online retail.</p>
+        <ul class="card-features">
+          <li>$5K&ndash;$100K funding grid</li>
+          <li>Retail-specific use cases</li>
+          <li>Inventory &amp; marketing focus</li>
+        </ul>
+        <a href="grid_retail_ecommerce.html" class="btn-preview">Preview</a>
+        <a href="grid_retail_ecommerce.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('grid_retail_ecommerce.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== SEASONAL GRIDS ===== -->
+  <p class="section-title">Seasonal Campaigns (Funding Grid)</p>
+  <div class="grid" style="margin-bottom: 36px;">
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-seasonal">Q2 Spring</span>
+        <h3>Q2 Growth Push</h3>
+        <p>Spring energy &amp; momentum. Use-case cards, vibrant green theme. "Spring into Growth" messaging.</p>
+        <ul class="card-features">
+          <li>2x2 use-case cards</li>
+          <li>$5K&ndash;$250K range</li>
+          <li>Stats bar</li>
+        </ul>
+        <a href="seasonal_q2_growth.html" class="btn-preview">Preview</a>
+        <a href="seasonal_q2_growth.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('seasonal_q2_growth.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-seasonal">Summer</span>
+        <h3>Summer Capital Push</h3>
+        <p>Q3 seasonal campaign. Warm gold &amp; orange theme. Summer staffing, inventory, marketing push.</p>
+        <ul class="card-features">
+          <li>Summer-specific use cases</li>
+          <li>Warm gradient header</li>
+          <li>"Apply before the rush"</li>
+        </ul>
+        <a href="grid_summer_push.html" class="btn-preview">Preview</a>
+        <a href="grid_summer_push.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('grid_summer_push.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-seasonal">Q4 Year-End</span>
+        <h3>End the Year Strong</h3>
+        <p>Year-end push. Holiday inventory, equipment purchases, tax planning, Q1 preparation.</p>
+        <ul class="card-features">
+          <li>Year-end use cases</li>
+          <li>Navy + gold theme</li>
+          <li>"Fund before year-end"</li>
+        </ul>
+        <a href="grid_year_end.html" class="btn-preview">Preview</a>
+        <a href="grid_year_end.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('grid_year_end.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-seasonal">Q1 New Year</span>
+        <h3>New Year Fresh Start</h3>
+        <p>New year energy. Fresh green theme. "New Year. New Capital. New Growth." Forward-looking, ambitious.</p>
+        <ul class="card-features">
+          <li>Q1 use cases</li>
+          <li>Fresh green gradient</li>
+          <li>Ambitious goal-setting tone</li>
+        </ul>
+        <a href="grid_new_year.html" class="btn-preview">Preview</a>
+        <a href="grid_new_year.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('grid_new_year.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== CONSOLIDATION ===== -->
+  <p class="section-title">Debt Consolidation</p>
+  <div class="grid" style="margin-bottom: 36px;">
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-consolidation">Consolidation</span>
+        <h3>Consolidation Blast</h3>
+        <p>Before/after payment comparison, 4-phase roadmap, urgency messaging for overleveraged business owners.</p>
+        <ul class="card-features">
+          <li>Before/after payment table</li>
+          <li>4-phase consolidation roadmap</li>
+          <li>Testimonial block</li>
+        </ul>
+        <a href="consolidation_blast.html" class="btn-preview">Preview</a>
+        <a href="consolidation_blast.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('consolidation_blast.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-problem">Problem &rarr; Solution</span>
+        <h3>Pain Point Converter</h3>
+        <p>Red X pain points &rarr; green checkmark solutions. $2,100/day &rarr; $850/day comparison. High-conversion.</p>
+        <ul class="card-features">
+          <li>5 pain + 5 solution items</li>
+          <li>Before/after comparison</li>
+          <li>$37,500/month savings</li>
+        </ul>
+        <a href="problem_solution.html" class="btn-preview">Preview</a>
+        <a href="problem_solution.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('problem_solution.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== COMPETITOR-INSPIRED TIER COMPARISONS ===== -->
+  <p class="section-title">Competitor-Inspired Tier Comparisons</p>
+  <div class="grid" style="margin-bottom: 36px;">
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-compare">Comparison</span>
+        <h3>Compare Funding Options</h3>
+        <p>3-tier comparison (Starter $75K / Growth $200K / Scale $250K) with seedling-to-tree growth scale, "Most Popular" ribbon, progress bar, and triple CTA.</p>
+        <ul class="card-features">
+          <li>3 styled tier cards (starter / growth / scale)</li>
+          <li>Unicode growth scale visual (&#127807; &#127794; &#127795;)</li>
+          <li>Same-Day Funding badge + benefits bar</li>
+          <li>7 JotForm CTAs throughout</li>
+        </ul>
+        <a href="compare_funding_options.html" class="btn-preview">Preview</a>
+        <a href="compare_funding_options.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('compare_funding_options.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-tiers">Capital Tiers</span>
+        <h3>Business Capital Tiers</h3>
+        <p>Clean, premium design. White card on navy background with gold-divider tier rows. Large bold funding amounts, elegant per-tier CTAs, trust strip, and qualification box.</p>
+        <ul class="card-features">
+          <li>White card on deep navy bg</li>
+          <li>Gold gradient dividers between tiers</li>
+          <li>Large 46px funding amounts</li>
+          <li>8 JotForm CTAs throughout</li>
+        </ul>
+        <a href="business_capital_tiers.html" class="btn-preview">Preview</a>
+        <a href="business_capital_tiers.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('business_capital_tiers.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== TRUST & ENGAGEMENT ===== -->
+  <p class="section-title">Trust &amp; Engagement</p>
+  <div class="grid" style="margin-bottom: 36px;">
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-urgency">Urgency</span>
+        <h3>Fast Funding</h3>
+        <p>"3 Min &rarr; 4 Hours &rarr; 24 Hours" speed stats. Gold urgency banner. For prospects who need capital NOW.</p>
+        <ul class="card-features">
+          <li>3 speed stat cards</li>
+          <li>"Approved in hours"</li>
+          <li>No credit pull messaging</li>
+        </ul>
+        <a href="urgency_fast_funding.html" class="btn-preview">Preview</a>
+        <a href="urgency_fast_funding.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('urgency_fast_funding.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <span class="card-badge badge-trust">Social Proof</span>
+        <h3>Testimonial Trust</h3>
+        <p>3 customer success stories with star ratings. "Trusted by 500+ businesses." Pure social proof for skeptical prospects.</p>
+        <ul class="card-features">
+          <li>3 testimonial cards</li>
+          <li>Gold star ratings</li>
+          <li>"$50M+ Deployed" stats</li>
+        </ul>
+        <a href="social_proof_testimonial.html" class="btn-preview">Preview</a>
+        <a href="social_proof_testimonial.html" target="_blank" class="btn-new-tab">New Tab</a>
+        <button onclick="downloadTemplate('social_proof_testimonial.html')" class="btn-download">&#8595; Download</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>SUN<span>BIZ</span> FUNDING &mdash; Email Template Library</p>
+  <p style="margin-top: 4px;">16 templates &bull; All CAN-SPAM compliant &bull; All link to JotForm &bull; No credit pull</p>
+  <p style="margin-top: 4px;">Open any template to preview. Personalization tokens ({{first_name}}, etc.) show as-is in preview.</p>
+</div>
+
+<script>
+function downloadTemplate(filename) {
+  var a = document.createElement('a');
+  a.href = filename;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+</script>
+
+</body>
+</html>

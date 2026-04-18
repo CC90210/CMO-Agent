@@ -1,0 +1,65 @@
+{
+  "agent": "Maven (CMO)",
+  "version": "0.1.0",
+  "updated_at": "2026-04-18T07:22:25.246125Z",
+  "status": "INITIALIZING",
+  "content_pipeline": {
+    "drafts": 0,
+    "scheduled": 0,
+    "published_7d": 0,
+    "formats": [
+      "video",
+      "image",
+      "text",
+      "email"
+    ]
+  },
+  "ad_performance": {
+    "meta_active_campaigns": 0,
+    "google_active_campaigns": 0,
+    "total_ad_spend_30d_cad": 0,
+    "avg_roas": null,
+    "avg_cac_cad": null,
+    "best_performing_creative": null
+  },
+  "funnel_metrics": {
+    "visitors_30d": 0,
+    "leads_30d": 0,
+    "conversion_rate": null,
+    "email_list_size": 0,
+    "email_open_rate": null
+  },
+  "brand_health": {
+    "social_followers": {
+      "ig": 0,
+      "linkedin": 0,
+      "tiktok": 0,
+      "x": 0
+    },
+    "engagement_rate_7d": null,
+    "brand_voice_drift_detected": false,
+    "competitive_alerts": []
+  },
+  "orchestrated_systems": {
+    "shopify_ad_engine": {
+      "path": "C:\\Users\\User\\APPS\\shopify-ad-engine",
+      "status": "AVAILABLE",
+      "purpose": "Remotion video ad rendering pipeline"
+    },
+    "ig_setter_pro": {
+      "path": "C:\\Users\\User\\APPS\\ig-setter-pro",
+      "status": "DEPLOYED",
+      "url": "https://ig-setter-pro.vercel.app",
+      "purpose": "Instagram DM automation"
+    },
+    "cc_funnel": {
+      "path": "C:\\Users\\User\\APPS\\cc-funnel",
+      "status": "LIVE",
+      "purpose": "Lead capture funnel"
+    }
+  },
+  "spend_request_cad": 0,
+  "spend_approved_by_atlas": false,
+  "blocker_ceo_needs_to_know": "CMO agent initializing — needs identity transformation from single-client AdVantage to multi-client Maven",
+  "spend_requests": []
+}

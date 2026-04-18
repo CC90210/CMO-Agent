@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SunBiz Funding — Privacy Policy</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, #001F54 0%, #0a2d6e 50%, #001F54 100%);
+      border-bottom: 4px solid #D4A843;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+    .header h1 span { color: #D4A843; }
+    .header p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 1px;
+    }
+    .nav {
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 12px 20px;
+      text-align: center;
+    }
+    .nav a {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      margin: 0 4px;
+    }
+    .nav a:hover { color: #D4A843; background: rgba(212,168,67,0.1); }
+    .nav a.active { color: #D4A843; background: rgba(212,168,67,0.15); border: 1px solid #D4A843; }
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 20px;
+    }
+    .page-intro {
+      margin-bottom: 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #334155;
+    }
+    .page-intro h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .page-intro p {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.7;
+    }
+    .effective-date {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #D4A843;
+      background: rgba(212,168,67,0.1);
+      border: 1px solid rgba(212,168,67,0.3);
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    .section {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #D4A843;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #334155;
+    }
+    .section h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .section p {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.75;
+      margin-bottom: 12px;
+    }
+    .section p:last-child { margin-bottom: 0; }
+    .section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 12px 0;
+    }
+    .section ul li {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.75;
+      padding: 4px 0 4px 18px;
+      position: relative;
+    }
+    .section ul li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 13px;
+      width: 6px;
+      height: 6px;
+      background: #D4A843;
+      border-radius: 50%;
+    }
+    .section ul li:last-child { padding-bottom: 0; }
+    .contact-block {
+      background: rgba(212,168,67,0.07);
+      border: 1px solid rgba(212,168,67,0.25);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-top: 16px;
+    }
+    .contact-block p {
+      margin-bottom: 6px;
+      color: #cbd5e1;
+    }
+    .contact-block p:last-child { margin-bottom: 0; }
+    .contact-block a {
+      color: #D4A843;
+      text-decoration: none;
+    }
+    .contact-block a:hover { text-decoration: underline; }
+    .meta-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: #1877F2;
+      color: #fff;
+      padding: 3px 9px;
+      border-radius: 3px;
+      margin-bottom: 12px;
+    }
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #475569;
+      font-size: 12px;
+    }
+    .footer span { color: #D4A843; }
+    .footer a {
+      color: #64748b;
+      text-decoration: none;
+    }
+    .footer a:hover { color: #D4A843; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>SUN<span>BIZ</span> FUNDING</h1>
+  <p>PRIVACY POLICY</p>
+</div>
+
+<div class="nav">
+  <a href="index.html">Email Templates</a>
+  <a href="ads.html">Ad Creatives</a>
+  <a href="privacy-policy.html" class="active">Privacy Policy</a>
+  <a href="data-deletion.html">Data Deletion</a>
+</div>
+
+<div class="container">
+
+  <div class="page-intro">
+    <div class="effective-date">Effective Date: March 17, 2026</div>
+    <h2>Privacy Policy</h2>
+    <p>
+      SunBiz Funding ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy
+      describes how we collect, use, disclose, and safeguard information about you when you visit our
+      website, submit an inquiry, or interact with our advertising on third-party platforms such as
+      Meta (Facebook and Instagram). Please read this policy carefully. If you do not agree with its
+      terms, please discontinue use of our services.
+    </p>
+  </div>
+
+  <!-- Section 1 -->
+  <div class="section">
+    <p class="section-title">01 &mdash; Information We Collect</p>
+    <h3>Information You Provide Directly</h3>
+    <p>
+      When you complete an inquiry form, contact us, or engage with our advertising, we may collect
+      the following categories of personal information:
+    </p>
+    <ul>
+      <li>Full name and business name</li>
+      <li>Email address and phone number</li>
+      <li>Business type, industry, and years in operation</li>
+      <li>Estimated monthly revenue and funding needs</li>
+      <li>State of business operation</li>
+    </ul>
+    <h3 style="margin-top: 16px;">Information Collected Automatically</h3>
+    <p>
+      When you interact with our website or our advertisements, certain information may be collected
+      automatically through cookies, pixel tags, and similar tracking technologies, including:
+    </p>
+    <ul>
+      <li>IP address and approximate geographic location</li>
+      <li>Browser type and version</li>
+      <li>Device type and operating system</li>
+      <li>Pages visited and time spent on pages</li>
+      <li>Referring URLs and click path data</li>
+      <li>Ad interaction data (impressions, clicks, conversions)</li>
+    </ul>
+  </div>
+
+  <!-- Section 2 -->
+  <div class="section">
+    <p class="section-title">02 &mdash; How We Use Your Information</p>
+    <p>We use the information we collect for the following purposes:</p>
+    <ul>
+      <li>To evaluate your inquiry and connect you with appropriate business funding or capital options</li>
+      <li>To communicate with you about your application status or follow-up questions</li>
+      <li>To send marketing communications you have opted into, including information about working capital and funding programs (you may opt out at any time)</li>
+      <li>To improve our website, advertising, and service offerings</li>
+      <li>To measure advertising performance and optimize campaigns on Meta and other platforms</li>
+      <li>To comply with legal obligations and prevent fraud</li>
+    </ul>
+    <p>
+      We do not sell your personal information to third parties. We do not use your information to
+      make automated funding decisions. All funding determinations involve human review.
+    </p>
+  </div>
+
+  <!-- Section 3 -->
+  <div class="section">
+    <p class="section-title">03 &mdash; Meta / Facebook Advertising</p>
+    <span class="meta-badge">Meta Platform</span>
+    <p>
+      We use the Meta Pixel and Meta Conversions API on our website and lead forms to measure the
+      effectiveness of our advertising campaigns on Facebook and Instagram. These tools allow us to
+      understand how users interact with our ads and website so we can improve campaign targeting and
+      performance.
+    </p>
+    <p>
+      Through Meta's advertising platform, we may serve ads to users based on interest categories,
+      business behaviors, and lookalike audiences. All campaigns are run under Meta's Special Ad
+      Category for Credit, which restricts targeting by age, gender, and zip code in compliance with
+      fair lending principles.
+    </p>
+    <p>
+      Data shared with Meta through these integrations is governed by Meta's own Data Policy, available
+      at <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener noreferrer"
+      style="color: #D4A843; text-decoration: none;">facebook.com/privacy/policy</a>. You may control
+      your ad preferences and opt out of interest-based advertising through your Facebook account
+      settings or through the Digital Advertising Alliance at
+      <a href="https://optout.aboutads.info/" target="_blank" rel="noopener noreferrer"
+      style="color: #D4A843; text-decoration: none;">optout.aboutads.info</a>.
+    </p>
+  </div>
+
+  <!-- Section 4 -->
+  <div class="section">
+    <p class="section-title">04 &mdash; Third-Party Disclosure</p>
+    <p>
+      We may share your information with trusted third parties in the following limited circumstances:
+    </p>
+    <ul>
+      <li><strong style="color: #cbd5e1;">Funding Partners:</strong> If you submit an inquiry, your information may be shared with funding partners and capital providers for the purpose of evaluating your funding request.</li>
+      <li><strong style="color: #cbd5e1;">Service Providers:</strong> We work with vendors who assist in operating our website, processing inquiries, and delivering email communications (e.g., CRM and email platforms). These vendors are contractually obligated to protect your information.</li>
+      <li><strong style="color: #cbd5e1;">Advertising Platforms:</strong> Hashed or aggregated data may be shared with Meta Ads and Google Ads for conversion tracking and audience matching. Raw personally identifiable information is not shared for targeting purposes beyond what is described in Section 03.</li>
+      <li><strong style="color: #cbd5e1;">Legal Compliance:</strong> We may disclose information if required by law, court order, or government authority, or to protect the rights, property, or safety of SunBiz Funding, our clients, or the public.</li>
+    </ul>
+    <p>We do not sell, rent, or trade your personal information to unaffiliated third parties for their own marketing use.</p>
+  </div>
+
+  <!-- Section 5 -->
+  <div class="section">
+    <p class="section-title">05 &mdash; Cookies and Tracking Technologies</p>
+    <p>
+      Our website uses cookies and similar technologies to enhance functionality, analyze traffic, and
+      support advertising measurement. Types of cookies we use include:
+    </p>
+    <ul>
+      <li><strong style="color: #cbd5e1;">Essential cookies:</strong> Required for the website to function properly.</li>
+      <li><strong style="color: #cbd5e1;">Analytics cookies:</strong> Help us understand how visitors use our site (e.g., Google Analytics).</li>
+      <li><strong style="color: #cbd5e1;">Advertising cookies:</strong> Used to measure ad performance and enable retargeting through Meta Pixel and Google Ads tags.</li>
+    </ul>
+    <p>
+      Most browsers allow you to refuse or delete cookies through their settings. Disabling cookies may
+      affect your experience on our site. You may also opt out of Google Analytics data collection by
+      installing the
+      <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer"
+      style="color: #D4A843; text-decoration: none;">Google Analytics Opt-out Browser Add-on</a>.
+    </p>
+  </div>
+
+  <!-- Section 6 -->
+  <div class="section">
+    <p class="section-title">06 &mdash; Data Retention</p>
+    <p>
+      We retain personal information for as long as necessary to fulfill the purposes described in this
+      policy, unless a longer retention period is required by law. Inquiry data is typically retained for
+      up to 24 months. You may request earlier deletion of your data at any time — see Section 07 below.
+    </p>
+    <p>
+      Aggregated, non-identifiable data (such as anonymized campaign performance statistics) may be
+      retained indefinitely for internal business analysis.
+    </p>
+  </div>
+
+  <!-- Section 7 -->
+  <div class="section">
+    <p class="section-title">07 &mdash; Your Rights and Choices</p>
+    <p>
+      Depending on your location, you may have certain rights with respect to your personal information,
+      including:
+    </p>
+    <ul>
+      <li><strong style="color: #cbd5e1;">Access:</strong> Request a copy of the personal information we hold about you.</li>
+      <li><strong style="color: #cbd5e1;">Correction:</strong> Request correction of inaccurate or incomplete information.</li>
+      <li><strong style="color: #cbd5e1;">Deletion:</strong> Request deletion of your personal data, subject to legal retention obligations.</li>
+      <li><strong style="color: #cbd5e1;">Opt-Out of Marketing:</strong> Unsubscribe from marketing emails at any time using the unsubscribe link in any email, or by contacting us directly.</li>
+      <li><strong style="color: #cbd5e1;">Data Portability:</strong> Request a portable copy of your data in a structured, machine-readable format (where applicable).</li>
+      <li><strong style="color: #cbd5e1;">Restrict Processing:</strong> Request that we limit how we use your information in certain circumstances.</li>
+    </ul>
+    <p>
+      To exercise any of these rights, please contact us using the information in Section 09. We will
+      respond to all verified requests within 30 days. We will not discriminate against you for
+      exercising your privacy rights.
+    </p>
+    <p>
+      For data deletion requests specifically, please visit our
+      <a href="data-deletion.html" style="color: #D4A843; text-decoration: none;">Data Deletion page</a>
+      for instructions.
+    </p>
+  </div>
+
+  <!-- Section 8 -->
+  <div class="section">
+    <p class="section-title">08 &mdash; Security</p>
+    <p>
+      We implement reasonable administrative, technical, and physical safeguards to protect your personal
+      information from unauthorized access, disclosure, alteration, or destruction. These measures include
+      encrypted data transmission (HTTPS), access controls, and vendor security assessments.
+    </p>
+    <p>
+      No method of transmission over the internet or electronic storage is completely secure. While we
+      strive to protect your information, we cannot guarantee absolute security. In the event of a data
+      breach that affects your rights and freedoms, we will notify affected individuals as required by
+      applicable law.
+    </p>
+  </div>
+
+  <!-- Section 9 -->
+  <div class="section">
+    <p class="section-title">09 &mdash; Contact Information</p>
+    <p>
+      If you have questions, concerns, or requests related to this Privacy Policy or our data practices,
+      please contact us at:
+    </p>
+    <div class="contact-block">
+      <p><strong style="color: #fff;">SunBiz Funding</strong></p>
+      <p>Privacy and Data Inquiries</p>
+      <p>Email: <a href="mailto:info@sunbizfunding.com">info@sunbizfunding.com</a></p>
+      <p style="margin-top: 8px; font-size: 13px; color: #64748b;">
+        Please include "Privacy Request" in the subject line so we can route your inquiry appropriately.
+      </p>
+    </div>
+  </div>
+
+  <!-- Section 10 -->
+  <div class="section">
+    <p class="section-title">10 &mdash; Changes to This Policy</p>
+    <p>
+      We may update this Privacy Policy periodically to reflect changes in our practices, technology, or
+      legal requirements. When we make material changes, we will update the effective date at the top of
+      this page. We encourage you to review this policy regularly. Continued use of our services after
+      changes are posted constitutes your acceptance of the updated policy.
+    </p>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>SUN<span>BIZ</span> FUNDING &mdash; Privacy Policy</p>
+  <p style="margin-top: 6px;">
+    <a href="privacy-policy.html">Privacy Policy</a> &bull;
+    <a href="data-deletion.html">Data Deletion</a> &bull;
+    <a href="index.html">Email Templates</a> &bull;
+    <a href="ads.html">Ad Creatives</a>
+  </p>
+  <p style="margin-top: 6px;">&copy; 2026 SunBiz Funding. All rights reserved.</p>
+</div>
+
+</body>
+</html>

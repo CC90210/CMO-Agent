@@ -1,0 +1,15 @@
+node_modules/
+dist/
+exports/
+.env
+.env.local
+.env.agents
+*.mp4
+*.mov
+*.webm
+public/products/*.png
+public/products/*.jpg
+public/products/*.webp
+!public/products/.gitkeep
+public/audio/*.mp3
+!public/audio/.gitkeep

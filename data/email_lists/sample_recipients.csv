@@ -1,0 +1,4 @@
+email,first_name,last_name,business_name,monthly_revenue,funding_amount
+john@example.com,John,Smith,Smith Construction LLC,85000,50000
+maria@example.com,Maria,Garcia,Garcia Transport Services,120000,75000
+david@example.com,David,Chen,Chen Restaurant Group,42000,25000

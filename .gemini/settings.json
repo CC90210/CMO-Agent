@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "google-ads-mcp": {
+      "command": "cmd",
+      "args": ["/c", "scripts/google-ads-mcp-wrapper.cmd"],
+      "disabled": true
+    },
+    "meta-ads-mcp": {
+      "command": "cmd",
+      "args": ["/c", "scripts/meta-ads-mcp-wrapper.cmd"],
+      "disabled": true
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    }
+  }
+}

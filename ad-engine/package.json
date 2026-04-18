@@ -1,0 +1,45 @@
+{
+  "name": "shopify-ad-engine",
+  "version": "1.0.0",
+  "description": "AI-powered Shopify ad creation engine — product ads, UGC, cinematic reveals → Meta posting",
+  "scripts": {
+    "studio": "npx remotion studio",
+    "render": "npx remotion render",
+    "render:all": "node scripts/render_batch.js",
+    "shopify:sync": "node scripts/shopify_sync.js",
+    "meta:post": "python scripts/meta_ads_engine.py",
+    "build": "tsc --noEmit"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "@react-three/drei": "^9.88.0",
+    "@react-three/fiber": "^8.15.0",
+    "@remotion/captions": "^4.0.438",
+    "@remotion/cli": "^4.0.436",
+    "@remotion/google-fonts": "^4.0.436",
+    "@remotion/layout-utils": "^4.0.438",
+    "@remotion/light-leaks": "^4.0.438",
+    "@remotion/media": "^4.0.438",
+    "@remotion/media-utils": "^4.0.438",
+    "@remotion/motion-blur": "^4.0.438",
+    "@remotion/paths": "^4.0.438",
+    "@remotion/player": "^4.0.438",
+    "@remotion/renderer": "^4.0.438",
+    "@remotion/shapes": "^4.0.438",
+    "@remotion/three": "^4.0.438",
+    "@remotion/transitions": "^4.0.438",
+    "@remotion/zod-types": "^4.0.438",
+    "dotenv": "^16.3.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remotion": "^4.0.438",
+    "three": "^0.160.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/eslint": "^9.6.1",
+    "@types/react": "^18.2.0",
+    "@types/three": "^0.160.0",
+    "typescript": "^5.9.3"
+  }
+}

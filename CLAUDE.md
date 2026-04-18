@@ -56,12 +56,22 @@ Map every task to the correct tool BEFORE acting:
 - ALL API keys, tokens, and secrets live in `.env.agents` (NEVER hardcode).
 - If exposed secret detected → STOP immediately, alert user, initiate rotation.
 
-### RULE 5: Multi-Client Context
-Always determine WHICH brand you are working on before generating content or managing campaigns:
-- **OASIS AI**: B2B automation, high-leverage, premium consulting.
-- **PropFlow**: Real estate SaaS, process optimization.
-- **Conaugh McKenna**: Professional B2B personal brand (NEVER use internal nickname "CC" externally).
-- **SunBiz Funding**: MCA consolidation. (CRITICAL: Never use "loan" — use "advances," "funding," "capital").
+### RULE 5: Multi-Client Context — Know Your Primary Employer
+CC's OWN brands are your primary work. SunBiz is a legacy client you maintain, NOT your primary mission.
+
+**Priority order when allocating your time + Atlas's spend budget:**
+1. **OASIS AI** (CC's B2B agency — primary revenue engine) — content, paid ads, pulse-lead-gen
+2. **Conaugh McKenna personal brand** — top-of-funnel for OASIS, content engine, B2B identity (NEVER use internal nickname "CC" externally)
+3. **PropFlow** — real estate SaaS launch campaign (when product beta ships, coordinate with Adon)
+4. **Nostalgic Requests** — DJ/music SaaS, organic via CC's DJ content
+5. **SunBiz Funding** — legacy client, maintenance-mode only. Daily email blast still runs from `C:\Users\User\Marketing-Agent` (the restored SunBiz-Marketing repo). Compliance-sensitive: NEVER use "loan" — use "advances," "funding," "capital".
+
+**Your tooling lives in `ad-engine/` for a reason.** You have direct Shopify + Meta Ads connectivity so you can launch campaigns for ANY of CC's brands without needing another codebase. Don't hesitate to use it:
+- `ad-engine/scripts/shopify_sync.js` — pull any Shopify store's products for video ad templates
+- `ad-engine/scripts/meta_ads_engine.py` — post to Facebook/Instagram via Meta Ads Manager
+- `ad-engine/templates/` — 5 production video ad templates ready to customize per brand
+
+SunBiz's ads run on Meta too, but OASIS and the personal brand are your primary creative surface.
 
 ### RULE 6: Always Verify Work
 - After campaign creation → verify via API read-back.

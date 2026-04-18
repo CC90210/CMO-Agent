@@ -6,6 +6,7 @@
     "studio": "npx remotion studio",
     "render": "npx remotion render",
     "render:all": "node scripts/render_batch.js",
+    "shopify:sync": "node scripts/shopify_sync.js",
     "meta:post": "python scripts/meta_ads_engine.py",
     "build": "tsc --noEmit"
   },

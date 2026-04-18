@@ -59,7 +59,7 @@
 ## Health Report Format
 
 ```
-=== AdVantage Health Report ===
+=== Maven Health Report ===
 Date: YYYY-MM-DD HH:MM
 
 APIs:        [OK/WARN/FAIL] Google Ads | [OK/WARN/FAIL] Meta Ads

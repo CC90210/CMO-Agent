@@ -1,6 +1,6 @@
 # CAPABILITIES — Complete Tool Inventory
 
-> All tools available to AdVantage across all interfaces.
+> All tools available to Maven (CMO) across all interfaces.
 
 ---
 

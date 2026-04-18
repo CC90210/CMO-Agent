@@ -1,113 +1,64 @@
-# ADVANTAGE V2.0 — SYSTEM STATE
-> Last updated: 2026-03-19 01:15 EST
-> Session: Deep diagnostic + ad set activation fix
+---
+tags: [state, ephemeral]
+---
+
+# STATE — Maven V1.0 Operational State
+
+> Last updated: 2026-04-18
+> Session: Clean split from SunBiz-Marketing. Maven is fully operational as standalone CMO-Agent.
 
 ---
 
-## SYSTEM HEALTH: OPERATIONAL
+## Identity
+- **Agent:** Maven (CMO)
+- **Project:** `C:\Users\User\CMO-Agent`
+- **GitHub:** CC90210/CMO-Agent
+- **Version:** 1.0 (fresh split from AdVantage V2.0 / SunBiz-Marketing)
 
-| Component | Status | Details |
-|-----------|--------|---------|
-| Meta Ads API | LIVE | Token valid (193 chars), expires ~2026-05-17 |
-| Google Ads API | CREDENTIALS SET | Awaiting first API call verification |
-| Gemini AI | READY | API key set (39 chars) |
-| All Scripts | HEALTHY | 9,656 lines across 19 production scripts |
-| Git Repo | CLEAN | Pushed to origin/main |
-| Dependencies | ALL INSTALLED | 7/7 packages exceed minimum versions |
+## C-Suite Position
+- **CFO (Atlas):** `C:\Users\User\APPS\CFO-Agent` — read `data/pulse/cfo_pulse.json` for spend gate
+- **CEO (Bravo):** `C:\Users\User\Business-Empire-Agent` — read `data/pulse/ceo_pulse.json` for directives
+- **CMO (Maven, self):** write `data/pulse/cmo_pulse.json` only — never touch others
 
----
+## System Health
 
-## META ADS — 5 CAMPAIGNS ACTIVE
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Identity docs | OK | SOUL.md, CLAUDE.md, GEMINI.md, ANTIGRAVITY.md all Maven V1.0 |
+| Clients | OK (5 profiles) | OASIS AI, PropFlow, Nostalgic, CC personal, SunBiz (see `brain/clients/`) |
+| Skills | OK (29 loaded) | 20 AdVantage heritage + 10 migrated from Bravo |
+| Sub-agents | OK (16 agents) | ad-strategist, content-creator, video-editor, etc. |
+| ad-engine | OK (cloned) | Remotion 4.0 + Meta Ads SDK in `ad-engine/`. Run `cd ad-engine && npm install && npx remotion studio` |
+| Pulse protocol | OK (tested) | 14/15 stress tests pass. cmo_pulse.json sovereign in `data/pulse/` |
+| Shared Supabase | OK (documented) | `brain/SHARED_DB.md`. Project: phctllmtsogkovoilwos. Tag rows with agent='maven'. |
+| ENV / API health | Verify on next session | Re-check Google Ads + Meta Ads tokens |
+| Git | OK (clean) | Pushed to origin/main (CC90210/CMO-Agent) |
 
-| Campaign | ID | Ad Set Status | Ads Active | Budget |
-|----------|----|---------------|------------|--------|
-| Growth Capital | 120241441622900086 | ACTIVE | 2/2 | $100 lifetime |
-| Consolidation | 120241441624860086 | ACTIVE | 2/2 | $100 lifetime |
-| Fast Funding | 120241441625290086 | ACTIVE | 2/2 | $100 lifetime |
-| Industry Targeted | 120241441625510086 | ACTIVE | 2/2 | $100 lifetime |
-| Social Proof | 120241441625670086 | ACTIVE | 1/1 | $100 lifetime |
+## Active Campaigns
+- **pulse-lead-gen** — Free PULSE repo lead magnet for OASIS AI
+  - Playbook: `campaigns/pulse-lead-gen/creative/ad-playbook.md` (4 hooks, reels, statics, retargeting)
+  - Teaser email: `campaigns/pulse-lead-gen/emails/teaser.md`
+  - Repo delivery email: `campaigns/pulse-lead-gen/emails/full-delivery.md`
+  - Setup guide for the free repo: `campaigns/pulse-lead-gen/SETUP.md`
+  - Status: Code-complete. Ad launch blocked pending Atlas spend approval.
 
-**Total Budget:** $500 | **Total Active Ads:** 9 | **Daily Spend Limit (Meta):** $50/day
-**Targeting:** US, 25-65, Facebook Feed only | **Objective:** OUTCOME_TRAFFIC
-**CTA Destination:** https://form.jotform.com/253155026259254
+## Known Blockers
+- No active paid campaigns. Atlas approval required before Meta/Google ad launch (see pulse protocol).
+- Meta App Review for ig-setter-pro (PULSE) is pending — when approved, PULSE auto-reply will fire for cold DMs.
 
-### Fix Applied This Session
-- 4 of 5 ad sets were PAUSED — activated all via API
-- All 9 ads now confirmed ACTIVE and delivering
+## Next Session Priorities
+1. Read `data/pulse/cfo_pulse.json` to confirm runway + spend gate status
+2. Read `data/pulse/ceo_pulse.json` to confirm Bravo's current directives
+3. Execute `pulse-lead-gen` ad campaign when spend gate opens
+4. Deep content research for OASIS (see `brain/clients/oasis-ai.md` + `campaigns/pulse-lead-gen/`)
 
----
+## Focus Areas (Medium-Term)
+- OASIS AI lead-gen via pulse-lead-gen campaign (primary)
+- CC's personal brand content engine (top-of-funnel for OASIS)
+- PropFlow launch campaign (when product ships)
+- SunBiz legacy maintenance (`scripts/email_outbound.py` daily blast — note: email_outbound lives in the separate SunBiz-Marketing repo now, invoke via subprocess if needed)
 
-## SCRIPTS INVENTORY (9,656 lines)
-
-| Script | Lines | Purpose |
-|--------|-------|---------|
-| google_ads_engine.py | 1,541 | Full Google Ads automation (17 methods) |
-| imagen_generate.py | 928 | AI image generation via Gemini Imagen |
-| ad_copy_generator.py | 907 | AI ad copy + compliance validation |
-| ab_testing_engine.py | 814 | Bayesian A/B testing (Ax platform) |
-| meta_ads_engine.py | 791 | Production Meta Ads automation (13 methods) |
-| monitoring.py | 772 | Real-time campaign monitoring & alerts |
-| email_blast.py | 720 | Gmail email campaigns |
-| meta_campaign_builder.py | 616 | Campaign builder wizard |
-| campaign_templates.py | 477 | 7 reusable campaign templates |
-| audit_logger.py | 456 | Campaign audit trail (JSONL) |
-| performance_reporter.py | 413 | Automated performance reporting |
-| cache_layer.py | 365 | TTL-based API response caching |
-| meta_ads_sdk.py | 183 | Meta SDK wrapper |
-| google_ads_sdk.py | 147 | Google Ads SDK wrapper |
-| + 5 utility scripts | 446 | Setup, logo gen, token gen |
-
----
-
-## CREDENTIALS STATUS
-
-| Credential | Status |
-|------------|--------|
-| META_ACCESS_TOKEN | SET (long-lived, ~60 days) |
-| META_AD_ACCOUNT_ID | act_2105091616729816 |
-| META_PAGE_ID | 1045845225275938 |
-| META_APP_ID | 956504317114012 (SunBiz Ads Live) |
-| META_APP_SECRET | SET |
-| GEMINI_API_KEY | SET |
-| GOOGLE_ADS_DEVELOPER_TOKEN | SET (needs verification) |
-| GOOGLE_ADS_CLIENT_ID | SET (needs verification) |
-| GOOGLE_ADS_CLIENT_SECRET | SET (needs verification) |
-| GOOGLE_ADS_REFRESH_TOKEN | SET (25 chars — may be placeholder) |
-| GOOGLE_ADS_CUSTOMER_ID | SET (needs verification) |
-
----
-
-## WHAT TO DO TOMORROW
-
-### Priority 1: Check Campaign Performance (5 min)
-- Run `/performance` to pull insights from all 5 campaigns
-- New accounts can take 24-48h before spend starts flowing
-- Check for any ad disapprovals or policy flags
-- Verify the $50/day spending limit isn't blocking delivery
-
-### Priority 2: Verify Google Ads Credentials (10 min)
-- The Google Ads refresh token (25 chars) looks short — may be a placeholder
-- Run a test API call to verify: `python scripts/google_ads_engine.py`
-- If credentials are invalid, generate new OAuth2 refresh token via `scripts/generate_google_ads_token.py`
-
-### Priority 3: Monitor & Optimize (ongoing)
-- After 48h of data, run `/optimize` to analyze performance
-- Check CTR, CPC, and conversion rates across all 5 campaigns
-- Pause underperformers, scale winners
-- Consider A/B testing top 2 campaigns with `ab_testing_engine.py`
-
-### Priority 4: Google Ads Campaign Launch (when ready)
-- Once Google Ads credentials verified, launch search campaigns
-- Use `campaign_templates.py` for consistent copy across platforms
-- Target high-intent keywords: "business funding", "MCA consolidation", "working capital"
-
-### Future Tasks
-- Token renewal before ~2026-05-17 (set reminder)
-- Build automated daily reporting pipeline (n8n workflow)
-- Instagram account setup for cross-platform ads
-- Landing page A/B testing for JotForm conversion optimization
-
----
-
-## SESSION LOG
-- 2026-03-19: Deep system diagnostic — found 4/5 ad sets PAUSED, activated all via API. All 9 ads confirmed ACTIVE. Committed elite ad management system (4 new scripts, 3,142 lines) to GitHub. Full system verified operational.
+## Memory Health
+- SESSION_LOG: will receive entries per session
+- PATTERNS: carried over from AdVantage era, still valid for general marketing
+- MISTAKES: audit on first full session — avoid repeating AdVantage-era single-client thinking

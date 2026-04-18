@@ -1,12 +1,11 @@
 {
-  "name": "shopify-ad-engine",
+  "name": "cmo-ad-engine",
   "version": "1.0.0",
-  "description": "AI-powered Shopify ad creation engine — product ads, UGC, cinematic reveals → Meta posting",
+  "description": "Maven's multi-brand video ad pipeline — Remotion templates + Meta Ads SDK. Cloned from shopify-ad-engine; Shopify-specific sync excluded.",
   "scripts": {
     "studio": "npx remotion studio",
     "render": "npx remotion render",
     "render:all": "node scripts/render_batch.js",
-    "shopify:sync": "node scripts/shopify_sync.js",
     "meta:post": "python scripts/meta_ads_engine.py",
     "build": "tsc --noEmit"
   },

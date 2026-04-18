@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/User/**)",
+      "Read(//c/Users/User//**)",
+      "WebSearch",
+      "Bash(find /c/Users/User/Business-Empire-Agent -type f -name *.md -o -name *.json -o -name *.txt -o -name *.yaml -o -name *.yml -o -name .*rules)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\User\\Marketing-Agent\\media"
+    ]
+  }
+}

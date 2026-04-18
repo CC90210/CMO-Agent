@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SunBiz Funding — Data Deletion</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, #001F54 0%, #0a2d6e 50%, #001F54 100%);
+      border-bottom: 4px solid #D4A843;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+    .header h1 span { color: #D4A843; }
+    .header p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 1px;
+    }
+    .nav {
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 12px 20px;
+      text-align: center;
+    }
+    .nav a {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      margin: 0 4px;
+    }
+    .nav a:hover { color: #D4A843; background: rgba(212,168,67,0.1); }
+    .nav a.active { color: #D4A843; background: rgba(212,168,67,0.15); border: 1px solid #D4A843; }
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 20px;
+    }
+    .page-intro {
+      margin-bottom: 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #334155;
+    }
+    .page-intro h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .page-intro p {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.7;
+    }
+    .page-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #D4A843;
+      background: rgba(212,168,67,0.1);
+      border: 1px solid rgba(212,168,67,0.3);
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    .section {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #D4A843;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #334155;
+    }
+    .section h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .section p {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.75;
+      margin-bottom: 12px;
+    }
+    .section p:last-child { margin-bottom: 0; }
+    .section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 12px 0;
+    }
+    .section ul li {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.75;
+      padding: 4px 0 4px 18px;
+      position: relative;
+    }
+    .section ul li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 13px;
+      width: 6px;
+      height: 6px;
+      background: #D4A843;
+      border-radius: 50%;
+    }
+    .section ul li:last-child { padding-bottom: 0; }
+    /* Steps */
+    .steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: step-counter;
+    }
+    .steps li {
+      counter-increment: step-counter;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid #334155;
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.65;
+    }
+    .steps li:last-child { border-bottom: none; padding-bottom: 0; }
+    .steps li:first-child { padding-top: 0; }
+    .step-num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      background: rgba(212,168,67,0.12);
+      border: 1px solid rgba(212,168,67,0.35);
+      color: #D4A843;
+      font-size: 13px;
+      font-weight: 800;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+    .step-text strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .cta-block {
+      background: rgba(212,168,67,0.07);
+      border: 1px solid rgba(212,168,67,0.3);
+      border-radius: 10px;
+      padding: 24px 28px;
+      margin-top: 20px;
+      text-align: center;
+    }
+    .cta-block p {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 14px;
+    }
+    .cta-block p:last-child { margin-bottom: 0; }
+    .cta-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #D4A843;
+      margin-bottom: 6px;
+    }
+    .cta-email {
+      display: inline-block;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      margin-bottom: 12px;
+    }
+    .cta-email:hover { color: #D4A843; }
+    .cta-subject {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #D4A843;
+      background: rgba(212,168,67,0.12);
+      border: 1px solid rgba(212,168,67,0.3);
+      padding: 6px 16px;
+      border-radius: 5px;
+    }
+    .meta-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: #1877F2;
+      color: #fff;
+      padding: 3px 9px;
+      border-radius: 3px;
+      margin-bottom: 12px;
+    }
+    .contact-block {
+      background: rgba(212,168,67,0.07);
+      border: 1px solid rgba(212,168,67,0.25);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-top: 16px;
+    }
+    .contact-block p {
+      margin-bottom: 6px;
+      color: #cbd5e1;
+    }
+    .contact-block p:last-child { margin-bottom: 0; }
+    .contact-block a {
+      color: #D4A843;
+      text-decoration: none;
+    }
+    .contact-block a:hover { text-decoration: underline; }
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #475569;
+      font-size: 12px;
+    }
+    .footer span { color: #D4A843; }
+    .footer a {
+      color: #64748b;
+      text-decoration: none;
+    }
+    .footer a:hover { color: #D4A843; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>SUN<span>BIZ</span> FUNDING</h1>
+  <p>DATA DELETION REQUEST</p>
+</div>
+
+<div class="nav">
+  <a href="index.html">Email Templates</a>
+  <a href="ads.html">Ad Creatives</a>
+  <a href="privacy-policy.html">Privacy Policy</a>
+  <a href="data-deletion.html" class="active">Data Deletion</a>
+</div>
+
+<div class="container">
+
+  <div class="page-intro">
+    <div class="page-badge">Your Data Rights</div>
+    <h2>Data Deletion Instructions</h2>
+    <p>
+      You have the right to request deletion of your personal data that SunBiz Funding holds,
+      including data collected through our website, inquiry forms, and advertising platforms such as
+      Meta (Facebook and Instagram). This page explains what data may be held, how to submit a deletion
+      request, and what to expect after you do.
+    </p>
+  </div>
+
+  <!-- What data we hold -->
+  <div class="section">
+    <p class="section-title">01 &mdash; What Data We May Hold</p>
+    <p>
+      Depending on how you have interacted with SunBiz Funding, we may hold some or all of the
+      following categories of personal data:
+    </p>
+    <ul>
+      <li>Name, email address, and phone number submitted through inquiry forms</li>
+      <li>Business details provided during the funding inquiry process (business name, industry, revenue, funding needs)</li>
+      <li>Email engagement data (opens, clicks) from marketing communications</li>
+      <li>Website interaction data collected via cookies and analytics tools</li>
+      <li>Ad interaction data collected via the Meta Pixel or Meta Conversions API</li>
+      <li>Any correspondence you have sent to us directly</li>
+    </ul>
+  </div>
+
+  <!-- Meta / Facebook data -->
+  <div class="section">
+    <p class="section-title">02 &mdash; Meta / Facebook Data</p>
+    <span class="meta-badge">Meta Platform</span>
+    <p>
+      If you have interacted with our advertisements on Facebook or Instagram, Meta (Meta Platforms, Inc.)
+      may have collected data about those interactions as part of its own advertising infrastructure.
+      This data is held by Meta and governed by Meta's Data Policy.
+    </p>
+    <p>
+      SunBiz Funding uses the Meta Pixel and Meta Conversions API for ad measurement only. We do not
+      receive or store raw user-level behavioral data from Meta directly.
+    </p>
+    <p>
+      To request deletion of data held by Meta directly, you should:
+    </p>
+    <ul>
+      <li>Visit your Facebook account settings at
+        <a href="https://www.facebook.com/settings" target="_blank" rel="noopener noreferrer"
+        style="color: #D4A843; text-decoration: none;">facebook.com/settings</a>
+      </li>
+      <li>Navigate to "Your Facebook Information" and select "Off-Facebook Activity"</li>
+      <li>Use the "Clear History" and "Manage Future Activity" tools to limit or remove data</li>
+      <li>Submit a data deletion request directly to Meta via
+        <a href="https://www.facebook.com/help/contact/540977946302970" target="_blank" rel="noopener noreferrer"
+        style="color: #D4A843; text-decoration: none;">Meta's support portal</a>
+      </li>
+    </ul>
+    <p>
+      To request that SunBiz Funding remove any data we hold that originated from Meta integrations,
+      follow the process in Section 03 below.
+    </p>
+  </div>
+
+  <!-- How to request deletion -->
+  <div class="section">
+    <p class="section-title">03 &mdash; How to Submit a Deletion Request</p>
+    <p>
+      To request deletion of your personal data held by SunBiz Funding, follow the steps below.
+      We do not require you to create an account or log in to submit a request.
+    </p>
+    <ol class="steps">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-text">
+          <strong>Compose an email</strong>
+          Send an email to <a href="mailto:info@sunbizfunding.com" style="color: #D4A843; text-decoration: none;">info@sunbizfunding.com</a> from the email address associated with your inquiry or interaction with us.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-text">
+          <strong>Use the required subject line</strong>
+          Set your subject line to exactly: <strong style="color: #D4A843;">Data Deletion Request</strong> — this ensures your message reaches the correct team and is logged appropriately.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <strong>Include identifying information</strong>
+          In the body of your email, include your full name, the email address(es) used when contacting us or submitting an inquiry, and optionally your phone number or business name so we can locate all records associated with you.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-text">
+          <strong>Specify the scope of your request</strong>
+          Indicate whether you want all data deleted, or only specific categories (e.g., marketing lists only, or inquiry form data only).
+        </div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div class="step-text">
+          <strong>Receive confirmation</strong>
+          We will acknowledge your request within 5 business days and complete the deletion within 30 days. We will send a confirmation email when deletion is complete.
+        </div>
+      </li>
+    </ol>
+
+    <div class="cta-block">
+      <p class="cta-label">Send Your Request To</p>
+      <a href="mailto:info@sunbizfunding.com?subject=Data%20Deletion%20Request" class="cta-email">
+        info@sunbizfunding.com
+      </a>
+      <br />
+      <p style="margin-bottom: 8px;">With subject line:</p>
+      <span class="cta-subject">Data Deletion Request</span>
+    </div>
+  </div>
+
+  <!-- What happens after -->
+  <div class="section">
+    <p class="section-title">04 &mdash; What Happens After Your Request</p>
+    <p>
+      Once we receive your verified deletion request, we will:
+    </p>
+    <ul>
+      <li>Locate all personal data associated with your identifying information across our systems</li>
+      <li>Permanently delete or anonymize that data within 30 days</li>
+      <li>Instruct any sub-processors who hold your data on our behalf to delete it as well</li>
+      <li>Remove your email address from all marketing lists immediately upon receipt of your request</li>
+      <li>Send you a written confirmation once deletion is complete</li>
+    </ul>
+    <p>
+      Please note that we may be required by law to retain certain records for a defined period (for
+      example, financial records or records related to a prior contractual relationship). In those cases,
+      we will inform you of what records we are legally obligated to retain and for how long.
+    </p>
+    <p>
+      We will not charge any fee for processing a data deletion request. We will not discriminate against
+      you in any way for exercising this right.
+    </p>
+  </div>
+
+  <!-- Identity verification -->
+  <div class="section">
+    <p class="section-title">05 &mdash; Identity Verification</p>
+    <p>
+      To protect against unauthorized deletion requests, we may ask you to verify your identity before
+      processing your request. Verification is typically done by confirming the email address associated
+      with your records. We will never ask for sensitive financial information, passwords, or government
+      ID unless legally required and will explain the reason if we do.
+    </p>
+    <p>
+      If you are submitting a request on behalf of another person (for example, as a legal representative),
+      please state this in your email and include documentation of your authority to act on their behalf.
+    </p>
+  </div>
+
+  <!-- Contact -->
+  <div class="section">
+    <p class="section-title">06 &mdash; Questions and Additional Rights</p>
+    <p>
+      If you have questions about this process, want to exercise other data rights (access, correction,
+      portability), or have a concern about how your data has been handled, contact us at:
+    </p>
+    <div class="contact-block">
+      <p><strong style="color: #fff;">SunBiz Funding</strong></p>
+      <p>Data Rights and Privacy</p>
+      <p>Email: <a href="mailto:info@sunbizfunding.com">info@sunbizfunding.com</a></p>
+      <p style="margin-top: 8px; font-size: 13px; color: #64748b;">
+        For full details on our data practices, please review our
+        <a href="privacy-policy.html" style="color: #64748b; text-decoration: underline;">Privacy Policy</a>.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>SUN<span>BIZ</span> FUNDING &mdash; Data Deletion</p>
+  <p style="margin-top: 6px;">
+    <a href="privacy-policy.html">Privacy Policy</a> &bull;
+    <a href="data-deletion.html">Data Deletion</a> &bull;
+    <a href="index.html">Email Templates</a> &bull;
+    <a href="ads.html">Ad Creatives</a>
+  </p>
+  <p style="margin-top: 6px;">&copy; 2026 SunBiz Funding. All rights reserved.</p>
+</div>
+
+</body>
+</html>

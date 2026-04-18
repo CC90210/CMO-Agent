@@ -1,0 +1,26 @@
+{
+  "projectName": "shopify-ad-engine",
+  "description": "AI-powered Shopify ad creation — Remotion compositions → Meta campaigns",
+  "permissions": {
+    "allow": [
+      "Bash(npm run build)",
+      "Bash(npm run studio)",
+      "Bash(node scripts/render_batch.js*)",
+      "Bash(node scripts/shopify_sync.js*)",
+      "Bash(python scripts/meta_ads_engine.py status)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add src/*)",
+      "Bash(git add scripts/*)",
+      "Bash(git add brain/*)",
+      "Bash(git commit*)",
+      "Bash(git push*)"
+    ],
+    "deny": [
+      "Bash(python scripts/meta_ads_engine.py post*)",
+      "Bash(python scripts/meta_ads_engine.py create-campaign*)",
+      "Bash(python scripts/meta_ads_engine.py upload*)"
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+{"timestamp": "2026-03-19T04:57:22.939422+00:00", "action": "create", "entity_type": "campaign", "entity_id": "120200000000001", "details": {"name": "SunBiz \u2014 MCA Consolidation Q1", "objective": "OUTCOME_LEADS"}, "user": "claude", "previous_values": null}
+{"timestamp": "2026-03-19T04:57:22.940926+00:00", "action": "update", "entity_type": "campaign", "entity_id": "120200000000001", "details": {"daily_budget_usd": 50.0}, "user": "claude", "previous_values": {"daily_budget_usd": 30.0}}
+{"timestamp": "2026-03-19T04:57:22.941443+00:00", "action": "pause", "entity_type": "campaign", "entity_id": "120200000000001", "details": {"reason": "CPL above $150 threshold"}, "user": "claude", "previous_values": {"status": "ACTIVE"}}
+{"timestamp": "2026-03-19T04:58:05.319544+00:00", "action": "test", "entity_type": "system", "entity_id": "test_001", "details": {"message": "integration test"}, "user": "claude", "previous_values": null}

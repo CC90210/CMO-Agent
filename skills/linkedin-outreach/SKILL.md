@@ -4,8 +4,9 @@ description: Use the CLI-Anything wrapper to send connection requests and messag
 triggers: [LinkedIn, outreach, lead, prospect, DM, connection request]
 tier: specialized
 dependencies: [browser-automation]
+canon_references: [ross-predictable-revenue, miner-nepq, holmes-dream-100]
+canon_source: brain/MARKETING_CANON.md
 ---
-
 # LinkedIn Outreach Engine (CLI-Anything)
 
 ## Overview

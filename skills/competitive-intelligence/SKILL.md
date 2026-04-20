@@ -2,8 +2,9 @@
 name: competitive-intelligence
 description: Systematic competitor tracking, battlecard generation, market monitoring, and competitive response playbook for OASIS AI, PropFlow, and Nostalgic Requests
 tags: [skill, competitive-intelligence, market-research, strategy]
+canon_references: [ritson-diagnosis, dunford-positioning, fishkin-sparktoro]
+canon_source: brain/MARKETING_CANON.md
 ---
-
 # Competitive Intelligence
 
 ## Overview

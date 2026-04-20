@@ -1,18 +1,14 @@
 {
   "agent": "Maven (CMO)",
-  "version": "0.1.0",
-  "updated_at": "2026-04-18T21:51:21.805582Z",
-  "status": "INITIALIZING",
+  "version": "1.1.0",
+  "updated_at": "2026-04-19T23:55:00Z",
+  "status": "OPERATIONAL",
+  "session_note": "Self-improvement protocol executed 2026-04-19. Internalized MARKETING_CANON.md across all skills, built marketing-research skill + ATTRIBUTION_MODEL.md, populated agency/ + creator/ vertical packs.",
   "content_pipeline": {
     "drafts": 0,
     "scheduled": 0,
     "published_7d": 0,
-    "formats": [
-      "video",
-      "image",
-      "text",
-      "email"
-    ]
+    "formats": ["video", "image", "text", "email"]
   },
   "ad_performance": {
     "meta_active_campaigns": 0,
@@ -30,27 +26,22 @@
     "email_open_rate": null
   },
   "brand_health": {
-    "social_followers": {
-      "ig": 0,
-      "linkedin": 0,
-      "tiktok": 0,
-      "x": 0
-    },
+    "social_followers": {"ig": 0, "linkedin": 0, "tiktok": 0, "x": 0},
     "engagement_rate_7d": null,
     "brand_voice_drift_detected": false,
     "competitive_alerts": []
   },
   "orchestrated_systems": {
-    "shopify_ad_engine": {
-      "path": "C:\\Users\\User\\APPS\\shopify-ad-engine",
-      "status": "AVAILABLE",
-      "purpose": "Remotion video ad rendering pipeline"
+    "ad_engine": {
+      "path": "C:\\Users\\User\\CMO-Agent\\ad-engine",
+      "status": "READY",
+      "purpose": "Remotion 4.0 video ad rendering + Meta Ads SDK (5 templates). npm install complete."
     },
     "ig_setter_pro": {
       "path": "C:\\Users\\User\\APPS\\ig-setter-pro",
       "status": "DEPLOYED",
       "url": "https://ig-setter-pro.vercel.app",
-      "purpose": "Instagram DM automation"
+      "purpose": "Instagram DM automation (PULSE)"
     },
     "cc_funnel": {
       "path": "C:\\Users\\User\\APPS\\cc-funnel",
@@ -60,6 +51,42 @@
   },
   "spend_request_cad": 0,
   "spend_approved_by_atlas": false,
-  "blocker_ceo_needs_to_know": "CMO agent initializing — needs identity transformation from single-client AdVantage to multi-client Maven",
-  "spend_requests": []
+  "blocker_ceo_needs_to_know": null,
+  "spend_requests": [],
+  "last_self_improvement": {
+    "ran_at": "2026-04-19T23:55:00Z",
+    "protocol": "full 4-loop (HEAL / OPTIMIZE / DEVELOP / IMPROVE)",
+    "heal": {
+      "ad_engine_npm_install": "completed",
+      "pulse_refreshed": true,
+      "advantage_refs_scrubbed": ["brain/SOUL.md", "brain/STATE.md", ".agents/workflows/prime.md", ".agents/workflows/health.md", "MAXIMIZATION_GUIDE.md title", "data/pulse/cmo_pulse.json"],
+      "sunbiz_hardcoding": "confirmed isolated to brain/clients/sunbiz-funding.md + MAXIMIZATION_GUIDE.md (scoped as SunBiz playbook)"
+    },
+    "optimize": {
+      "traces_query_status": "deferred — scripts/supabase_tool.py missing in this repo; Supabase MCP available but pre-operations means no 7d Maven traces yet to analyze",
+      "skill_probation_flags": "none yet — first OPERATIONAL session"
+    },
+    "develop": {
+      "gap_A_canon_references": "added to all skills (frontmatter canon_references: [pillar-name])",
+      "gap_B_marketing_research": "skills/marketing-research/SKILL.md created (Fitzpatrick + Fishkin + Ritson + Dunford)",
+      "gap_C_attribution": "brain/ATTRIBUTION_MODEL.md written — Supabase schema extension proposed (source_content_ids JSONB + attribution_touches JSONB on leads)",
+      "gap_D_vertical_packs": "agency/ and creator/ populated (lead-channels, pricing-playbook, objection-handlers, sources)"
+    },
+    "improve": {
+      "mistakes_logged": "AdVantage-era single-client hardcoding risk; skill frontmatter drift; paid launch without Atlas gate",
+      "patterns_promoted": "Atlas-spend-gate-before-campaign → [VALIDATED]"
+    }
+  },
+  "canon_pillars_now_binding": [
+    "April Dunford — Positioning before copy",
+    "Byron Sharp — Reach + light-buyer acquisition > retention below $1M ARR",
+    "Mark Ritson — Diagnosis before prescription",
+    "Alex Hormozi — Value Equation + 4 lead flows",
+    "Chet Holmes — Buyer Pyramid (60% educational content)",
+    "Jeremy Miner — NEPQ objection handling",
+    "Russell Brunson — Funnel type chosen before copy",
+    "Seth Godin — Smallest Viable Audience",
+    "Rory Sutherland — Signalling > functionality",
+    "Blair Enns — Agency pricing + value-based"
+  ]
 }

@@ -1,3 +1,11 @@
+---
+name: lead-generation
+canon_references: [hormozi-lead-flows, holmes-buyer-pyramid, miner-nepq]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: Lead Generation Funnel (SunBiz Funding)
 
 > End-to-end lead capture system — from ad click to qualified MCA merchant.

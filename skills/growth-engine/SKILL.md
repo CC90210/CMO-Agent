@@ -4,8 +4,9 @@ description: Self-learning and evolution system. Tracks capability expansion, ex
 triggers: [MRR, revenue, growth, evolution, capability, skill gap, pattern promotion]
 tier: core
 dependencies: [memory-management, sop-breakdown]
+canon_references: [sharp-how-brands-grow, hormozi-lead-flows, brunson-funnel]
+canon_source: brain/MARKETING_CANON.md
 ---
-
 # Growth Engine — Self-Learning System
 
 ## Overview

@@ -1,3 +1,11 @@
+---
+name: meta-ads-management
+canon_references: [sharp-mental-availability, ritson-diagnosis]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: Meta Ads Management
 
 > Complete Meta Marketing API operations for SunBiz Funding — Facebook & Instagram MCA ad lifecycle.

@@ -4,8 +4,9 @@ description: Complete automated video production system for CC's content pipelin
 triggers: [video, edit, post, caption, hook, grade, audio, export, reel, short, tiktok, b-roll, lower third, film grain, remotion, ffmpeg, whisper, cinematic]
 tier: full
 dependencies: [content-engine]
+canon_references: [sutherland-signalling, dunford-positioning]
+canon_source: brain/MARKETING_CANON.md
 ---
-
 # Elite Video Production
 
 Raw iPhone footage → cinematic, captioned, platform-ready output. No questions, no half-measures.

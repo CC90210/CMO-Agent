@@ -4,8 +4,9 @@ description: Track leads through conversion funnels, measure stage-to-stage conv
 triggers: [funnel, conversion, drop-off, stage, pipeline metrics, awareness, consideration]
 tier: standard
 dependencies: [lead-management, email-marketing]
+canon_references: [brunson-funnel, hormozi-value-equation, ritson-diagnosis]
+canon_source: brain/MARKETING_CANON.md
 ---
-
 # Funnel Management — Conversion Tracking
 
 ## Overview

@@ -28,7 +28,7 @@ Use `/prime` at the start of every session to load context and get situational a
 
 4. **Report:**
    ```
-   AdVantage online. V1.0 loaded.
+   Maven online. V1.0 loaded.
    Status: [INITIALIZING/OPERATIONAL/DEGRADED]
    APIs: Google [OK/PENDING] | Meta [OK/PENDING]
    Campaigns: X active | $X/day total budget
@@ -38,4 +38,4 @@ Use `/prime` at the start of every session to load context and get situational a
 
 ## Example Usage
 **User:** `/prime`
-**Agent:** "AdVantage online. OPERATIONAL. 3 active campaigns, $150/day. No issues. Ready."
+**Agent:** "Maven online. OPERATIONAL. 3 active campaigns, $150/day. No issues. Ready."

@@ -1,3 +1,11 @@
+---
+name: image-generation
+canon_references: [sutherland-signalling, dunford-positioning, godin-permission]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: AI Image Generation (Production-Grade)
 
 > Generate agency-quality, psychology-based ad creatives with AI-generated humans, logo compositing, and conversion science for SunBiz Funding MCA campaigns.

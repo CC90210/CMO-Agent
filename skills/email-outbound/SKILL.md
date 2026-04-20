@@ -1,3 +1,11 @@
+---
+name: email-outbound
+canon_references: [hormozi-lead-flows, godin-permission, miner-nepq, ross-predictable-revenue]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: Email Outbound (Gmail Blast System)
 
 > Send production-grade HTML email campaigns for SunBiz Funding via Gmail SMTP — bulk sending, personalization, tracking, CAN-SPAM compliance.

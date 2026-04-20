@@ -1,3 +1,11 @@
+---
+name: seo-aeo
+canon_references: [sharp-mental-availability, godin-permission, fishkin-sparktoro]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: SEO & AEO (Search Engine + Answer Engine Optimization)
 
 > Keyword research, Quality Score optimization, landing page SEO, and AI-ready content strategies for MCA consolidation.

@@ -1,3 +1,11 @@
+---
+name: budget-optimization
+canon_references: [sharp-reach-over-frequency, hormozi-lead-flows, ritson-diagnosis]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: Budget Optimization
 
 > Strategic budget allocation and pacing across platforms and campaigns.

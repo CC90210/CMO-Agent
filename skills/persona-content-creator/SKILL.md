@@ -8,8 +8,9 @@ metadata:
     requires:
       bins: ["gws"]
       skills: ["gws-docs", "gws-drive", "gws-gmail", "gws-chat", "gws-slides"]
+canon_references: [dunford-positioning, godin-tribes]
+canon_source: brain/MARKETING_CANON.md
 ---
-
 # Content Creator
 
 > **PREREQUISITE:** Load the following utility skills to operate as this persona: `gws-docs`, `gws-drive`, `gws-gmail`, `gws-chat`, `gws-slides`

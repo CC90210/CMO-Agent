@@ -1,6 +1,8 @@
-# MAXIMIZATION GUIDE — SunBiz Funding x AdVantage
+# MAXIMIZATION GUIDE — SunBiz Funding Playbook (Maven CMO)
 
-> Your playbook for using the AI marketing system. Copy-paste these prompts.
+> SunBiz-specific operational prompts. For other brands (OASIS, PropFlow, Nostalgic, CC personal), see the brand's profile in `brain/clients/<brand>.md` and the matching vertical pack in `skills/verticals/<vertical>/`.
+>
+> This guide captures one client's operating playbook. It is NOT Maven's system-wide doctrine — that lives in `brain/MARKETING_CANON.md` and each skill's SKILL.md.
 
 ---
 

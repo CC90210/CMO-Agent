@@ -1,3 +1,11 @@
+---
+name: lending-industry
+canon_references: [ritson-diagnosis]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: MCA Industry Knowledge
 
 > Compliance, regulations, and MCA-specific advertising strategies for SunBiz Funding.

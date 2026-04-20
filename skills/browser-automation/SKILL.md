@@ -1,3 +1,11 @@
+---
+name: browser-automation
+canon_references: [ritson-diagnosis]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: Browser Automation
 
 > Playwright-based fallback for operations not supported by APIs.

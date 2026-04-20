@@ -1,3 +1,11 @@
+---
+name: video-editing
+canon_references: [sutherland-signalling, dunford-positioning]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: Video Editing & Production
 
 > Video processing pipeline for ad creative — trimming, captioning, formatting, and platform optimization.

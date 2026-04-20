@@ -5,8 +5,9 @@ license: Complete terms in LICENSE.txt
 triggers: [brand, colors, typography, style guide, design system, Anthropic brand]
 tier: specialized
 dependencies: []
+canon_references: [dunford-positioning, sharp-distinctive-assets, sutherland-signalling]
+canon_source: brain/MARKETING_CANON.md
 ---
-
 # Anthropic Brand Styling
 
 ## Overview

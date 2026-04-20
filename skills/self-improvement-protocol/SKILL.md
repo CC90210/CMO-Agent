@@ -8,8 +8,9 @@ metadata:
   installs_in: [bravo, atlas, maven, aura]
   tier: full
 triggers: [self-heal, self-optimize, self-develop, self-improve, retrospective, reflexion, review-self, heal, optimize, evolve]
+canon_references: [ritson-diagnosis]
+canon_source: brain/MARKETING_CANON.md
 ---
-
 # SELF-IMPROVEMENT PROTOCOL — The 4-Loop
 
 The skill every agent runs to stay production-grade. Four protocols, one unified loop.

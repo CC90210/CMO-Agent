@@ -1,3 +1,11 @@
+---
+name: systematic-debugging
+canon_references: [ritson-diagnosis]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: Systematic Debugging
 
 > 4-Phase root cause analysis for API errors, campaign issues, and infrastructure problems.

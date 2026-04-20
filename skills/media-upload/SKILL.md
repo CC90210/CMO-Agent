@@ -1,3 +1,11 @@
+---
+name: media-upload
+canon_references: [ritson-diagnosis]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: Media Upload
 
 > Image and video asset management across Google Ads and Meta platforms.

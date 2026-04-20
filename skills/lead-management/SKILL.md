@@ -7,8 +7,9 @@ metadata:
   universal: true
   vertical_extensions: [agency, saas, ecommerce, coaching, creator, local-service]
 triggers: [lead, leads, pipeline, crm, funnel, qualify, nurture, mql, sql, cpl, cpql, cac, attribution, handoff]
+canon_references: [ross-predictable-revenue, holmes-buyer-pyramid, hormozi-lead-flows, miner-nepq]
+canon_source: brain/MARKETING_CANON.md
 ---
-
 # LEAD MANAGEMENT — The Full Lifecycle
 
 How Maven captures, qualifies, nurtures, and hands off leads. Industry-standard methodology; brand-specific at the vertical-pack + client-profile layer.

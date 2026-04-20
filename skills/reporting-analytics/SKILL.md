@@ -1,3 +1,11 @@
+---
+name: reporting-analytics
+canon_references: [ritson-diagnosis, sharp-mental-availability]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: Reporting & Analytics
 
 > Cross-platform performance reporting and data analysis.

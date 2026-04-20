@@ -4,8 +4,9 @@ description: Send individual emails, run nurture sequences, and manage templates
 triggers: [email, nurture, sequence, campaign, gmail, smtp, template, drip]
 tier: standard
 dependencies: [lead-management]
+canon_references: [hormozi-lead-flows, godin-permission, miner-nepq]
+canon_source: brain/MARKETING_CANON.md
 ---
-
 # Email Marketing — Gmail SMTP + Supabase
 
 ## Overview

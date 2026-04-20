@@ -30,7 +30,7 @@ Use `/health` at session start, when something seems off, or for routine checks.
 
 7. **Report:**
    ```
-   === AdVantage Health Report ===
+   === Maven Health Report ===
    APIs:        [OK/FAIL] Google | [OK/FAIL] Meta
    Tokens:      [OK/WARN] Valid
    MCP:         X/6 operational

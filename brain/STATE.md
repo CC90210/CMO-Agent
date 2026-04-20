@@ -26,7 +26,7 @@ tags: [state, ephemeral]
 |-----------|--------|-------|
 | Identity docs | OK | SOUL.md, CLAUDE.md, GEMINI.md, ANTIGRAVITY.md all Maven V1.0 |
 | Clients | OK (5 profiles) | OASIS AI, PropFlow, Nostalgic, CC personal, SunBiz (see `brain/clients/`) |
-| Skills | OK (29 loaded) | 20 AdVantage heritage + 10 migrated from Bravo |
+| Skills | OK (30 loaded, all canon-referenced) | 29 existing + marketing-research (new). MARKETING_CANON.md is the ground-truth framework library. |
 | Sub-agents | OK (16 agents) | ad-strategist, content-creator, video-editor, etc. |
 | ad-engine | OK (cloned) | Remotion 4.0 + Meta Ads SDK in `ad-engine/`. Run `cd ad-engine && npm install && npx remotion studio` |
 | Pulse protocol | OK (tested) | 14/15 stress tests pass. cmo_pulse.json sovereign in `data/pulse/` |
@@ -59,6 +59,6 @@ tags: [state, ephemeral]
 - SunBiz legacy maintenance (`scripts/email_outbound.py` daily blast — note: email_outbound lives in the separate SunBiz-Marketing repo now, invoke via subprocess if needed)
 
 ## Memory Health
-- SESSION_LOG: will receive entries per session
-- PATTERNS: carried over from AdVantage era, still valid for general marketing
-- MISTAKES: audit on first full session — avoid repeating AdVantage-era single-client thinking
+- SESSION_LOG: receives entries per session
+- PATTERNS: validated patterns promoted via Protocol 4 (see `skills/self-improvement-protocol/SKILL.md`)
+- MISTAKES: AdVantage-era inheritance risks logged on 2026-04-19; scan before single-client hardcoding

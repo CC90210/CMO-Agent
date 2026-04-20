@@ -4,8 +4,9 @@ description: Use this skill whenever the user asks about generating content, wri
 triggers: [content, post, copy, brand voice, pillar, marketing, content engine]
 tier: standard
 dependencies: []
+canon_references: [godin-permission, holmes-buyer-pyramid, sharp-mental-availability]
+canon_source: brain/MARKETING_CANON.md
 ---
-
 # Content Engine Skill
 
 Turn one idea into strong, platform-native content instead of posting the same thing everywhere.

@@ -1,3 +1,11 @@
+---
+name: ad-copywriting
+canon_references: [dunford-positioning, hormozi-value-equation, miner-nepq, sutherland-signalling]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: Ad Copywriting for MCA / Business Funding
 
 > High-converting ad copy for SunBiz Funding's MCA consolidation and growth capital campaigns.

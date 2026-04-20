@@ -1,3 +1,11 @@
+---
+name: a-b-testing
+canon_references: [sharp-how-brands-grow, ritson-diagnosis, hormozi-value-equation]
+canon_source: brain/MARKETING_CANON.md
+universal: true
+note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+---
+
 # SKILL: A/B Testing
 
 > Systematic split testing for ads, audiences, and landing pages.

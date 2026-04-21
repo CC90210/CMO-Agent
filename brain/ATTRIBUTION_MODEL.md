@@ -265,8 +265,14 @@ This registry is the human-readable index. Supabase is the machine-readable join
 
 ## Related
 
-- `brain/MARKETING_CANON.md` — framework library this model rests on
-- `brain/SHARED_DB.md` — Supabase schema context
-- `skills/lead-management/SKILL.md` — lead lifecycle this model augments
-- `skills/funnel-management/SKILL.md` — funnel metrics this model powers
-- `skills/reporting-analytics/SKILL.md` — dashboards that consume this model
+- [[INDEX]] — vault home
+- [[MARKETING_CANON]] — framework library this model rests on
+- [[SHARED_DB]] — Supabase schema context
+- [[content_registry]] — canonical content IDs this model consumes
+- [[WRITING]] — the copy pipeline that terminates in registration + attribution
+- [[lead-management/SKILL]] — lead lifecycle this model augments
+- [[funnel-management/SKILL]] — funnel metrics this model powers
+- [[reporting-analytics/SKILL]] — dashboards that consume this model
+
+## Obsidian Links
+- [[INDEX]] | [[MARKETING_CANON]] | [[content_registry]] | [[SHARED_DB]] | [[WRITING]]

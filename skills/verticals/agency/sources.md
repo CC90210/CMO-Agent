@@ -118,7 +118,12 @@ If a recommendation has no canonical citation, it's a draft opinion — not yet 
 
 ## Related
 
-- `brain/MARKETING_CANON.md` — the universal framework library
-- `skills/verticals/agency/lead-channels.md` — applied lead-gen
-- `skills/verticals/agency/pricing-playbook.md` — applied pricing
-- `skills/verticals/agency/objection-handlers.md` — applied sales conversations
+- [[MARKETING_CANON]] — the universal framework library
+- [[agency/lead-channels]] — applied lead-gen
+- [[agency/pricing-playbook]] — applied pricing
+- [[agency/objection-handlers]] — applied sales conversations
+- [[oasis-ai]] — primary internal application
+- [[WRITING]] · [[ATTRIBUTION_MODEL]]
+
+## Obsidian Links
+- [[INDEX]] | [[MARKETING_CANON]] | [[oasis-ai]]

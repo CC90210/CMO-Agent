@@ -45,3 +45,14 @@
 **Prevention:** [how to avoid in future]
 **Severity:** [LOW/MEDIUM/HIGH/CRITICAL]
 ```
+
+
+---
+
+## Related
+
+- [[INDEX]] · [[self-improvement-protocol/SKILL]] (writes this file) · [[PATTERNS]] · [[MARKETING_CANON]]
+- [[STATE]] · [[ACTIVE_TASKS]] · [[SESSION_LOG]]
+
+## Obsidian Links
+- [[INDEX]] | [[PATTERNS]] | [[self-improvement-protocol/SKILL]]

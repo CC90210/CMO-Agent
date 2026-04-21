@@ -59,6 +59,18 @@ tags: [state, ephemeral]
 - SunBiz legacy maintenance (`scripts/email_outbound.py` daily blast — note: email_outbound lives in the separate SunBiz-Marketing repo now, invoke via subprocess if needed)
 
 ## Memory Health
-- SESSION_LOG: receives entries per session
-- PATTERNS: validated patterns promoted via Protocol 4 (see `skills/self-improvement-protocol/SKILL.md`)
-- MISTAKES: AdVantage-era inheritance risks logged on 2026-04-19; scan before single-client hardcoding
+- SESSION_LOG: receives entries per session — see [[SESSION_LOG]]
+- PATTERNS: validated patterns promoted via Protocol 4 — see [[PATTERNS]] and [[self-improvement-protocol/SKILL|self-improvement-protocol]]
+- MISTAKES: AdVantage-era inheritance risks logged on 2026-04-19 — see [[MISTAKES]]; scan before single-client hardcoding
+
+---
+
+## Related
+
+- [[INDEX]] · [[SOUL]] · [[MARKETING_CANON]] · [[ATTRIBUTION_MODEL]] · [[WRITING]]
+- Clients: [[oasis-ai]] · [[conaugh-personal]] · [[propflow]] · [[nostalgic-requests]] · [[sunbiz-funding]]
+- Memory: [[ACTIVE_TASKS]] · [[PATTERNS]] · [[MISTAKES]] · [[SESSION_LOG]]
+- Skills: [[marketing-research/SKILL]] · [[content-engine/SKILL]] · [[campaign-creation/SKILL]]
+
+## Obsidian Links
+- [[INDEX]] | [[SOUL]] | [[MARKETING_CANON]] | [[ACTIVE_TASKS]]

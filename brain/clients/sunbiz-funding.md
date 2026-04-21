@@ -48,3 +48,16 @@ This vertical is regulated. Language violations have platform consequences (Meta
 ## Priority
 - **Maintenance mode.** Don't break it, don't scale it until OASIS is at $5K MRR.
 - Revenue share with CC (exact terms tracked in Bravo's financial records).
+
+---
+
+## Related
+
+- [[INDEX]] · [[MARKETING_CANON]] · [[WRITING]] (compliance rails section)
+- [[sunbiz-funding-ad-research]] — archived MCA ad creative research (legacy reference)
+- [[MCA_MARKETING_DEEP_RESEARCH_2026]] — full MCA market research doc
+- [[PATTERNS]] — MCA Ad Category, MCA Language Compliance, Google Ads MCA Disclosure patterns
+- Skills: [[email-outbound/SKILL]] · [[ad-copywriting/SKILL]] (legacy MCA examples)
+
+## Obsidian Links
+- [[INDEX]] | [[sunbiz-funding-ad-research]] | [[MCA_MARKETING_DEEP_RESEARCH_2026]] | [[PATTERNS]]

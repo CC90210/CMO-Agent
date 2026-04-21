@@ -262,9 +262,15 @@ PULSE is the DM front-door for OASIS + CC personal brand specifically. Other bra
 ## Related
 
 - [[MARKETING_CANON]] — frameworks this methodology rests on
-- `skills/funnel-management/SKILL.md` — TOFU/MOFU/BOFU
-- `skills/email-marketing/SKILL.md` — nurture execution
-- `skills/competitive-intelligence/SKILL.md` — ICP refinement
-- `skills/verticals/<vertical>/funnel-template.md` — vertical-specific funnel architectures
-- `brain/clients/<brand>.md` — brand-specific ICP
-- `brain/SHARED_DB.md` — Supabase `leads` + `lead_interactions` + `funnel_leads` schema
+- [[funnel-management/SKILL]] — TOFU/MOFU/BOFU
+- [[email-marketing/SKILL]] — nurture execution
+- [[competitive-intelligence/SKILL]] — ICP refinement
+- [[ATTRIBUTION_MODEL]] — source_content_ids + attribution_touches schema this skill populates
+- [[content_registry]] — canonical IDs this skill tags leads with
+- [[MARKETING_CANON]] · [[WRITING]]
+- Verticals: [[agency/lead-channels]] · [[creator/lead-channels]]
+- Clients: [[oasis-ai]] · [[conaugh-personal]] · [[propflow]] · [[sunbiz-funding]]
+- [[SHARED_DB]] — Supabase `leads` + `lead_interactions` + `funnel_leads` schema
+
+## Obsidian Links
+- [[INDEX]] | [[MARKETING_CANON]] | [[ATTRIBUTION_MODEL]] | [[WRITING]] | [[content_registry]]

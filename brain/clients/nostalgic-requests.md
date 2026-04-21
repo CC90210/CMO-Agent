@@ -34,3 +34,13 @@ tags: [client, nostalgic, music, dj, events]
 
 ## Priority
 - Low-priority brand. OASIS is the revenue driver. Nostalgic keeps living expenses paid and the DJ brand alive.
+
+---
+
+## Related
+
+- [[INDEX]] · [[conaugh-personal]] (DJ content is CC's voice) · [[MARKETING_CANON]] · [[WRITING]]
+- Skills: [[content-engine/SKILL]] · [[persona-content-creator/SKILL]]
+
+## Obsidian Links
+- [[INDEX]] | [[conaugh-personal]] | [[WRITING]]

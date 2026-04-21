@@ -1,14 +1,19 @@
 {
   "agent": "Maven (CMO)",
   "version": "1.1.0",
-  "updated_at": "2026-04-19T23:55:00Z",
+  "updated_at": "2026-04-21T22:40:00Z",
   "status": "OPERATIONAL",
-  "session_note": "Self-improvement protocol executed 2026-04-19. Internalized MARKETING_CANON.md across all skills, built marketing-research skill + ATTRIBUTION_MODEL.md, populated agency/ + creator/ vertical packs.",
+  "session_note": "2026-04-21 graph-wiring pass. Built brain/INDEX.md (vault hub), brain/WRITING.md (voice/hook/anti-slop communication hub), brain/research/content_registry.md (attribution dependency). Relocated stale brain/LENDING_AD_RESEARCH.md to brain/clients/sunbiz-funding-ad-research.md. Wired [[wikilinks]] through SOUL/STATE/CAPABILITIES/SHARED_DB/MARKETING_CANON/ATTRIBUTION_MODEL, all 5 client files, all 8 vertical-pack files (agency + creator), PATTERNS/MISTAKES/ACTIVE_TASKS, marketing-research+lead-management+self-improvement-protocol skills, and START_HERE. Obsidian graph now properly connected — 244 wikilinks total (was 13).",
   "content_pipeline": {
     "drafts": 0,
     "scheduled": 0,
     "published_7d": 0,
-    "formats": ["video", "image", "text", "email"]
+    "formats": [
+      "video",
+      "image",
+      "text",
+      "email"
+    ]
   },
   "ad_performance": {
     "meta_active_campaigns": 0,
@@ -26,7 +31,12 @@
     "email_open_rate": null
   },
   "brand_health": {
-    "social_followers": {"ig": 0, "linkedin": 0, "tiktok": 0, "x": 0},
+    "social_followers": {
+      "ig": 0,
+      "linkedin": 0,
+      "tiktok": 0,
+      "x": 0
+    },
     "engagement_rate_7d": null,
     "brand_voice_drift_detected": false,
     "competitive_alerts": []
@@ -59,7 +69,14 @@
     "heal": {
       "ad_engine_npm_install": "completed",
       "pulse_refreshed": true,
-      "advantage_refs_scrubbed": ["brain/SOUL.md", "brain/STATE.md", ".agents/workflows/prime.md", ".agents/workflows/health.md", "MAXIMIZATION_GUIDE.md title", "data/pulse/cmo_pulse.json"],
+      "advantage_refs_scrubbed": [
+        "brain/SOUL.md",
+        "brain/STATE.md",
+        ".agents/workflows/prime.md",
+        ".agents/workflows/health.md",
+        "MAXIMIZATION_GUIDE.md title",
+        "data/pulse/cmo_pulse.json"
+      ],
       "sunbiz_hardcoding": "confirmed isolated to brain/clients/sunbiz-funding.md + MAXIMIZATION_GUIDE.md (scoped as SunBiz playbook)"
     },
     "optimize": {
@@ -88,5 +105,20 @@
     "Seth Godin — Smallest Viable Audience",
     "Rory Sutherland — Signalling > functionality",
     "Blair Enns — Agency pricing + value-based"
-  ]
+  ],
+  "graph_wiring_2026_04_21": {
+    "new_hubs_created": [
+      "brain/INDEX.md",
+      "brain/WRITING.md",
+      "brain/research/content_registry.md"
+    ],
+    "relocations": [
+      "brain/LENDING_AD_RESEARCH.md -> brain/clients/sunbiz-funding-ad-research.md"
+    ],
+    "files_rewired_to_wikilinks": 27,
+    "total_wikilinks_in_vault": 244,
+    "wikilinks_before": 13,
+    "purpose": "Obsidian vault was configured for wikilinks (useMarkdownLinks: false) but docs used raw markdown paths, leaving the graph nearly empty (0 wikilinks in brain/, 13 in skills/). Wired the graph so Maven can navigate natively and CC can visualize topic connections in graph view.",
+    "entry_points": ["brain/INDEX.md (vault hub)", "START_HERE.md", "brain/WRITING.md (communication hub)"]
+  }
 }

@@ -98,7 +98,11 @@ If the same objection keeps firing, the objection isn't the problem. The positio
 
 ## Related
 
-- `skills/verticals/agency/pricing-playbook.md` — pricing structure
-- `skills/verticals/agency/lead-channels.md` — where these leads come from
-- `skills/verticals/agency/sources.md` — canonical reading
-- `skills/lead-management/SKILL.md` — lifecycle this sits inside
+- [[agency/pricing-playbook]] — pricing structure
+- [[agency/lead-channels]] — where these leads come from
+- [[agency/sources]] — canonical reading
+- [[lead-management/SKILL]] — lifecycle this sits inside
+- [[MARKETING_CANON]] · [[WRITING]] · [[oasis-ai]]
+
+## Obsidian Links
+- [[INDEX]] | [[MARKETING_CANON]] | [[lead-management/SKILL]] | [[oasis-ai]]

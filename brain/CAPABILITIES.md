@@ -169,5 +169,19 @@ Both platforms work the same way:
 - **Video Tools:** 2 (FFmpeg, Whisper)
 - **Native Tools:** 12+
 - **Agents:** 15
-- **Skills:** 18
+- **Skills:** 32 (all canon-referenced)
 - **Workflows:** 11
+
+---
+
+## Related
+
+- [[INDEX]] — vault home
+- [[AGENTS]] — 16 sub-agents + routing
+- [[MARKETING_CANON]] — framework library every skill references
+- [[WRITING]] — writing/communication hub for every deliverable
+- [[SHARED_DB]] — Supabase protocol
+- [[ATTRIBUTION_MODEL]] — tracking pipeline
+
+## Obsidian Links
+- [[INDEX]] | [[SOUL]] | [[STATE]] | [[AGENTS]]

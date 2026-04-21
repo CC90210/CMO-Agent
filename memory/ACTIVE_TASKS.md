@@ -49,3 +49,14 @@
 4. **Video rendering:** `ad-engine/` (Remotion + 5 templates)
 5. **Sibling agents:** Bravo CEO at `C:\Users\User\Business-Empire-Agent`, Atlas CFO at `C:\Users\User\APPS\CFO-Agent`
 6. **C-Suite contract:** `C:\Users\User\Business-Empire-Agent\brain\C_SUITE_ARCHITECTURE.md`
+
+
+---
+
+## Related
+
+- [[INDEX]] · [[STATE]] · [[SESSION_LOG]] · [[MARKETING_CANON]] · [[WRITING]]
+- Clients: [[oasis-ai]] · [[conaugh-personal]] · [[propflow]] · [[sunbiz-funding]]
+
+## Obsidian Links
+- [[INDEX]] | [[STATE]] | [[SESSION_LOG]] | [[MARKETING_CANON]]

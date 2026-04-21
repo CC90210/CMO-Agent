@@ -107,7 +107,11 @@ Pre-empting > handling live.
 
 ## Related
 
-- `skills/verticals/creator/pricing-playbook.md` — pricing context
-- `skills/verticals/creator/lead-channels.md` — where these buyers come from
-- `skills/verticals/creator/sources.md` — canonical reading
-- `skills/lead-management/SKILL.md` — lifecycle this sits inside
+- [[creator/pricing-playbook]] — pricing context
+- [[creator/lead-channels]] — where these buyers come from
+- [[creator/sources]] — canonical reading
+- [[lead-management/SKILL]] — lifecycle this sits inside
+- [[MARKETING_CANON]] · [[WRITING]] · [[conaugh-personal]]
+
+## Obsidian Links
+- [[INDEX]] | [[MARKETING_CANON]] | [[lead-management/SKILL]] | [[conaugh-personal]]

@@ -156,7 +156,11 @@ Pricing follows audience narrowness. Narrower audience = higher willingness to p
 
 ## Related
 
-- `skills/verticals/creator/lead-channels.md` — how leads reach these offers
-- `skills/verticals/creator/objection-handlers.md` — handling price objections specific to creator buyers
-- `skills/verticals/creator/sources.md` — Welsh / Koe / Cole reading pack
-- `brain/clients/conaugh-personal.md` — CC's personal brand positioning
+- [[creator/lead-channels]] — how leads reach these offers
+- [[creator/objection-handlers]] — handling price objections specific to creator buyers
+- [[creator/sources]] — Welsh / Koe / Cole reading pack
+- [[conaugh-personal]] — CC's personal brand positioning
+- [[MARKETING_CANON]] · [[WRITING]]
+
+## Obsidian Links
+- [[INDEX]] | [[MARKETING_CANON]] | [[conaugh-personal]]

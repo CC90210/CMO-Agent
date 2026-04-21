@@ -141,7 +141,11 @@ Kill metric: follower count, per se. 10k followers who don't buy << 500 subs who
 
 ## Related
 
-- `skills/verticals/creator/pricing-playbook.md` — 4-tier creator offer structure
-- `skills/verticals/creator/objection-handlers.md` — objection patterns specific to creators selling
-- `skills/verticals/creator/sources.md` — Welsh / Koe / Cole canonical reading
-- `brain/clients/conaugh-personal.md` — CC's personal brand state + positioning
+- [[creator/pricing-playbook]] — 4-tier creator offer structure
+- [[creator/objection-handlers]] — objection patterns specific to creators selling
+- [[creator/sources]] — Welsh / Koe / Cole canonical reading
+- [[conaugh-personal]] — CC's personal brand state + positioning
+- [[MARKETING_CANON]] · [[WRITING]]
+
+## Obsidian Links
+- [[INDEX]] | [[MARKETING_CANON]] | [[conaugh-personal]] | [[creator/sources]]

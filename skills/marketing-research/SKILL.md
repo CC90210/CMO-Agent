@@ -221,8 +221,13 @@ Chasing every trend. Only act on a trend when you have audience research showing
 
 ## Related
 
-- `brain/MARKETING_CANON.md` — the grounded framework library
-- `skills/competitive-intelligence/SKILL.md` — ongoing CI monitoring (this skill is upstream discovery)
-- `skills/persona-content-creator/SKILL.md` — persona docs built FROM research output
-- `skills/brand-guidelines/SKILL.md` — brand codes derived from audience research
+- [[MARKETING_CANON]] — the grounded framework library
+- [[competitive-intelligence/SKILL]] — ongoing CI monitoring (this skill is upstream discovery)
+- [[persona-content-creator/SKILL]] — persona docs built FROM research output
+- [[brand-guidelines/SKILL]] — brand codes derived from audience research
+- [[content_registry]] — published pieces that came out of this research
+- [[WRITING]] — where research output feeds into copy
 - `brain/research/` — output artifacts live here, one folder per brand
+
+## Obsidian Links
+- [[INDEX]] | [[MARKETING_CANON]] | [[WRITING]] | [[content_registry]] | [[competitive-intelligence/SKILL]]

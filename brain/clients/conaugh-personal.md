@@ -54,3 +54,18 @@ The personal brand is the **top-of-funnel for OASIS AI**. Every reel, every post
 - Write CC's long-form posts (CC owns — he won't publish something that doesn't sound like him)
 - Book DJ gigs (CC handles)
 - Handle Skool community directly (Bennett manages, Bravo tracks revenue)
+
+---
+
+## Related
+
+- [[INDEX]] — vault home
+- [[oasis-ai]] — business brand this personal brand funnels into
+- [[WRITING]] — voice rules, anti-slop, hook formulas
+- [[MARKETING_CANON]] — Sharp, Godin, Sutherland most load-bearing here
+- Creator vertical: [[creator/lead-channels]] · [[creator/pricing-playbook]] · [[creator/objection-handlers]] · [[creator/sources]]
+- Skills: [[content-engine/SKILL]] · [[persona-content-creator/SKILL]] · [[elite-video-production/SKILL]]
+- [[content_registry]] — every post CC publishes gets registered here
+
+## Obsidian Links
+- [[INDEX]] | [[oasis-ai]] | [[WRITING]] | [[creator/sources]] | [[content-engine/SKILL]]

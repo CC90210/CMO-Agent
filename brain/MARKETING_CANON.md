@@ -141,11 +141,11 @@ Propose additions in `memory/PATTERNS.md` with evidence; promote after 3 success
 ## Per-Vertical Canon Extensions
 
 See `skills/verticals/<vertical>/sources.md` for the pack-specific canonical voices:
-- **Agency**: Blair Enns, David C. Baker, Chris Do
+- **Agency** — [[agency/sources]]: Blair Enns, David C. Baker, Chris Do
 - **SaaS**: Patrick Campbell, Jason Lemkin, April Dunford, Lenny Rachitsky
 - **E-commerce**: Ezra Firestone, Drew Sanocki, Nik Sharma
 - **Coaching**: Hormozi, Dan Koe, Brunson, Dean Graziosi
-- **Creator**: Tiago Forte, Justin Welsh, Nicolas Cole, Joe Pulizzi
+- **Creator** — [[creator/sources]]: Tiago Forte, Justin Welsh, Nicolas Cole, Joe Pulizzi
 - **Local service**: Joe Crisara, Ryan Redding
 
 ---
@@ -156,3 +156,19 @@ See `skills/verticals/<vertical>/sources.md` for the pack-specific canonical voi
 > If you can't, you're doing crafts.
 
 Maven does marketing. Never crafts.
+
+---
+
+## Related
+
+- [[INDEX]] — vault home
+- [[WRITING]] — how this canon gets APPLIED to every piece of copy
+- [[ATTRIBUTION_MODEL]] — the measurement layer (Ritson: diagnose before prescribe)
+- [[content_registry]] — where every canon-grounded piece gets an ID
+- Clients: [[oasis-ai]] · [[conaugh-personal]] · [[propflow]] · [[nostalgic-requests]] · [[sunbiz-funding]]
+- Verticals: [[agency/lead-channels]] · [[agency/pricing-playbook]] · [[agency/objection-handlers]] · [[agency/sources]] · [[creator/lead-channels]] · [[creator/pricing-playbook]] · [[creator/objection-handlers]] · [[creator/sources]]
+- Memory: [[PATTERNS]] (canon-citation rule PROBATIONARY)
+- Key skills: [[marketing-research/SKILL]] · [[ad-copywriting/SKILL]] · [[content-engine/SKILL]] · [[funnel-management/SKILL]] · [[lead-management/SKILL]]
+
+## Obsidian Links
+- [[INDEX]] | [[WRITING]] | [[ATTRIBUTION_MODEL]] | [[content_registry]]

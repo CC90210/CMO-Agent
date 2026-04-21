@@ -88,7 +88,11 @@ List 100 people who already have your ideal clients' attention:
 
 ## Related
 
-- `skills/verticals/agency/pricing-playbook.md` — what to charge + how to package
-- `skills/verticals/agency/objection-handlers.md` — common agency-buyer objections
-- `skills/verticals/agency/sources.md` — canonical voices for agency operators
-- `brain/clients/oasis-ai.md` — OASIS's ICP + current state
+- [[agency/pricing-playbook]] — what to charge + how to package
+- [[agency/objection-handlers]] — common agency-buyer objections
+- [[agency/sources]] — canonical voices for agency operators
+- [[oasis-ai]] — OASIS's ICP + current state
+- [[MARKETING_CANON]] · [[WRITING]] · [[ATTRIBUTION_MODEL]]
+
+## Obsidian Links
+- [[INDEX]] | [[MARKETING_CANON]] | [[oasis-ai]] | [[agency/sources]]

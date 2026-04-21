@@ -253,3 +253,17 @@ After each run, produce:
 ---
 
 **The iron rule**: CC never teaches the same lesson twice. If Protocol 4 caught it, it's in MISTAKES.md. If it's in MISTAKES.md, Protocol 1 checks against it next time.
+
+
+---
+
+## Related
+
+- [[INDEX]] — vault home
+- [[MARKETING_CANON]] — frameworks this protocol applies to skills
+- [[PATTERNS]] · [[MISTAKES]] — Protocol 4 writes here
+- [[STATE]] · [[ACTIVE_TASKS]] — Protocol 1 HEAL scans these
+- [[SHARED_DB]] — Protocol 2 OPTIMIZE queries here
+
+## Obsidian Links
+- [[INDEX]] | [[MARKETING_CANON]] | [[PATTERNS]] | [[MISTAKES]] | [[SHARED_DB]]

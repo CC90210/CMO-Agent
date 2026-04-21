@@ -137,8 +137,12 @@ A recommendation without a canonical citation is a draft opinion, not yet a Mave
 
 ## Related
 
-- `brain/MARKETING_CANON.md` — universal framework library
-- `skills/verticals/creator/lead-channels.md` — applied lead-gen
-- `skills/verticals/creator/pricing-playbook.md` — applied pricing
-- `skills/verticals/creator/objection-handlers.md` — applied sales conversations
-- `brain/clients/conaugh-personal.md` — CC's personal brand (primary internal application)
+- [[MARKETING_CANON]] — universal framework library
+- [[creator/lead-channels]] — applied lead-gen
+- [[creator/pricing-playbook]] — applied pricing
+- [[creator/objection-handlers]] — applied sales conversations
+- [[conaugh-personal]] — CC's personal brand (primary internal application)
+- [[WRITING]] · [[ATTRIBUTION_MODEL]]
+
+## Obsidian Links
+- [[INDEX]] | [[MARKETING_CANON]] | [[conaugh-personal]]

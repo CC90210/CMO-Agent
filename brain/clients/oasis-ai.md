@@ -62,3 +62,18 @@ Meta Reels (PULSE hook)
 - Client delivery (Bravo owns)
 - Sales calls (CC owns)
 - Financial modeling / pricing (Atlas advises, CC decides)
+
+---
+
+## Related
+
+- [[INDEX]] — vault home
+- [[conaugh-personal]] — top-of-funnel brand feeding OASIS leads
+- [[MARKETING_CANON]] — frameworks Maven applies for OASIS
+- [[WRITING]] — voice, hooks, anti-slop rules
+- [[ATTRIBUTION_MODEL]] + [[content_registry]] — lead tracking
+- Verticals: [[agency/lead-channels]] · [[agency/pricing-playbook]] · [[agency/objection-handlers]] · [[agency/sources]]
+- Key skills: [[content-engine/SKILL]] · [[ad-copywriting/SKILL]] · [[funnel-management/SKILL]] · [[lead-management/SKILL]]
+
+## Obsidian Links
+- [[INDEX]] | [[conaugh-personal]] | [[MARKETING_CANON]] | [[WRITING]] | [[agency/sources]]

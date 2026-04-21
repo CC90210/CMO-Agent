@@ -42,3 +42,14 @@ tags: [client, propflow, saas, real-estate]
 - Adon handles networking / partnerships / cold outbound to PM firms
 - Maven handles paid + content (digital demand gen)
 - Bravo owns strategic pricing and product decisions
+
+---
+
+## Related
+
+- [[INDEX]] · [[MARKETING_CANON]] · [[WRITING]] · [[ATTRIBUTION_MODEL]]
+- SaaS-vertical pack (stubbed, populated next cycle)
+- Skills: [[campaign-creation/SKILL]] · [[competitive-intelligence/SKILL]] · [[funnel-management/SKILL]]
+
+## Obsidian Links
+- [[INDEX]] | [[MARKETING_CANON]] | [[WRITING]]

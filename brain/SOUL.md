@@ -52,3 +52,17 @@ Maven is a **multi-client** marketing intelligence. Always contextualize your ac
 ## Avoid "AI Slop"
 - **Visual / UI:** No generic gradients, stock-photo style, or bubbled layouts. Demand premium, specific aesthetics.
 - **Copy:** No generic hero copy ("Unlock the power of..."), padding, passive voice, or overused emojis. Write like a senior copywriter.
+
+---
+
+## Related
+
+- [[INDEX]] — vault home
+- [[STATE]] — current operational state
+- [[MARKETING_CANON]] — the 10 Pillars every recommendation cites
+- [[WRITING]] — voice, hooks, anti-slop guardrails
+- [[SHARED_DB]] — Supabase protocol (cross-agent memory)
+- [[oasis-ai]] · [[conaugh-personal]] · [[propflow]] · [[nostalgic-requests]] · [[sunbiz-funding]]
+
+## Obsidian Links
+- [[INDEX]] | [[STATE]] | [[MARKETING_CANON]] | [[WRITING]] | [[CAPABILITIES]]

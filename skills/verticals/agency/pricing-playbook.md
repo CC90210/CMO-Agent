@@ -119,7 +119,11 @@ For OASIS's B2B positioning, round numbers > psychological pricing. $5,000 > $4,
 
 ## Related
 
-- `skills/verticals/agency/lead-channels.md` — where agency leads come from
-- `skills/verticals/agency/objection-handlers.md` — price objections handled
-- `skills/verticals/agency/sources.md` — Enns / Baker / Do canonical reading
-- `brain/clients/oasis-ai.md` — OASIS's current pricing + stack
+- [[agency/lead-channels]] — where agency leads come from
+- [[agency/objection-handlers]] — price objections handled
+- [[agency/sources]] — Enns / Baker / Do canonical reading
+- [[oasis-ai]] — OASIS's current pricing + stack
+- [[MARKETING_CANON]] · [[WRITING]]
+
+## Obsidian Links
+- [[INDEX]] | [[MARKETING_CANON]] | [[oasis-ai]]

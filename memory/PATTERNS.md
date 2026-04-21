@@ -80,3 +80,14 @@
 - **Why:** Prevents getting stuck on one bad approach
 - **Max attempts:** 3 total across all approaches, then escalate
 - **Source:** Inherited from Business Empire Agent (VALIDATED there)
+
+
+---
+
+## Related
+
+- [[INDEX]] · [[self-improvement-protocol/SKILL]] (writes this file) · [[MISTAKES]] · [[MARKETING_CANON]]
+- [[STATE]] · [[ACTIVE_TASKS]] · [[SESSION_LOG]]
+
+## Obsidian Links
+- [[INDEX]] | [[MISTAKES]] | [[self-improvement-protocol/SKILL]] | [[MARKETING_CANON]]

@@ -87,3 +87,15 @@ rows = query("SELECT * FROM agent_traces WHERE agent = 'bravo' AND created_at > 
 | "What skill is Maven firing most often?" | Supabase `skill_activation` (aggregated) | System diagnostics |
 
 **Rule of thumb:** pulse = "now," Supabase = "over time."
+
+---
+
+## Related
+
+- [[INDEX]] · [[STATE]] · [[ATTRIBUTION_MODEL]] — this DB carries the attribution touches
+- [[content_registry]] — content IDs that populate `leads.source_content_ids`
+- [[MARKETING_CANON]] — the frameworks that decide what gets written to this DB
+- [[self-improvement-protocol/SKILL]] — Protocol 2 OPTIMIZE queries `agent_traces` + `skill_activation` here
+
+## Obsidian Links
+- [[INDEX]] | [[ATTRIBUTION_MODEL]] | [[content_registry]] | [[MARKETING_CANON]]

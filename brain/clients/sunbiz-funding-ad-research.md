@@ -1,5 +1,16 @@
+---
+brand: SunBiz Funding
+type: legacy-research
+status: archived
+tags: [client, sunbiz, mca, research, legacy, ad-creative]
+canon_references: [hormozi-value-equation, dunford-positioning]
+canon_source: brain/MARKETING_CANON.md
+---
+
 # High-Converting Business Lending Ad Research
 **Compiled: March 2026 | For: Business Term Loans ($50K-$500K)**
+
+> Archived 2026-04-21: relocated from `brain/LENDING_AD_RESEARCH.md` into client context. SunBiz is maintenance-mode; this research is reference-only. Reinterpret through the canon before applying — some advice predates [[MARKETING_CANON]] and [[WRITING]].
 
 ---
 
@@ -397,3 +408,15 @@ Custom qualifying questions:
 - [Dolead - Business Loans Leads Strategies](https://www.dolead.com/growth-hub/business-loans-leads-strategies-to-grow)
 - [Sendlane - Lead Nurturing Email Examples](https://www.sendlane.com/blog/lead-nurturing-email-examples)
 - [Jordan Digital Marketing - Facebook Special Ad Categories for Fintech](https://www.jordandigitalmarketing.com/blog/facebook-special-ad-categories-for-the-finance-industry)
+
+
+---
+
+## Related
+
+- [[INDEX]] · [[sunbiz-funding]] · [[WRITING]] (compliance rails) · [[MARKETING_CANON]]
+- [[MCA_MARKETING_DEEP_RESEARCH_2026]] — full MCA market research
+- [[PATTERNS]] — active MCA compliance patterns
+
+## Obsidian Links
+- [[INDEX]] | [[sunbiz-funding]] | [[MCA_MARKETING_DEEP_RESEARCH_2026]]

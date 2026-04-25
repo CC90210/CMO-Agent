@@ -39,6 +39,22 @@ CMO-Agent/
 └── memory/             # Session logs, patterns, active tasks
 ```
 
+## Quick Install (One Line) ⭐ Recommended
+
+**macOS / Linux / WSL:**
+```bash
+curl -sSL https://raw.githubusercontent.com/CC90210/CMO-Agent/main/install/quickstart.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/CC90210/CMO-Agent/main/install/quickstart.ps1 | iex
+```
+
+What it does: auto-installs missing prereqs (python ≥3.10, git, node, npm), clones this repo into `~/maven-repo`, runs `npm install` for Remotion + ad-engine, walks you through an interactive wizard (Anthropic required; Meta Ads / Google Ads / ElevenLabs / Late optional). Total time: ~5–10 minutes including npm. Full details: [`install/README.md`](install/README.md).
+
+---
+
 ## C-Suite Integration
 
 Maven operates under three non-negotiable rules:

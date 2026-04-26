@@ -1,3 +1,10 @@
+---
+name: media-manager
+description: Use this agent when CC asks to upload, organize, or optimize creative assets (images, videos) across platforms.
+model: sonnet
+tools: Read, Write, Edit, Glob, Grep, Bash
+---
+
 # Agent: Media Manager
 
 > Image and video upload, creative asset management, and media optimization.

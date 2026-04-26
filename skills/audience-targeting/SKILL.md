@@ -1,5 +1,6 @@
 ---
 name: audience-targeting
+description: Audience-strategy playbook — behavioral targeting, custom audiences, lookalikes, exclusions, keyword segmentation.
 canon_references: [sharp-mental-availability, godin-smallest-viable-audience, holmes-buyer-pyramid]
 canon_source: brain/MARKETING_CANON.md
 universal: true

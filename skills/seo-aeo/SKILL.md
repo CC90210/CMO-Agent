@@ -1,5 +1,6 @@
 ---
 name: seo-aeo
+description: Search Engine + Answer Engine Optimization — keyword research, schema, AI-citable content structure, on-page tuning.
 canon_references: [sharp-mental-availability, godin-permission, fishkin-sparktoro]
 canon_source: brain/MARKETING_CANON.md
 universal: true

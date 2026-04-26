@@ -1,5 +1,6 @@
 ---
 name: ad-copywriting
+description: Direct-response ad copywriting for headlines, descriptions, CTAs, and hooks across Meta and Google Ads. Avoids AI slop; cites canon.
 canon_references: [dunford-positioning, hormozi-value-equation, miner-nepq, sutherland-signalling]
 canon_source: brain/MARKETING_CANON.md
 universal: true

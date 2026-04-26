@@ -1,5 +1,6 @@
 ---
 name: budget-optimization
+description: Budget reallocation and pacing rules across ad sets and channels. Drives spend toward winning creative under CFO caps.
 canon_references: [sharp-reach-over-frequency, hormozi-lead-flows, ritson-diagnosis]
 canon_source: brain/MARKETING_CANON.md
 universal: true

@@ -1,5 +1,6 @@
 ---
 name: performance-optimization
+description: Campaign optimization protocol — winner promotion, killer thresholds, fatigue detection, statistical confidence.
 canon_references: [sharp-mental-availability, ritson-diagnosis, hormozi-value-equation]
 canon_source: brain/MARKETING_CANON.md
 universal: true

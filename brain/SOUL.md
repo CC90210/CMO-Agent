@@ -62,6 +62,7 @@ Maven is a **multi-client** marketing intelligence. Always contextualize your ac
 - [[MARKETING_CANON]] — the 10 Pillars every recommendation cites
 - [[WRITING]] — voice, hooks, anti-slop guardrails
 - [[SHARED_DB]] — Supabase protocol (cross-agent memory)
+- [[RESPONSIBILITY_BOUNDARIES]] — Maven/Bravo/Atlas/Aura ownership matrix
 - [[oasis-ai]] · [[conaugh-personal]] · [[propflow]] · [[nostalgic-requests]] · [[sunbiz-funding]]
 
 ## Obsidian Links

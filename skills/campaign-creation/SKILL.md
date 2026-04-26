@@ -1,5 +1,6 @@
 ---
 name: campaign-creation
+description: End-to-end campaign-creation workflow: objective, structure, audience, creative, budget, launch verification.
 canon_references: [dunford-positioning, ritson-diagnosis, hormozi-value-equation, brunson-funnel]
 canon_source: brain/MARKETING_CANON.md
 universal: true

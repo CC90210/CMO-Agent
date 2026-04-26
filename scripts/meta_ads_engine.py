@@ -272,19 +272,29 @@ class MetaAdsEngine:
         objective: str = "OUTCOME_LEADS",
         special_ad_categories: Optional[list[str]] = None,
         status: str = "PAUSED",
+        brand: str = "sunbiz",
+        daily_budget_usd: Optional[float] = None,
     ) -> dict:
         """
         Create a campaign. Defaults to PAUSED so you can review before going live.
-
-        Args:
-            name: Campaign display name.
-            objective: Meta campaign objective, e.g. OUTCOME_LEADS, OUTCOME_TRAFFIC.
-            special_ad_categories: Defaults to ["FINANCIAL_PRODUCTS_SERVICES"].
-            status: ACTIVE or PAUSED.
-
-        Returns:
-            dict with id, name, status.
+        Spend is gated through send_gateway → CFO spend pulse before any
+        platform-API call. ACTIVE launches with a known daily budget will be
+        rejected if Atlas hasn't approved that channel/brand/amount.
         """
+        # CFO spend gate (Maven send_gateway chokepoint)
+        from send_gateway import send as _gateway_send
+        gate_result = _gateway_send(
+            channel="meta_ads",
+            agent_source="meta_ads_engine",
+            brand=brand,
+            spend_amount_usd=daily_budget_usd,
+            intent="commercial",
+            dry_run=True,  # gate-check only; the create call below is the actual action
+        )
+        if gate_result["status"] == "blocked":
+            log.warning("CFO spend gate blocked meta_ads campaign: %s", gate_result["reason"])
+            return {"error": gate_result["reason"], "status": "blocked"}
+
         categories = special_ad_categories or ["FINANCIAL_PRODUCTS_SERVICES"]
         payload = {
             "name": name,

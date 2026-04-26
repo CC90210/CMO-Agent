@@ -1,3 +1,10 @@
+---
+name: workflow-builder
+description: Use this agent when CC asks to build n8n workflows, scheduled tasks, or marketing automations (nurture sequences, reporting cron).
+model: sonnet
+tools: Read, Write, Edit, Glob, Grep, Bash
+---
+
 # Agent: Workflow Builder
 
 > n8n workflow automation, scheduled tasks, and automated reporting.

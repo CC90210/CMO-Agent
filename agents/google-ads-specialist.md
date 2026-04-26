@@ -1,3 +1,10 @@
+---
+name: google-ads-specialist
+description: Use this agent when CC asks for Google Ads work — campaigns, ad groups, ads, keywords, bidding, or reporting via the Google Ads API.
+model: sonnet
+tools: Read, Write, Edit, Glob, Grep, Bash
+---
+
 # Agent: Google Ads Specialist
 
 > All Google Ads API operations for SunBiz Funding — campaigns, ad groups, ads, keywords, bidding, reporting.

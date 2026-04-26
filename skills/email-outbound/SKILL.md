@@ -1,5 +1,6 @@
 ---
 name: email-outbound
+description: Marketing email blast operations — HTML templates, bulk send, deliverability, list hygiene, CASL/CAN-SPAM compliance.
 canon_references: [hormozi-lead-flows, godin-permission, miner-nepq, ross-predictable-revenue]
 canon_source: brain/MARKETING_CANON.md
 universal: true

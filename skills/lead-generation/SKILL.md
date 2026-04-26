@@ -1,5 +1,6 @@
 ---
 name: lead-generation
+description: Lead-generation funnel construction — lead magnets, tripwires, gated content, qualified-lead routing into CRM.
 canon_references: [hormozi-lead-flows, holmes-buyer-pyramid, miner-nepq]
 canon_source: brain/MARKETING_CANON.md
 universal: true

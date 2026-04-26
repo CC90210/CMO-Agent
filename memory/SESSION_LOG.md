@@ -29,3 +29,11 @@
 - Await API credentials from client
 - Install MCP servers
 - Test connectivity
+### 2026-04-26 — Auto-sync
+**Agent:** MAVEN state_sync
+**Note:** V1.1 final: orphan pickup + obsidian graph wiring + push
+
+### 2026-04-26 — Auto-sync
+**Agent:** MAVEN state_sync
+**Note:** Phase 4 smoke test: delegation tools wired
+

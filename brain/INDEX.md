@@ -36,6 +36,59 @@ Maven writes only to `data/pulse/cmo_pulse.json`.
 
 ---
 
+## Operations & Identity (V1.1)
+
+- [[USER]] — Operator profile + role boundaries
+- [[PERSONALITY]] — Maven voice, operating principles, behavioral patterns
+- [[BENCHMARK]] — 10-dimension agentic maturity scoring
+- [[OKRs]] — Quarterly objectives + key results
+- [[RISK_REGISTER]] — Active marketing risks (probability × impact)
+- [[DASHBOARD]] — Single-pane operational overview
+- [[DAILY_SCHEDULE]] — Daily/weekly/monthly operational rhythm
+- [[PRODUCT_VERTICALS]] — Vertical knowledge pack registry
+- [[MEMORY_INDEX]] — Memory file map
+
+---
+
+## Marketing Canon Library (`brain/canon/`)
+
+The 13 implemented frameworks every Maven recommendation cites at least one of:
+
+- [[canon/INDEX|Canon Index]] — Library home, organized in 6 knowledge tiers
+- [[canon/schwartz-breakthrough-advertising|Schwartz: Breakthrough Advertising]] — Awareness levels
+- [[canon/hopkins-scientific-advertising|Hopkins: Scientific Advertising]] — Measurement-first
+- [[canon/ogilvy-advertising|Ogilvy: Advertising]] — Brand + measurement
+- [[canon/cialdini-influence|Cialdini: 7 Principles of Influence]]
+- [[canon/kahneman-system-1-2|Kahneman: System 1/2]] — Dual-process decision-making
+- [[canon/binet-field-long-short|Binet & Field: 60:40]] — Brand vs activation split
+- [[canon/balfour-4-fits|Balfour: 4 Fits]] — Multiplicative growth
+- [[canon/berger-contagious-stepps|Berger: STEPPS]] — Virality drivers
+- [[canon/ries-trout-positioning|Ries & Trout: Positioning]] — Mental slot ownership
+- [[canon/moore-crossing-chasm|Moore: Crossing the Chasm]] — Adoption framework
+- [[canon/ellis-pmf-engine|Ellis: PMF Engine]] — 40% disappointment threshold
+- [[canon/miller-storybrand|Miller: StoryBrand]] — 7-part messaging
+- [[canon/whitman-cashvertising|Whitman: Cashvertising]] — LF8 biological drives
+
+---
+
+## Templates (`_templates/`)
+
+Standardized scaffolds for consistency:
+
+- [[_templates/INDEX|Templates Index]]
+- [[_templates/campaign-brief|campaign-brief]] · [[_templates/daily-note|daily-note]]
+- [[_templates/decision-entry|decision-entry]] · [[_templates/mistake-entry|mistake-entry]]
+- [[_templates/pattern-entry|pattern-entry]] · [[_templates/session-log-entry|session-log-entry]]
+- [[_templates/skill-template|skill-template]] · [[_templates/content-registry-entry|content-registry-entry]]
+
+---
+
+## Proposals
+
+In-flight RFCs and brief proposals: see [[proposals/README|proposals/]].
+
+---
+
 ## Clients (5 Brands)
 
 - [[oasis-ai]] — Primary. B2B AI agency. Pulse-lead-gen campaign.
@@ -107,13 +160,14 @@ Full skill inventory: [[CAPABILITIES]]
 
 ---
 
-## Agents (16)
+## Agents (19)
 
 Sub-agents in `agents/`:
 - Strategy: ad-strategist, analytics-analyst, seo-specialist
 - Content: content-creator, video-editor, image-generator, media-manager
 - Execution: google-ads-specialist, meta-ads-specialist, email-outbound, audience-builder
 - System: architect, debugger, explorer, documenter, workflow-builder
+- Cross-cutting (Bravo parity, V1.1): reviewer, researcher, writer
 
 See [[AGENTS]] for routing.
 

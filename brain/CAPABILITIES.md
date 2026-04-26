@@ -194,6 +194,10 @@ The CMO repo's `scripts/` directory holds these executables. Each is invoked fro
 - `google_ads_engine.py` — Google Ads SDK CRUD (spend gated through send_gateway).
 - `meta_campaign_builder.py` — campaign-structure builder for Meta.
 - `jotform_tracker.py` — JotForm submission polling.
+- `late_tool.py` — Late SDK CLI (accounts, profiles, posts, create, cross-post). Bravo's CEO dashboard subprocesses to `posts --status published --json` — JSON output shape is a load-bearing contract.
+- `late_publisher.py` — content_calendar publisher; gates every publish through send_gateway (channel="social"). Tested by `test_late_publisher.py` (5 cases).
+- `instagram_engine.py` — Instagram DM auto-reply + booking confirmation via Playwright. Outbound DMs gated through send_gateway (channel="instagram_dm", per-recipient cooldown). Tested by `test_instagram_engine.py` (6 cases).
+- `codex_image_gen.py` — content image generation via Codex/OpenAI (no credentials hardcoded; auth implicit via codex-companion).
 - `ad_copy_generator.py` — copy generation pipeline.
 - `ab_testing_engine.py` — A/B test management.
 - `campaign_templates.py` — campaign-structure templates.

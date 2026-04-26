@@ -31,6 +31,10 @@
 - Test connectivity
 ### 2026-04-26 — Auto-sync
 **Agent:** MAVEN state_sync
+**Note:** V1.2 finalization: tests, gates, content_pipeline, attribution, adversarial review
+
+### 2026-04-26 — Auto-sync
+**Agent:** MAVEN state_sync
 **Note:** V1.1 final: orphan pickup + obsidian graph wiring + push
 
 ### 2026-04-26 — Auto-sync

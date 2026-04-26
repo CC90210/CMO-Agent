@@ -79,6 +79,6 @@ tags: [state, ephemeral]
 
 - **Date:** 2026-04-26
 - **Agent:** MAVEN via Claude Code
-- **Result:** V1.1 final: orphan pickup + obsidian graph wiring + push
+- **Result:** V1.2 finalization: tests, gates, content_pipeline, attribution, adversarial review
 
 *Last updated: 2026-04-26*

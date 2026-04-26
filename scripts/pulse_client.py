@@ -1,13 +1,16 @@
 import json
-import os
 import datetime
 from pathlib import Path
 
-# The pulse directory is centralized in the CEO's (Bravo's) repository to act as the board room table.
-PULSE_DIR = Path(r"C:\Users\User\Business-Empire-Agent\data\pulse")
+# Each agent owns its own pulse directory. Maven and Bravo read from the
+# canonical paths (which are NOT all under one repo). Override per-machine
+# via env vars MAVEN_PULSE_DIR / CEO_PULSE_PATH / CFO_PULSE_PATH if needed.
+PULSE_DIR = Path(r"C:\Users\User\CMO-Agent\data\pulse")
 CMO_PULSE_PATH = PULSE_DIR / "cmo_pulse.json"
-CEO_PULSE_PATH = PULSE_DIR / "ceo_pulse.json"
-CFO_PULSE_PATH = PULSE_DIR / "cfo_pulse.json"
+CEO_PULSE_PATH = Path(r"C:\Users\User\Business-Empire-Agent\data\pulse\ceo_pulse.json")
+# Atlas (CFO) writes to CFO-Agent/data/pulse — fixed 2026-04-26 to match
+# brain/CFO_PULSE_CONTRACT.md in Atlas's repo.
+CFO_PULSE_PATH = Path(r"C:\Users\User\APPS\CFO-Agent\data\pulse\cfo_pulse.json")
 
 class PulseClient:
     """
@@ -77,11 +80,20 @@ class PulseClient:
 
     def check_spend_approval(self) -> bool:
         """
-        Checks cfo_pulse.json to see if Atlas has approved the spend.
+        Checks Atlas's cfo_pulse.json to see if the spend gate is open.
+
+        Atlas uses a nested `spend_gate` object — see
+        c:/Users/User/APPS/CFO-Agent/brain/CFO_PULSE_CONTRACT.md.
+        Approved iff status == 'open'. The legacy boolean
+        `spend_approved_by_atlas` was never written by Atlas — kept as a
+        no-op fallback so this stays back-compatible.
         """
         cfo_pulse = self.get_cfo_pulse()
-        # Atlas will set this boolean in cfo_pulse.json when approving
-        return cfo_pulse.get("spend_approved_by_atlas", False)
+        spend_gate = cfo_pulse.get("spend_gate") or {}
+        if isinstance(spend_gate, dict):
+            return spend_gate.get("status") == "open"
+        # v0 string form (deprecated 2026-04-26)
+        return spend_gate == "open"
 
 if __name__ == "__main__":
     # Test script functionality

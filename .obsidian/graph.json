@@ -8,6 +8,27 @@
   "collapse-color-groups": false,
   "colorGroups": [
     {
+      "query": "path:brain/canon",
+      "color": {
+        "a": 1,
+        "rgb": 16766720
+      }
+    },
+    {
+      "query": "path:brain/clients",
+      "color": {
+        "a": 1,
+        "rgb": 16737095
+      }
+    },
+    {
+      "query": "path:brain/verticals",
+      "color": {
+        "a": 1,
+        "rgb": 14423100
+      }
+    },
+    {
       "query": "path:brain",
       "color": {
         "a": 1,
@@ -36,6 +57,27 @@
       }
     },
     {
+      "query": "path:_templates",
+      "color": {
+        "a": 1,
+        "rgb": 10066329
+      }
+    },
+    {
+      "query": "path:proposals",
+      "color": {
+        "a": 1,
+        "rgb": 6737151
+      }
+    },
+    {
+      "query": "path:docs",
+      "color": {
+        "a": 1,
+        "rgb": 13421772
+      }
+    },
+    {
       "query": "path:APPS_CONTEXT",
       "color": {
         "a": 1,
@@ -53,6 +95,6 @@
   "repelStrength": 11.25,
   "linkStrength": 0.203125,
   "linkDistance": 500,
-  "scale": 0.08317427835927546,
-  "close": true
+  "scale": 0.08317427835927543,
+  "close": false
 }

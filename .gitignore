@@ -10,6 +10,24 @@ dist/
 # BUT allow the committable template (structure only, no values)
 !.env.agents.template
 !.env.example
+
+# Token / credential files
+*.token
+*_token.txt
+*_token.json
+*token*.txt
+.long_lived_token*
+credentials.json
+service_account.json
+id_rsa
+id_ed25519
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+
 *.log
 .DS_Store
 __pycache__/

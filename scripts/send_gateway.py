@@ -96,13 +96,15 @@ def _telegram_notify(*_a: Any, **_kw: Any) -> bool:
 DEFAULT_COOLDOWNS: dict[str, int] = {
     "email": 96,        # 4 days between marketing emails to the same lead
     "instagram": 48,    # 2 days
+    "instagram_dm": 24, # 24h cooldown per IG recipient (1:1 outbound at scale)
     "skool": 24,        # 1 day
     "telegram": 0,      # internal
     # Paid-spend channels — no recipient-level cooldown (audience targeting
     # is the gate, not per-lead cadence). The CFO spend gate is the cap.
     "meta_ads": 0,
     "google_ads": 0,
-    "late_post": 0,     # organic social posting via Late MCP
+    "late_post": 0,     # organic social posting via Late MCP (legacy alias)
+    "social": 0,        # organic social — Late publisher unified channel
 }
 
 # Daily outbound caps. Stricter than Bravo's because marketing list sizes
@@ -110,7 +112,9 @@ DEFAULT_COOLDOWNS: dict[str, int] = {
 DAILY_CAPS: dict[str, int] = {
     "email": 200,       # marketing-blast cap (per master doc)
     "instagram": 30,
+    "instagram_dm": 30, # 1:1 IG DMs — anti-spam discipline
     "late_post": 25,
+    "social": 50,       # organic posts across all platforms via Late
     # Paid-spend channels do NOT have a count-based daily cap — the
     # dollar-budget cap from cfo_pulse.json is the meaningful limit.
 }
@@ -118,7 +122,9 @@ DAILY_CAPS: dict[str, int] = {
 HOURLY_CAPS: dict[str, int] = {
     "email": 30,        # protects sender reputation against bursty sends
     "instagram": 6,
+    "instagram_dm": 5,
     "late_post": 5,
+    "social": 10,
 }
 
 KNOWN_AGENT_SOURCES: frozenset[str] = frozenset({
@@ -128,6 +134,8 @@ KNOWN_AGENT_SOURCES: frozenset[str] = frozenset({
     "content_pipeline",
     "jotform_tracker",
     "late_poster",
+    "late_publisher",
+    "instagram_engine",
     "ad_copy_generator",
     "manual_cc",
     "scheduler",
@@ -327,11 +335,12 @@ def _read_cfo_pulse() -> Optional[dict]:
         return None
 
 
+CFO_PULSE_STALE_HOURS = 24
+
+
 def check_cfo_spend_gate(channel: str, brand: str, amount_usd: Optional[float] = None) -> dict:
-    """Consult cfo_pulse.json to determine whether a paid-spend action is
-    approved. Fail-closed: if the pulse is missing or the channel is not
-    explicitly approved, the gate blocks. Atlas always has the final say on
-    money out the door.
+    """Consult cfo_pulse.json. Fail-closed on missing, stale (>24h), closed,
+    no-channel-approval, no-brand-approval, zero-budget, or amount-over-budget.
 
     Returns:
         {"allowed": bool, "reason": str, "approved_budget": float|None}
@@ -346,6 +355,26 @@ def check_cfo_spend_gate(channel: str, brand: str, amount_usd: Optional[float] =
             "reason": "cfo_pulse.json unavailable — Atlas spend gate fails closed",
             "approved_budget": None,
         }
+
+    # Staleness check — pulse older than 24h means Atlas isn't actively
+    # speaking. Fail closed; Atlas should refresh before any spend.
+    pulse_ts_raw = pulse.get("updated_at") or (pulse.get("spend_gate") or {}).get("updated_at")
+    if pulse_ts_raw:
+        try:
+            pulse_ts = datetime.fromisoformat(str(pulse_ts_raw).replace("Z", "+00:00"))
+            age_hours = (datetime.now(timezone.utc) - pulse_ts).total_seconds() / 3600.0
+            if age_hours > CFO_PULSE_STALE_HOURS:
+                return {
+                    "allowed": False,
+                    "reason": f"cfo_pulse.json stale ({age_hours:.1f}h > {CFO_PULSE_STALE_HOURS}h) — refusing spend",
+                    "approved_budget": None,
+                }
+        except (ValueError, TypeError):
+            return {
+                "allowed": False,
+                "reason": f"cfo_pulse.json updated_at unparseable ({pulse_ts_raw!r})",
+                "approved_budget": None,
+            }
 
     spend_gate = pulse.get("spend_gate") or {}
     if spend_gate.get("status") != "open":
@@ -366,6 +395,13 @@ def check_cfo_spend_gate(channel: str, brand: str, amount_usd: Optional[float] =
         }
 
     approved_budget = brand_block.get("daily_budget_usd")
+    # Zero-budget is a hard block even if the channel/brand combo exists.
+    if approved_budget is not None and approved_budget <= 0:
+        return {
+            "allowed": False,
+            "reason": f"Atlas approved budget for {channel}/{brand} is $0.00 — spend disabled",
+            "approved_budget": approved_budget,
+        }
     if amount_usd is not None and approved_budget is not None and amount_usd > approved_budget:
         return {
             "allowed": False,
@@ -377,6 +413,169 @@ def check_cfo_spend_gate(channel: str, brand: str, amount_usd: Optional[float] =
         }
 
     return {"allowed": True, "reason": "ok", "approved_budget": approved_budget}
+
+
+# ---- Marketing-specific content gates ---------------------------------------
+
+import re as _re  # noqa: E402
+
+_UTM_REQUIRED = ("utm_source", "utm_medium", "utm_campaign")
+_URL_RE = _re.compile(r"https?://[^\s<>\"']+", _re.IGNORECASE)
+_SUBJECT_SLOP_PATTERNS = [
+    _re.compile(r"\bunlock the power of\b", _re.IGNORECASE),
+    _re.compile(r"\bgame[- ]chang(er|ing)\b", _re.IGNORECASE),
+    _re.compile(r"\brevolution(ize|ary|izing)\b", _re.IGNORECASE),
+    _re.compile(r"\btake your .* to the next level\b", _re.IGNORECASE),
+]
+
+
+def check_utm_compliance(text: Optional[str]) -> dict:
+    """Every outbound link in commercial copy must carry utm_source +
+    utm_medium + utm_campaign. Returns {allowed, reason, missing_links}."""
+    if not text:
+        return {"allowed": True, "reason": "no body", "missing_links": []}
+    missing = []
+    for url in _URL_RE.findall(text):
+        # Skip unsubscribe + transactional links — they intentionally don't
+        # carry campaign UTMs.
+        if "unsubscribe" in url.lower() or "/u/" in url.lower():
+            continue
+        # mailto: handled by the regex's http(s) anchor, so any URL captured here is web.
+        url_lower = url.lower()
+        if not all(tag in url_lower for tag in _UTM_REQUIRED):
+            missing.append(url)
+    if missing:
+        return {
+            "allowed": False,
+            "reason": f"UTM tags missing on {len(missing)} link(s): "
+                      + ", ".join(m[:80] for m in missing[:3]),
+            "missing_links": missing,
+        }
+    return {"allowed": True, "reason": "ok", "missing_links": []}
+
+
+def check_subject_slop(subject: Optional[str]) -> dict:
+    """Subject-line slop detection — block 'Unlock the power of...',
+    all-caps subjects, generic emoji-only opens."""
+    if not subject:
+        return {"allowed": True, "reason": "no subject"}
+    s = subject.strip()
+    # All-caps test (allow short codes like SALE but block whole-line ALL CAPS over 12 chars)
+    letters = [c for c in s if c.isalpha()]
+    if len(letters) >= 12 and all(c.isupper() for c in letters):
+        return {"allowed": False, "reason": f"all-caps subject blocked: {s[:60]!r}"}
+    # Emoji-only opener: if first 4 non-space chars are all non-alphanumeric
+    head = s.lstrip()[:4]
+    if head and not any(c.isalnum() for c in head):
+        return {"allowed": False, "reason": f"emoji-only subject opener blocked: {s[:60]!r}"}
+    for pat in _SUBJECT_SLOP_PATTERNS:
+        if pat.search(s):
+            return {"allowed": False, "reason": f"subject slop pattern matched: {pat.pattern!r}"}
+    return {"allowed": True, "reason": "ok"}
+
+
+def check_image_alt_text(attachments: Optional[list[dict]]) -> dict:
+    """Every image attachment MUST have alt_text. ADA + anti-slop discipline.
+    Non-image attachments are exempt (PDFs, .ics, etc.)."""
+    if not attachments:
+        return {"allowed": True, "reason": "no attachments"}
+    missing = []
+    for att in attachments:
+        ctype = (att.get("content_type") or "").lower()
+        if not ctype.startswith("image/"):
+            continue
+        if not (att.get("alt_text") or "").strip():
+            missing.append(att.get("filename") or "<unnamed>")
+    if missing:
+        return {"allowed": False,
+                "reason": f"{len(missing)} image(s) missing alt_text: {missing[:3]}"}
+    return {"allowed": True, "reason": "ok"}
+
+
+def check_creative_fatigue(db: Any, lead_id: Optional[str], channel: str,
+                           creative_id: Optional[str], window_days: int = 14) -> dict:
+    """Block sending the same creative_id to the same lead within window_days.
+    Returns {allowed, reason}."""
+    if not lead_id or not creative_id:
+        return {"allowed": True, "reason": "no creative_id or lead_id; cannot check fatigue"}
+    try:
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=window_days)).isoformat()
+        rows = (
+            db.table("lead_interactions")
+            .select("metadata, created_at")
+            .eq("lead_id", lead_id)
+            .eq("channel", channel)
+            .gte("created_at", cutoff)
+            .execute()
+            .data
+        ) or []
+        for r in rows:
+            md = r.get("metadata") or {}
+            if isinstance(md, dict) and md.get("creative_id") == creative_id:
+                return {
+                    "allowed": False,
+                    "reason": f"creative {creative_id} already sent to lead {lead_id} "
+                              f"in last {window_days}d ({r.get('created_at')})",
+                }
+    except Exception as exc:  # noqa: BLE001
+        return {"allowed": False, "reason": f"creative-fatigue check failed: {exc}"}
+    return {"allowed": True, "reason": "ok"}
+
+
+# ---- VIP segment override (env-driven) --------------------------------------
+
+def is_vip_recipient(to_email: Optional[str], env: Optional[dict[str, str]] = None) -> bool:
+    """VIP segment override — for flagged accounts, draft_critic non-ship
+    verdicts return ship-with-warning instead of blocking. Defined by
+    env var MAVEN_VIP_EMAILS (comma-sep) or by suffix MAVEN_VIP_DOMAINS.
+
+    Source-of-truth precedence: .env.agents (the project's audited credential
+    file) ALWAYS wins. os.environ is only consulted when .env.agents is silent
+    on a key. This prevents an attacker who can set os.environ from elevating
+    arbitrary recipients to VIP status against the operator's vetted list."""
+    if not to_email:
+        return False
+    env = env if env is not None else load_env()
+    # If the operator has set MAVEN_VIP_EMAILS in .env.agents at all (even
+    # to empty string), treat that as authoritative. Only fall back to
+    # os.environ when the key is absent from the audited file.
+    raw_emails = env["MAVEN_VIP_EMAILS"] if "MAVEN_VIP_EMAILS" in env else os.environ.get("MAVEN_VIP_EMAILS", "")
+    raw_domains = env["MAVEN_VIP_DOMAINS"] if "MAVEN_VIP_DOMAINS" in env else os.environ.get("MAVEN_VIP_DOMAINS", "")
+    vip_emails = {e.strip().lower() for e in (raw_emails or "").split(",") if e.strip()}
+    vip_domains = {d.strip().lower().lstrip("@") for d in (raw_domains or "").split(",") if d.strip()}
+    norm = to_email.strip().lower()
+    if norm in vip_emails:
+        return True
+    domain = norm.rpartition("@")[2]
+    return domain in vip_domains
+
+
+# ---- List-mode caps (≥50 recipients in <1h => list-mode) --------------------
+
+LIST_MODE_THRESHOLD = 50
+LIST_MODE_WINDOW_MINUTES = 60
+LIST_MODE_HOURLY_CAP = 200  # 4× single-recipient hourly cap of 30 + slack
+LIST_MODE_DAILY_CAP = 500
+
+
+def check_list_mode_caps(db: Any, channel: str) -> dict:
+    """When >= LIST_MODE_THRESHOLD sends in the trailing hour, treat the
+    burst as a list/blast and apply the higher list-mode cap as the gate.
+    Returns {allowed, reason, in_list_mode}."""
+    try:
+        window_start = datetime.now(timezone.utc) - timedelta(minutes=LIST_MODE_WINDOW_MINUTES)
+        recent = _count_window(db, channel, window_start)
+    except Exception as exc:  # noqa: BLE001
+        return {"allowed": False, "reason": f"list-mode check failed: {exc}", "in_list_mode": False}
+    if recent < LIST_MODE_THRESHOLD:
+        return {"allowed": True, "reason": "single-recipient mode", "in_list_mode": False}
+    if recent >= LIST_MODE_HOURLY_CAP:
+        return {
+            "allowed": False,
+            "reason": f"list-mode hourly cap hit: {recent}/{LIST_MODE_HOURLY_CAP}",
+            "in_list_mode": True,
+        }
+    return {"allowed": True, "reason": "in list-mode under cap", "in_list_mode": True}
 
 
 # ---- Lead resolution --------------------------------------------------------
@@ -1307,6 +1506,47 @@ def send(
             "sent_at": datetime.now(timezone.utc).isoformat(),
         })
 
+        # ---- Marketing content gates (commercial intent only) ----
+        if intent == "commercial":
+            # UTM compliance: every link in the body needs utm_source/medium/campaign
+            if _env_bool(env, "UTM_COMPLIANCE_ENABLED", True):
+                utm_check = check_utm_compliance(body_text)
+                if not utm_check["allowed"]:
+                    return {"status": "blocked",
+                            "reason": f"UTM compliance: {utm_check['reason']}",
+                            "lead_id": lead_id, "interaction_id": None,
+                            "cooldown_until": None, "daily_count": None}
+            # Subject-line slop
+            subj_check = check_subject_slop(subject)
+            if not subj_check["allowed"]:
+                return {"status": "blocked",
+                        "reason": f"subject slop: {subj_check['reason']}",
+                        "lead_id": lead_id, "interaction_id": None,
+                        "cooldown_until": None, "daily_count": None}
+            # Image alt-text presence
+            alt_check = check_image_alt_text(attachments)
+            if not alt_check["allowed"]:
+                return {"status": "blocked",
+                        "reason": f"image alt-text: {alt_check['reason']}",
+                        "lead_id": lead_id, "interaction_id": None,
+                        "cooldown_until": None, "daily_count": None}
+            # Creative fatigue: don't ship the same creative_id twice in 14d
+            creative_id = (metadata or {}).get("creative_id") if metadata else None
+            if creative_id:
+                fatigue_check = check_creative_fatigue(db, lead_id, channel, creative_id)
+                if not fatigue_check["allowed"]:
+                    return {"status": "blocked",
+                            "reason": f"creative fatigue: {fatigue_check['reason']}",
+                            "lead_id": lead_id, "interaction_id": None,
+                            "cooldown_until": None, "daily_count": None}
+            # List-mode caps when burst exceeds threshold
+            list_check = check_list_mode_caps(db, channel)
+            if not list_check["allowed"]:
+                return {"status": "blocked",
+                        "reason": list_check["reason"],
+                        "lead_id": lead_id, "interaction_id": None,
+                        "cooldown_until": None, "daily_count": None}
+
         # Fail-closed draft-critic gate (mirrors Bravo db37263 fix).
         if intent == "commercial" and _env_bool(env, "DRAFT_CRITIC_ENABLED", True):
             try:
@@ -1324,17 +1564,25 @@ def send(
                         "cooldown_until": None, "daily_count": None}
             verdict = critic_result.get("verdict")
             if verdict != "ship":
-                reasons = critic_result.get("reasons") or []
-                reason_text = (
-                    "; ".join(str(r) for r in reasons[:5])
-                    or critic_result.get("notes")
-                    or verdict
-                    or "rejected"
-                )
-                return {"status": "blocked",
-                        "reason": f"draft_critic rejected: {reason_text}",
-                        "lead_id": lead_id, "interaction_id": None,
-                        "cooldown_until": None, "daily_count": None}
+                # VIP override: ship-with-warning instead of block. Maven still
+                # logs the critic verdict in metadata so post-send review can
+                # surface the override.
+                if is_vip_recipient(to_email, env):
+                    full_metadata["critic_override"] = "vip"
+                    full_metadata["critic_verdict"] = verdict
+                    full_metadata["critic_reasons"] = (critic_result.get("reasons") or [])[:5]
+                else:
+                    reasons = critic_result.get("reasons") or []
+                    reason_text = (
+                        "; ".join(str(r) for r in reasons[:5])
+                        or critic_result.get("notes")
+                        or verdict
+                        or "rejected"
+                    )
+                    return {"status": "blocked",
+                            "reason": f"draft_critic rejected: {reason_text}",
+                            "lead_id": lead_id, "interaction_id": None,
+                            "cooldown_until": None, "daily_count": None}
 
         reservation = reserve_send_slot(
             db=db,

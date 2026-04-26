@@ -52,7 +52,7 @@ ORPHAN_ALLOWLIST = {
     "brain/PRODUCT_VERTICALS.md", "brain/OKRs.md", "brain/BENCHMARK.md",
     "brain/RISK_REGISTER.md", "brain/INDEX.md", "brain/RESPONSIBILITY_BOUNDARIES.md",
     "brain/MARKETING_CANON.md", "brain/WRITING.md", "brain/SHARED_DB.md",
-    "brain/ATTRIBUTION_MODEL.md",
+    "brain/ATTRIBUTION_MODEL.md", "brain/CFO_GATE_CONTRACT.md",
     # Memory
     "memory/ACTIVE_TASKS.md", "memory/SESSION_LOG.md",
     "memory/MISTAKES.md", "memory/PATTERNS.md", "memory/DECISIONS.md",

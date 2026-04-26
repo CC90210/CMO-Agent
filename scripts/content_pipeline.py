@@ -292,23 +292,39 @@ def generate_thumbnail(input_path, output_path, text=None, timestamp=1.0):
 # PLATFORM CAPTION GENERATION
 # ============================================================================
 
+# Per-platform character limits — canonical spec for marketing distribution.
+# Used by generate_captions and by late_publisher's validate_length.
+PLATFORM_CAPTION_LIMITS = {
+    "x": 280,
+    "threads": 500,
+    "instagram": 2200,
+    "linkedin": 3000,
+    "tiktok": 4000,
+    "facebook": 63206,      # Facebook is effectively unlimited for posts
+    "youtube_shorts": 100,  # title-style usage in this pipeline
+}
+
+
 def generate_captions(transcript_text, topic=None):
-    """Generate platform-specific caption text."""
+    """Generate platform-specific caption text. Every output respects
+    PLATFORM_CAPTION_LIMITS — tested in test_content_pipeline.py."""
     captions = {}
 
-    # Base caption with hashtags
     base = transcript_text[:200].strip() if transcript_text else ""
     if topic:
         hashtags = f"#{topic.replace(' ', '')} #AI #automation #claudecode"
     else:
         hashtags = "#AI #automation #tech #claudecode #oasisai"
 
-    captions["instagram"] = f"{base}\n\n{hashtags}"[:2200]
-    captions["tiktok"] = f"{base}\n\n{hashtags}"[:4000]
-    captions["youtube_shorts"] = base[:100]  # Title
-    captions["linkedin"] = f"{base}\n\n#AI #automation #business"[:3000]
-    captions["facebook"] = f"{base}\n\n{hashtags}"
-    captions["x"] = base[:250] + " " + hashtags[:25] if len(base) < 250 else base[:275]
+    captions["instagram"] = f"{base}\n\n{hashtags}"[:PLATFORM_CAPTION_LIMITS["instagram"]]
+    captions["threads"] = f"{base}\n\n{hashtags}"[:PLATFORM_CAPTION_LIMITS["threads"]]
+    captions["tiktok"] = f"{base}\n\n{hashtags}"[:PLATFORM_CAPTION_LIMITS["tiktok"]]
+    captions["youtube_shorts"] = base[:PLATFORM_CAPTION_LIMITS["youtube_shorts"]]
+    captions["linkedin"] = f"{base}\n\n#AI #automation #business"[:PLATFORM_CAPTION_LIMITS["linkedin"]]
+    captions["facebook"] = f"{base}\n\n{hashtags}"[:PLATFORM_CAPTION_LIMITS["facebook"]]
+    # X: keep hashtags inline but never exceed 280 — truncate the assembled string,
+    # not the parts (avoids the prior < 250 vs >= 250 bug that yielded 276-char output).
+    captions["x"] = (f"{base} {hashtags}"[:PLATFORM_CAPTION_LIMITS["x"]]).rstrip()
 
     print(f"[5/7] Captions generated for {len(captions)} platforms")
     return captions

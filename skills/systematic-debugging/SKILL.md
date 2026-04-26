@@ -1,5 +1,6 @@
 ---
 name: systematic-debugging
+description: Marketing-pipeline debugging protocol — hypothesis ladder, isolation, instrumentation, post-mortem capture.
 canon_references: [ritson-diagnosis]
 canon_source: brain/MARKETING_CANON.md
 universal: true

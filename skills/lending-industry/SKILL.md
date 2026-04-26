@@ -1,5 +1,6 @@
 ---
 name: lending-industry
+description: MCA/business-funding compliance and vocabulary rules. Use when working SunBiz or any regulated lending vertical.
 canon_references: [ritson-diagnosis]
 canon_source: brain/MARKETING_CANON.md
 universal: true

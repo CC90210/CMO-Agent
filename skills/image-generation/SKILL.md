@@ -1,5 +1,6 @@
 ---
 name: image-generation
+description: Production-grade AI ad imagery — prompt patterns, brand compositing, human-centered psychology, anti-slop standards.
 canon_references: [sutherland-signalling, dunford-positioning, godin-permission]
 canon_source: brain/MARKETING_CANON.md
 universal: true

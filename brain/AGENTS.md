@@ -1,6 +1,6 @@
 # AGENTS — Sub-Agent Registry & Orchestration Matrix
 
-> 15 specialized agents. Route tasks by type and complexity.
+> 19 specialized agents (16 marketing-specific + 3 cross-cutting from Bravo parity). Route tasks by type and complexity.
 
 ---
 
@@ -23,6 +23,17 @@
 | 13 | documenter | `agents/documenter.md` | Documentation, SOPs, memory management | Sonnet | "document", "SOP", "update docs" |
 | 14 | workflow-builder | `agents/workflow-builder.md` | n8n automation, scheduled tasks | Sonnet | "automate", "workflow", "schedule", "n8n" |
 | 15 | image-generator | `agents/image-generator.md` | AI ad creative generation (Gemini Imagen) | Opus | "generate ad", "create image", "ad creative", "imagen" |
+| 16 | email-outbound | `agents/email-outbound.md` | Marketing email blast operations | Sonnet | "email blast", "newsletter", "send campaign" |
+
+### Cross-Cutting Agents (Bravo parity)
+
+These three were imported in the V1.1 structural upgrade (2026-04-26). They handle disciplines Maven was missing — campaign-launch review, deep market research, and non-ad written communications.
+
+| # | Agent | File | Role | Model | Trigger |
+|---|-------|------|------|-------|---------|
+| 17 | reviewer | `agents/reviewer.md` | Adversarial pre-launch campaign review | Sonnet | "review this campaign", "before launching", "ship-ready?" |
+| 18 | researcher | `agents/researcher.md` | Market research, competitor ad-library scrapes | Sonnet | "research", "competitor", "ad library", "trend" |
+| 19 | writer | `agents/writer.md` | Briefs, retros, RFCs, memos to C-suite (NOT ad copy) | Sonnet | "draft a brief", "post-mortem", "memo to bravo", "RFC" |
 
 ---
 

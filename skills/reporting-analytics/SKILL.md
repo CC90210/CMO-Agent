@@ -1,5 +1,6 @@
 ---
 name: reporting-analytics
+description: Cross-platform performance reporting — metric reconciliation, ROAS modeling, dashboard generation, narrative writing.
 canon_references: [ritson-diagnosis, sharp-mental-availability]
 canon_source: brain/MARKETING_CANON.md
 universal: true

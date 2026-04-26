@@ -1,3 +1,10 @@
+---
+name: debugger
+description: Use this agent when CC asks to debug a marketing-pipeline failure, API error, or systematic troubleshooting of campaign/automation issues.
+model: sonnet
+tools: Read, Edit, Glob, Grep, Bash
+---
+
 # Agent: Debugger
 
 > Root cause analysis, API error resolution, and systematic troubleshooting.

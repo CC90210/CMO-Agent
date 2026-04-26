@@ -1,5 +1,6 @@
 ---
 name: media-upload
+description: Media upload pipeline for Meta, Google, Late, and Shopify. Format conversion, codec, aspect-ratio handling.
 canon_references: [ritson-diagnosis]
 canon_source: brain/MARKETING_CANON.md
 universal: true

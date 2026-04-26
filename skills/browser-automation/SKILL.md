@@ -1,5 +1,6 @@
 ---
 name: browser-automation
+description: Playwright-driven browser automation for ad-library scraping, competitor research, and UI flow verification.
 canon_references: [ritson-diagnosis]
 canon_source: brain/MARKETING_CANON.md
 universal: true

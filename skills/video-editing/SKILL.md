@@ -1,5 +1,6 @@
 ---
 name: video-editing
+description: Video editing pipeline for ad creative — trimming, captioning, hooks, platform aspect ratios, thumbnail generation.
 canon_references: [sutherland-signalling, dunford-positioning]
 canon_source: brain/MARKETING_CANON.md
 universal: true

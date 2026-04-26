@@ -1,3 +1,10 @@
+---
+name: architect
+description: Use this agent when CC asks for marketing-stack design, infrastructure planning, or major technical decisions inside the CMO repo (data pipelines, integration topology).
+model: opus
+tools: Read, Glob, Grep, Bash
+---
+
 # Agent: Architect
 
 > System design, infrastructure planning, and technical decision-making.

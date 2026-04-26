@@ -1,3 +1,10 @@
+---
+name: video-editor
+description: Use this agent when CC asks to trim, caption, format, thumbnail, or platform-optimize video assets for ad placement.
+model: sonnet
+tools: Read, Write, Edit, Glob, Grep, Bash
+---
+
 # Agent: Video Editor
 
 > Video production pipeline — trimming, captioning, formatting, thumbnail creation, and platform-specific optimization.

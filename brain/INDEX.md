@@ -32,6 +32,7 @@ Maven writes only to `data/pulse/cmo_pulse.json`.
 - [[WRITING]] — Voice, hooks, anti-slop, canon-citation rule for every deliverable
 - [[BRAIN_LOOP]] — How Maven reasons through a task
 - [[INTERACTION_PROTOCOL]] — How Maven talks to CC + sibling agents
+- [[RESPONSIBILITY_BOUNDARIES]] — Maven/Bravo/Atlas/Aura ownership matrix + grey-zone routing (V1.1)
 
 ---
 

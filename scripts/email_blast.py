@@ -42,14 +42,11 @@ import csv
 import logging
 import os
 import re
-import smtplib
 import threading
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from pathlib import Path
 from typing import Optional
 
@@ -308,48 +305,6 @@ def _personalise_subject(subject: str, recipient: dict[str, str]) -> str:
 
 
 # ---------------------------------------------------------------------------
-# SMTP Connection Pool (one connection per worker thread)
-# ---------------------------------------------------------------------------
-
-
-_thread_local = threading.local()
-
-
-def _get_smtp_connection() -> smtplib.SMTP:
-    """
-    Return a per-thread SMTP connection, creating one if needed.
-    Reconnects automatically if the connection has gone stale.
-    """
-    conn: Optional[smtplib.SMTP] = getattr(_thread_local, "smtp", None)
-    try:
-        if conn is not None:
-            conn.noop()  # ping — raises if dead
-            return conn
-    except Exception:
-        _logger.debug("SMTP connection stale — reconnecting")
-
-    smtp = smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30)
-    smtp.ehlo()
-    smtp.starttls()
-    smtp.ehlo()
-    smtp.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
-    _thread_local.smtp = smtp
-    _logger.debug("SMTP connection established (thread %s)", threading.current_thread().name)
-    return smtp
-
-
-def _close_thread_smtp() -> None:
-    """Gracefully close the per-thread SMTP connection."""
-    conn: Optional[smtplib.SMTP] = getattr(_thread_local, "smtp", None)
-    if conn:
-        try:
-            conn.quit()
-        except Exception:
-            pass
-        _thread_local.smtp = None
-
-
-# ---------------------------------------------------------------------------
 # Rate Limiter
 # ---------------------------------------------------------------------------
 
@@ -386,43 +341,40 @@ def send_single_email(
     html_body: str,
     from_name: str = FROM_NAME,
     dry_run: bool = False,
+    brand: str = "sunbiz",
 ) -> bool:
     """
-    Send one HTML email via Gmail SMTP.
+    Send one HTML email — routes through Maven's send_gateway for CASL,
+    cooldown, daily/hourly cap, draft-critic, name-sanitization, and
+    suppression enforcement. NEVER opens its own SMTP socket.
 
-    Args:
-        to_email:  Recipient address.
-        subject:   Email subject (already personalised).
-        html_body: Full HTML body (already personalised).
-        from_name: Display name in From header.
-        dry_run:   If True, skip the actual send and log only.
-
-    Returns:
-        True on success, False on failure.
+    Returns: True on accepted send, False on block/error.
     """
-    if dry_run:
-        _logger.info("[DRY RUN] Would send to %s | subject: %s", to_email, subject)
-        return True
-
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = f"{from_name} <{GMAIL_ADDRESS}>"
-    msg["To"] = to_email
-    msg["List-Unsubscribe"] = f"<mailto:{GMAIL_ADDRESS}?subject=unsubscribe>"
-    msg["X-Mailer"] = "SunBiz-EmailBlast/2.0"
-
-    # Plain-text fallback — strip HTML tags for a minimal plaintext version
+    # Plain-text fallback for the gateway (it builds the MIME envelope).
     plain_text = re.sub(r"<[^>]+>", "", html_body)
     plain_text = re.sub(r"\s{2,}", " ", plain_text).strip()
 
-    msg.attach(MIMEText(plain_text, "plain", "utf-8"))
-    msg.attach(MIMEText(html_body, "html", "utf-8"))
-
     _throttle()
 
-    smtp = _get_smtp_connection()
-    smtp.sendmail(GMAIL_ADDRESS, to_email, msg.as_string())
-    return True
+    from send_gateway import send as _gateway_send  # local import: chokepoint
+    result = _gateway_send(
+        channel="email",
+        agent_source="email_blast",
+        to_email=to_email,
+        subject=subject,
+        body_text=plain_text,
+        body_html=html_body,
+        brand=brand,
+        intent="commercial",
+        dry_run=dry_run,
+    )
+    if result["status"] in {"sent", "dry_run"}:
+        return True
+    _logger.warning(
+        "[email_blast] gateway %s for %s: %s",
+        result["status"], to_email, result.get("reason"),
+    )
+    return False
 
 
 # ---------------------------------------------------------------------------
@@ -534,17 +486,11 @@ def _send_one(
     last_error = ""
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            send_single_email(email, subject, html_body, dry_run=dry_run)
-            log_send(campaign_id, recipient, "sent")
-            return {"email": email, "status": "sent", "error": ""}
-        except smtplib.SMTPRecipientsRefused as exc:
-            last_error = f"Recipient refused: {exc}"
-            _logger.warning("Recipient refused %s — not retrying", email)
-            break  # Bounced — no point retrying
-        except smtplib.SMTPServerDisconnected:
-            # Force reconnect on next attempt
-            _close_thread_smtp()
-            last_error = "Server disconnected"
+            ok = send_single_email(email, subject, html_body, dry_run=dry_run)
+            if ok:
+                log_send(campaign_id, recipient, "sent")
+                return {"email": email, "status": "sent", "error": ""}
+            last_error = "send_gateway blocked or failed (see gateway logs)"
         except Exception as exc:
             last_error = str(exc)
 

@@ -168,9 +168,53 @@ Both platforms work the same way:
 - **AI Image Generation:** 1 (Gemini Imagen)
 - **Video Tools:** 2 (FFmpeg, Whisper)
 - **Native Tools:** 12+
-- **Agents:** 15
-- **Skills:** 32 (all canon-referenced)
+- **Agents:** 19 (16 marketing-specific + 3 cross-cutting)
+- **Skills:** 54 (32 marketing-specific + 22 cross-cutting from Bravo parity)
 - **Workflows:** 11
+
+## Maven Script Registry
+
+The CMO repo's `scripts/` directory holds these executables. Each is invoked from a slash command, a sub-agent, or directly during operations.
+
+### Send-safety chokepoint (V1.1)
+- `send_gateway.py` — single outbound chokepoint for email, Meta Ads spend, Google Ads spend, Late posts. CASL, name-sanitization, daily/hourly caps, draft-critic gate, CFO spend gate. Tested by `test_send_gateway.py` (48 cases).
+- `name_utils.py` — recipient-name placeholder defense (the "Hi Contact," fix).
+- `casl_compliance.py` — suppression list, footer, List-Unsubscribe headers.
+- `draft_critic.py` — adversarial Haiku reviewer; fail-closed gate.
+
+### Delegation + ops (V1.1)
+- `agent_inbox.py` — async cross-agent messaging (Bravo / Atlas / Aura / Codex).
+- `codex_delegate.py` — Codex bridge for backend marketing work at scale.
+- `state_sync.py` — end-of-session: STATE.md + SESSION_LOG.md + cmo_pulse.json.
+- `self_audit.py` — health score (frontmatter + send_gateway tests + pulse freshness + orphans).
+
+### Marketing engines
+- `email_blast.py` — bulk marketing email (routes through send_gateway).
+- `meta_ads_engine.py` — Meta Marketing API CRUD (spend gated through send_gateway).
+- `google_ads_engine.py` — Google Ads SDK CRUD (spend gated through send_gateway).
+- `meta_campaign_builder.py` — campaign-structure builder for Meta.
+- `jotform_tracker.py` — JotForm submission polling.
+- `ad_copy_generator.py` — copy generation pipeline.
+- `ab_testing_engine.py` — A/B test management.
+- `campaign_templates.py` — campaign-structure templates.
+- `performance_reporter.py` — cross-platform reporting.
+- `update_utm_links.py` — UTM hygiene.
+- `audit_logger.py` — audit trail for all platform mutations.
+- `cache_layer.py` — caching for platform reads.
+- `monitoring.py` — heartbeat for the marketing daemons.
+- `pulse_client.py` — read C-suite pulse files.
+- `full_diagnostic.py` — end-to-end stack diagnostic.
+
+### Content + creative
+- `content_engine.py`, `content_pipeline.py`, `content_generator.py`, `content_repurposer.py`, `edit_content_v2.py` — content production pipeline.
+- `generate_logo.py`, `save_logo.py` — brand logo generation.
+- `imagen_generate.py` — Gemini Imagen ad creative.
+- `generate_page_assets.py` — landing-page asset generation.
+- `render_video.py` — video composition + caption rendering.
+
+### Token + setup
+- `generate_google_ads_token.py` — OAuth flow for Google Ads.
+- `setup.py` — repo bootstrap.
 
 ---
 

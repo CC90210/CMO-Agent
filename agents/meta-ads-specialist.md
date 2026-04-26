@@ -1,3 +1,10 @@
+---
+name: meta-ads-specialist
+description: Use this agent when CC asks for Meta Ads work — campaigns, ad sets, ads, creatives, audiences, or insights via the Meta Marketing API.
+model: sonnet
+tools: Read, Write, Edit, Glob, Grep, Bash
+---
+
 # Agent: Meta Ads Specialist
 
 > All Meta Marketing API operations for SunBiz Funding — campaigns, ad sets, ads, creatives, audiences, insights.

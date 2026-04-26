@@ -1,5 +1,6 @@
 ---
 name: self-healing
+description: Auto-recovery patterns for marketing automations — token refresh, retry policies, fallback channels, dead-letter queues.
 canon_references: [ritson-diagnosis]
 canon_source: brain/MARKETING_CANON.md
 universal: true

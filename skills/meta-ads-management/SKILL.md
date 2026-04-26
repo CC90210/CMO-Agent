@@ -1,5 +1,6 @@
 ---
 name: meta-ads-management
+description: Meta Ads operational playbook — Special Ad Categories, Andromeda creative diversity, ad-set structure, audience overlap.
 canon_references: [sharp-mental-availability, ritson-diagnosis]
 canon_source: brain/MARKETING_CANON.md
 universal: true

@@ -1,5 +1,6 @@
 ---
 name: a-b-testing
+description: Systematic split-testing protocol for ads, audiences, and landing pages — test design, sample sizing, significance thresholds.
 canon_references: [sharp-how-brands-grow, ritson-diagnosis, hormozi-value-equation]
 canon_source: brain/MARKETING_CANON.md
 universal: true

@@ -364,27 +364,32 @@ class GoogleAdsEngine:
         budget_amount: float,
         bidding_strategy: str = "MAXIMIZE_CONVERSIONS",
         status: str = "PAUSED",
+        brand: str = "sunbiz",
     ) -> dict:
         """
         Create a Search campaign with a daily budget.
 
-        Creates the budget resource first, then the campaign.  Always defaults
-        to PAUSED so the operator can review before going live.
-
-        Args:
-            name: Display name for the campaign.
-            budget_amount: Daily budget in US dollars (e.g. 50.0 for $50/day).
-            bidding_strategy: One of MAXIMIZE_CONVERSIONS, MAXIMIZE_CLICKS,
-                              TARGET_CPA, MANUAL_CPC.
-            status: PAUSED or ENABLED.
-
-        Returns:
-            dict with id, name, status, budget_usd, bidding_strategy,
-            budget_resource_name, campaign_resource_name.
+        Spend is gated through send_gateway → CFO spend pulse before any
+        Google Ads API mutation. If Atlas hasn't approved this channel/brand
+        at the requested daily budget, the call is rejected.
         """
         err = self._guard("create_search_campaign")
         if err:
             return err
+
+        # CFO spend gate (Maven send_gateway chokepoint)
+        from send_gateway import send as _gateway_send
+        gate_result = _gateway_send(
+            channel="google_ads",
+            agent_source="google_ads_engine",
+            brand=brand,
+            spend_amount_usd=budget_amount,
+            intent="commercial",
+            dry_run=True,
+        )
+        if gate_result["status"] == "blocked":
+            log.warning("CFO spend gate blocked google_ads campaign: %s", gate_result["reason"])
+            return {"error": gate_result["reason"], "status": "blocked", "method": "create_search_campaign"}
 
         log.info(
             "Creating search campaign '%s' (budget=$%.2f/day, bidding=%s)",

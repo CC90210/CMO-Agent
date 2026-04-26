@@ -1,5 +1,6 @@
 ---
 name: google-ads-management
+description: Google Ads operational playbook — campaigns, ad groups, keywords, bidding, negative-keyword discipline, quality score.
 canon_references: [sharp-mental-availability, ritson-diagnosis]
 canon_source: brain/MARKETING_CANON.md
 universal: true

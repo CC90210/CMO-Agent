@@ -1,3 +1,10 @@
+---
+name: image-generator
+description: Use this agent when CC asks to generate ad creative imagery — psychology-based, human-centered, brand-composited static creative.
+model: sonnet
+tools: Read, Write, Edit, Glob, Grep, Bash
+---
+
 # Agent: Image Generator
 
 > Production-grade AI ad creative generation for SunBiz Funding — psychology-based, human-centered, logo-composited.

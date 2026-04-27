@@ -1,7 +1,7 @@
 {
   "agent": "maven",
   "version": "1.1",
-  "updated_at": "2026-04-27T08:23:42.379503+00:00",
+  "updated_at": "2026-04-27T09:40:57.542937+00:00",
   "status": "OPERATIONAL",
   "session_note": "2026-04-21 graph-wiring pass. Built brain/INDEX.md (vault hub), brain/WRITING.md (voice/hook/anti-slop communication hub), brain/research/content_registry.md (attribution dependency). Relocated stale brain/LENDING_AD_RESEARCH.md to brain/clients/sunbiz-funding-ad-research.md. Wired [[wikilinks]] through SOUL/STATE/CAPABILITIES/SHARED_DB/MARKETING_CANON/ATTRIBUTION_MODEL, all 5 client files, all 8 vertical-pack files (agency + creator), PATTERNS/MISTAKES/ACTIVE_TASKS, marketing-research+lead-management+self-improvement-protocol skills, and START_HERE. Obsidian graph now properly connected \u2014 244 wikilinks total (was 13).",
   "content_pipeline": {
@@ -125,7 +125,7 @@
       "brain/WRITING.md (communication hub)"
     ]
   },
-  "last_note": "video_editor hardening: cut accuracy, real ducking, Telegram auto-shrink",
+  "last_note": "V1.7 bridge: /pulses + /sibling slash commands (Atlas V3.2 parity)",
   "active_brands": [
     "oasis",
     "conaugh",

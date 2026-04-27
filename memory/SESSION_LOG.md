@@ -31,6 +31,10 @@
 - Test connectivity
 ### 2026-04-27 — Auto-sync
 **Agent:** MAVEN state_sync
+**Note:** V1.7 bridge: /pulses + /sibling slash commands (Atlas V3.2 parity)
+
+### 2026-04-27 — Auto-sync
+**Agent:** MAVEN state_sync
 **Note:** video_editor hardening: cut accuracy, real ducking, Telegram auto-shrink
 
 ### 2026-04-27 — Auto-sync
@@ -44,6 +48,10 @@
 ### 2026-04-27 — Auto-sync
 **Agent:** MAVEN state_sync
 **Note:** V1.3 Telegram surface: notify.py + telegram_agent.js
+
+### 2026-04-26 — Auto-sync
+**Agent:** MAVEN state_sync
+**Note:** MacBook V1.2 sync
 
 ### 2026-04-26 — Auto-sync
 **Agent:** MAVEN state_sync

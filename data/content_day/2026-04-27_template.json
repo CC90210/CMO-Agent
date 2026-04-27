@@ -1,0 +1,99 @@
+{
+  "content_day": "2026-04-27",
+  "week_starting": "2026-04-28",
+  "timezone": "America/New_York",
+  "brand": "cc_personal",
+  "total_pieces": 7,
+  "pieces": [
+    {
+      "piece_number": 1,
+      "pillar": "ceo_log",
+      "scheduled_for": "2026-04-28T08:00:00",
+      "platforms": ["linkedin", "twitter"],
+      "hook": "I automated my entire client pipeline. Took me 30 minutes. I'm 22.",
+      "body": "What it looked like before -- manual follow-up, missed leads, chaos. What one AI agent changed -- response time instant, follow-up automatic. The result -- leads don't slip, I focus on closing not chasing. Most agencies are still doing this manually. That's why they'll lose.",
+      "caption_overrides": {
+        "twitter": "I automated my entire client pipeline in 30 minutes. I'm 22.\n\nMost agencies are still doing this manually.\n\nThat's why they'll lose.\n\nComment 'AGENT' to see the system."
+      },
+      "media_path": "",
+      "media_urls": [],
+      "notes": "CEO Log energy -- effortless, 'another day at the office'. CTA: Comment 'AGENT' to see the actual system."
+    },
+    {
+      "piece_number": 2,
+      "pillar": "the_becoming",
+      "scheduled_for": "2026-04-29T12:00:00",
+      "platforms": ["instagram", "tiktok", "threads"],
+      "hook": "I used humor to avoid being serious for 20 years. Here's what I learned.",
+      "body": "Growing up using jokes as a shield -- relatable, honest. The moment I realized not everything is funny -- some things need weight. Learning to choose when to be serious changes how people respect you. Humor is a gift. But knowing when NOT to use it? That's power.",
+      "caption_overrides": {},
+      "media_path": "",
+      "media_urls": [],
+      "notes": "The Becoming -- intimate, sincere delivery. This is personal. CTA: Comment 'RESPECT' if this hit different."
+    },
+    {
+      "piece_number": 3,
+      "pillar": "the_journey",
+      "scheduled_for": "2026-04-30T09:00:00",
+      "platforms": ["instagram", "youtube", "tiktok"],
+      "hook": "At 20, I was in a university safety bubble. At 22, I see everything clearly.",
+      "body": "University felt safe but it was stagnant -- I wasn't facing reality. Dropping out was the hardest decision. Everyone thought I was crazy. Two years later -- I have AI systems, real clients, real direction. The bubble isn't protecting you. It's just delaying the inevitable.",
+      "caption_overrides": {},
+      "media_path": "",
+      "media_urls": [],
+      "notes": "The Journey -- raw, sentimental, growth arc. No hard CTA -- just 'Follow if you want to see what happens next'."
+    },
+    {
+      "piece_number": 4,
+      "pillar": "ai_oracle",
+      "scheduled_for": "2026-05-01T11:00:00",
+      "platforms": ["linkedin", "twitter", "threads"],
+      "hook": "Your boss doesn't want you to know this about AI.",
+      "body": "Most people think AI won't affect their industry. They're wrong. Specific examples of industries already being disrupted NOW. The people who adapt early will own the next decade. I can see it because I'm building it. The question is -- can you?",
+      "caption_overrides": {
+        "twitter": "Your boss doesn't want you to know this about AI.\n\nMost people think their industry is safe.\n\nIt's not.\n\nThe people who adapt early will own the next decade.\n\nComment 'FUTURE' for the breakdown."
+      },
+      "media_path": "",
+      "media_urls": [],
+      "notes": "AI Oracle -- Time Traveler energy. Confident certainty with controlled frustration. CTA: Comment 'FUTURE' for the free breakdown."
+    },
+    {
+      "piece_number": 5,
+      "pillar": "the_becoming",
+      "scheduled_for": "2026-05-02T08:30:00",
+      "platforms": ["instagram", "tiktok"],
+      "hook": "The difference between confidence and certainty -- and why most men have neither.",
+      "body": "Confidence is believing you can. Certainty is knowing you will. Most guys perform confidence but crumble when tested -- because it's an act. How to build actual certainty: stop limiting yourself, regulate your emotions, face reality instead of hiding from it. A free man is a certain man. Everything else is negotiable.",
+      "caption_overrides": {},
+      "media_path": "",
+      "media_urls": [],
+      "notes": "The Becoming -- wise friend at 2am energy. Strong close. CTA: Comment 'CERTAIN' to keep this conversation going."
+    },
+    {
+      "piece_number": 6,
+      "pillar": "ceo_log",
+      "scheduled_for": "2026-05-03T10:00:00",
+      "platforms": ["instagram", "linkedin", "twitter", "tiktok", "threads", "facebook"],
+      "hook": "What a 22-year-old CEO's week actually looks like. No cap.",
+      "body": "Quick run-through of the real week -- code, calls, gym, systems. The part nobody sees: the weight, the imposter syndrome, the doubt. Why I keep going anyway -- because I know what I'm building is ahead of everyone. Another day at the office.",
+      "caption_overrides": {
+        "twitter": "What a 22-year-old CEO's week actually looks like.\n\nNo cap.\n\nAnother day at the office.\n\nComment 'CEO' for the daily routine."
+      },
+      "media_path": "",
+      "media_urls": [],
+      "notes": "CEO Log -- Saturday, all platforms. Rob the Bank energy. CTA: Comment 'CEO' for the daily routine breakdown."
+    },
+    {
+      "piece_number": 7,
+      "pillar": "the_journey",
+      "scheduled_for": "2026-05-04T18:00:00",
+      "platforms": ["instagram", "tiktok", "youtube"],
+      "hook": "Momentum is earned. And I almost lost mine.",
+      "body": "The moment I lost focus -- what happened, how fast things slip. Getting it back is harder than starting -- momentum doesn't wait for you. The discipline to show up every day even when nobody's watching. Two years ago I would've told myself one thing: stay focused. Nothing else matters.",
+      "caption_overrides": {},
+      "media_path": "",
+      "media_urls": [],
+      "notes": "The Journey -- sentimental close to the week. Sunday evening. No hard CTA -- let the message land."
+    }
+  ]
+}

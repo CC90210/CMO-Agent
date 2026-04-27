@@ -31,6 +31,10 @@
 - Test connectivity
 ### 2026-04-27 — Auto-sync
 **Agent:** MAVEN state_sync
+**Note:** video_editor hardening: cut accuracy, real ducking, Telegram auto-shrink
+
+### 2026-04-27 — Auto-sync
+**Agent:** MAVEN state_sync
 **Note:** V1.5 Maven Telegram bridge — Bravo parity + CFO hard gate
 
 ### 2026-04-27 — Auto-sync

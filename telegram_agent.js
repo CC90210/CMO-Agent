@@ -493,7 +493,7 @@ const killTree = (pid) => {
     } catch (_) {}
 };
 
-// ---- CLI EXECUTION (Claude or fallback) ----
+// ---- CLI EXECUTION (Claude CLI primary + direct Anthropic API fallback) ----
 const NODE_EXE = process.execPath;
 const CLAUDE_EXE = IS_MAC
     ? 'claude'
@@ -503,9 +503,13 @@ const T0_TIMEOUT = 300000;
 const MCP_CONFIG_PATH = path.join(__dirname, '.claude', 'mcp.json');
 const HAS_MCP_CONFIG = fs.existsSync(MCP_CONFIG_PATH);
 
+// Patterns that indicate the CLI failed due to subscription/auth — triggering
+// automatic fallback to the direct Anthropic API using ANTHROPIC_API_KEY.
+const CLI_FALLBACK_TRIGGERS = /out of (extra )?usage|usage limit|subscription.*limit|plan limit|rate.?limit exceeded|authentication_error|OAuth.*expired|401|Invalid API key|ENOENT|spawn.*ENOENT|could not find/i;
+
 const cleanOutput = (raw) => {
     let text = (raw || '')
-        .replace(/[][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')
+        .replace(/[\x1b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')
         .replace(/[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏]/g, '');
     const noise = [
         /^[█▓░▀▄▐▌]+/,
@@ -516,6 +520,103 @@ const cleanOutput = (raw) => {
         /^\s*$/,
     ];
     return text.split('\n').filter(line => !noise.some(p => p.test(line.trim()))).join('\n').trim() || text.trim();
+};
+
+// ---- DIRECT ANTHROPIC API FALLBACK ----
+// Uses ANTHROPIC_API_KEY from .env.agents to call the Messages API directly.
+// This is independent of the Claude CLI subscription and serves as a reliable
+// fallback when the CLI is unavailable or out of usage.
+const executeAnthropicDirect = (userPrompt, chatId, modelOverride = null) => {
+    return new Promise((resolve) => {
+        const https = require('https');
+        const apiKey = process.env.ANTHROPIC_API_KEY;
+
+        if (!apiKey) {
+            log('[FALLBACK] ANTHROPIC_API_KEY missing — cannot use direct API fallback');
+            resolve('Both Claude CLI and direct API unavailable. Add ANTHROPIC_API_KEY to .env.agents.');
+            return;
+        }
+
+        const tier = classifyTier(userPrompt);
+        const systemPrompt = buildPrompt(chatId, userPrompt);
+        // Model hierarchy: explicit override > tier-appropriate default
+        const modelMap = { opus: 'claude-sonnet-4-20250514', sonnet: 'claude-sonnet-4-20250514', haiku: 'claude-haiku-4-5-20251001' };
+        const model = modelOverride ? (modelMap[modelOverride] || 'claude-sonnet-4-20250514') : 'claude-sonnet-4-20250514';
+        const maxTokens = tier <= 1 ? 2048 : 4096;
+
+        log(`[FALLBACK] Direct Anthropic API: model=${model} tier=T${tier} prompt=${userPrompt.substring(0, 60)}...`);
+
+        const body = JSON.stringify({
+            model,
+            max_tokens: maxTokens,
+            system: systemPrompt,
+            messages: [{ role: 'user', content: userPrompt }],
+        });
+
+        const req = https.request({
+            hostname: 'api.anthropic.com',
+            path: '/v1/messages',
+            method: 'POST',
+            headers: {
+                'x-api-key': apiKey,
+                'anthropic-version': '2023-06-01',
+                'content-type': 'application/json',
+                'content-length': Buffer.byteLength(body),
+            },
+            timeout: tier === 0 ? T0_TIMEOUT : CLAUDE_TIMEOUT,
+        }, (res) => {
+            let responseBody = '';
+            res.on('data', d => responseBody += d.toString());
+            res.on('end', () => {
+                if (res.statusCode === 200) {
+                    try {
+                        const parsed = JSON.parse(responseBody);
+                        const text = (parsed.content || []).map(c => c.text || '').join('\n').trim();
+                        log(`[FALLBACK] Success: ${text.length} chars, model=${parsed.model || model}`);
+
+                        // state_sync after successful T1+ runs
+                        if (tier > 0) {
+                            execFile(PYTHON, ['scripts/state_sync.py', '--note', `telegram-api T${tier}: ${userPrompt.substring(0, 140)}`],
+                                { cwd: __dirname, windowsHide: true, timeout: 8000 }, () => {});
+                        }
+
+                        resolve(text || 'Done.');
+                    } catch (e) {
+                        log(`[FALLBACK] Parse error: ${e.message}`);
+                        resolve(responseBody.substring(0, 3000) || 'API returned unparseable response.');
+                    }
+                } else {
+                    log(`[FALLBACK] API HTTP ${res.statusCode}: ${responseBody.substring(0, 500)}`);
+                    let errMsg = `API error (HTTP ${res.statusCode})`;
+                    try {
+                        const errJson = JSON.parse(responseBody);
+                        errMsg = errJson.error?.message || errMsg;
+                    } catch (_) {}
+                    resolve(`Direct API fallback also failed: ${errMsg}`);
+                }
+            });
+        });
+
+        req.on('timeout', () => {
+            log('[FALLBACK] Request timed out');
+            req.destroy();
+            resolve('Direct API fallback timed out.');
+        });
+
+        req.on('error', (e) => {
+            log(`[FALLBACK] Request error: ${e.message}`);
+            resolve(`Direct API fallback error: ${e.message}`);
+        });
+
+        // Keep-alive typing indicator
+        const typing = setInterval(() => {
+            if (chatId) bot.sendChatAction(chatId, 'typing').catch(() => {});
+        }, 8000);
+        req.on('close', () => clearInterval(typing));
+
+        req.write(body);
+        req.end();
+    });
 };
 
 const executeClaude = (userPrompt, chatId, modelOverride = null) => {
@@ -533,7 +634,7 @@ const executeClaude = (userPrompt, chatId, modelOverride = null) => {
         if (HAS_MCP_CONFIG) args.push('--mcp-config', MCP_CONFIG_PATH);
         if (modelOverride) args.push('--model', modelOverride);
 
-        log(`[EXEC] claude T${tier}: "${userPrompt.substring(0, 80)}..."`);
+        log(`[EXEC] claude CLI T${tier}: "${userPrompt.substring(0, 80)}..."`);
 
         const child = spawn(CLAUDE_EXE, args, {
             env: { ...process.env, CI: 'true', NONINTERACTIVE: 'true', PAGER: 'cat', NO_COLOR: '1', FORCE_COLOR: '0' },
@@ -567,12 +668,25 @@ const executeClaude = (userPrompt, chatId, modelOverride = null) => {
             else resolve(`Timed out after ${timeout / 1000}s.`);
         }, timeout);
 
-        child.on('close', (code) => {
+        child.on('close', async (code) => {
             clearTimeout(timer);
             clearInterval(progress);
             activeChildren.delete(child);
             const elapsed = Math.round((Date.now() - start) / 1000);
-            log(`[DONE] claude code=${code} stdout=${stdout.length}b time=${elapsed}s`);
+            log(`[DONE] claude CLI code=${code} stdout=${stdout.length}b time=${elapsed}s`);
+
+            const raw = (stdout.trim() || stderr.trim());
+
+            // ---- FALLBACK CHECK: CLI subscription exhausted or auth failed ----
+            if (code !== 0 && CLI_FALLBACK_TRIGGERS.test(raw + ' ' + stderr)) {
+                log(`[FALLBACK] CLI failed with subscription/auth issue — switching to direct Anthropic API`);
+                if (chatId) {
+                    bot.sendMessage(chatId, '⚡ CLI subscription limit hit — switching to API key...').catch(() => {});
+                }
+                const apiResult = await executeAnthropicDirect(userPrompt, chatId, modelOverride);
+                resolve(apiResult);
+                return;
+            }
 
             // state_sync after successful T1+ runs
             if (code === 0 && tier > 0) {
@@ -580,23 +694,29 @@ const executeClaude = (userPrompt, chatId, modelOverride = null) => {
                     { cwd: __dirname, windowsHide: true, timeout: 8000 }, () => {});
             }
 
-            const raw = (stdout.trim() || stderr.trim());
             if (!raw) {
                 resolve(code === 0 ? 'Done.' : `Error (code ${code}).`);
-                return;
-            }
-            if (code !== 0 && /authentication_error|OAuth.*expired|401|Invalid API key/i.test(raw)) {
-                resolve('Auth error — check ANTHROPIC_API_KEY in .env.agents, then: pm2 restart maven-telegram');
                 return;
             }
             resolve(cleanOutput(raw));
         });
 
-        child.on('error', (err) => {
+        child.on('error', async (err) => {
             clearTimeout(timer);
             clearInterval(progress);
             activeChildren.delete(child);
-            log(`[ERROR] claude: ${err.message}`);
+            log(`[ERROR] claude CLI: ${err.message}`);
+
+            // CLI binary not found or spawn error — fallback to direct API
+            if (CLI_FALLBACK_TRIGGERS.test(err.message)) {
+                log(`[FALLBACK] CLI not available — switching to direct Anthropic API`);
+                if (chatId) {
+                    bot.sendMessage(chatId, '⚡ CLI unavailable — switching to API key...').catch(() => {});
+                }
+                const apiResult = await executeAnthropicDirect(userPrompt, chatId, modelOverride);
+                resolve(apiResult);
+                return;
+            }
             resolve(`Error: ${err.message}`);
         });
     });

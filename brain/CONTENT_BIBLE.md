@@ -6,21 +6,29 @@ tags: [content, strategy, outreach]
 
 > Source library: [[memory/content/scripts_v1]] · Deep research: [[memory/research/2026-04-06-deep-research-intelligence]] · Daily notes: [[memory/daily/INDEX]] · Outreach archive: [[memory/outreach_archive/INDEX]]
 
-## CC's Content Bible (2026-03-07)
+## CC's Content Bible (Updated 2026-04-27)
 
-### 3 Daily Pillars (minimum 3 posts/day)
+> Full creative identity: [[CC_CREATIVE_IDENTITY]]
+
+### Content Persona: The Time Traveler
+CC's content feels like a futuristic, intimate conversation -- someone from the future telling you what's coming. Intelligent. Confident. Certain. Never political. Everyone included. Humor is natural but calibrated. Controversial about ideas, never about people.
+
+### 4 Content Pillars
 
 | Pillar | Frequency | Format | Purpose |
 |--------|-----------|--------|---------|
-| **60-Day Sobriety Log** | 1x daily | 30-90sec talking head | Accountability + transformation arc. People follow journeys. |
-| **Daily Quote Drop** | 1x daily | 5-15sec, face + text overlay | Low effort, high reach. Quote does the work, face = credibility. |
-| **22-Year-Old CEO Log** | 1x daily | 30-60sec, one decision/win/lesson | Building in public = magnetic. Raw and direct. |
+| **The AI Oracle** | 2x/week | 30-90sec talking head | CC sees what others can't -- AI's real impact, clearing misinformation, showing systems |
+| **The Becoming** | 2x/week | 30-60sec, intimate delivery | Self-improvement, masculinity, emotional regulation, psychology, relationships |
+| **The Journey** | 2x/week | 30-60sec, raw and sentimental | Sobriety, dropping out, entrepreneurship at 22, Montreal move, growth arc |
+| **The CEO Log** | 1x/week | 30-60sec, effortless operator energy | Building in public, behind-the-scenes OASIS AI, "another day at the office" |
 
 ### Hook Bank (4 Categories)
 - **Pattern Interrupt**: "Stop scrolling", "I wasn't gonna post this but...", "Nobody talks about this"
 - **Curiosity Gap**: "The thing they don't tell you about [X]...", "Most people do this wrong"
 - **Credibility/Proof**: "[X] days in -- here's exactly what changed", "I built this at 22 with no funding"
 - **Relatability/Emotion**: "If you're going through [X], this is for you", "Nobody clapped when I started"
+- **Time Traveler**: "Your industry won't exist in 5 years", "I can see what's coming. Let me show you."
+- **Uncomfortable Truth**: "I used humor to avoid being serious for 20 years", "The bubble isn't protecting you"
 
 ### 7 Pacing Rules
 1. Hook in 0-2 seconds (first sentence IS the video)
@@ -29,14 +37,20 @@ tags: [content, strategy, outreach]
 4. Speak to one person (camera = that one person)
 5. End with a punch, not a fade (hard cut after final sentence)
 6. 30-90 second sweet spot
-7. Film 3-5, post the best 3
+7. Film 3-5 takes, post the best one
 
-### Pre-Film Checklist
-- Hook written out before filming
-- One clear point identified
-- Camera at eye level
-- Good lighting (face lit, no harsh shadows)
+### Pre-Film Warm-Up Ritual
+- Push-ups (energy up)
+- Chest hits with fist (get pumped)
+- Humming (voice warm-up, tone control)
+- Drink water
+- Read bullet points one last time
 - First word = hook. No intro. No "hey guys."
+
+### CTA Strategy
+- Comment [specific keyword] on the video
+- Maven auto-DMs -> sends to CC funnel -> discovery call
+- Never sell in the video. Build trust. Sell on calls.
 
 ---
 

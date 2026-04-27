@@ -215,6 +215,7 @@ The CMO repo's `scripts/` directory holds these executables. Each is invoked fro
 
 ### Content + creative
 - `content_engine.py`, `content_pipeline.py`, `content_generator.py`, `content_repurposer.py`, `edit_content_v2.py` — content production pipeline.
+- `video_editor.py` — Complete 8-step automated video production pipeline (silence/filler cutting, audio mastering, color grading, karaoke captions, music overlay, multi-platform export, Telegram review gate). Replaces human video editors.
 - `script_ideation.py` — generates video/post script ideas grounded in `brain/CONTENT_BIBLE.md` (3 daily pillars + hook bank + 7 pacing rules), `brain/VIDEO_PRODUCTION_BIBLE.md`, `brain/MARKETING_CANON.md`, `brain/SOUL.md`, and live cross-agent pulse signal (Bravo / Atlas / Aura). Calls Claude Sonnet 4.6, writes to `data/ideation/<timestamp>.md`. CLI flags: `--count N`, `--pillar sobriety_log|quote_drop|ceo_log`, `--format short_video|long_video|post|carousel`, `--topic "<seed>"`. Tested by `test_script_ideation.py` (21 cases — foundation loading, pulse signal, prompt assembly, mocked API call, output writer, CLI dispatch).
 - `generate_logo.py`, `save_logo.py` — brand logo generation.
 - `imagen_generate.py` — Gemini Imagen ad creative.

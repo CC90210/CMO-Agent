@@ -64,17 +64,19 @@ Partner: Adon — 50/50 on PropFlow only. CC owns 100% of OASIS AI.
 
 ## CC's Strengths (Maven Amplifies)
 
-- **On-camera presence** — natural, conversational, self-aware. 10x any scripted delivery Maven could draft.
-- **Build-in-public authenticity** — shows real work, real clients, real losses. [[berger-contagious-stepps]] scores high on Public + Stories.
+- **On-camera presence** — natural, conversational, self-aware, witty, funny. Former DJ (Kona Makana), loves the spotlight. 10x any scripted delivery Maven could draft.
+- **The Time Traveler archetype** — CC's content persona is someone from the future having an intimate conversation with you. Intelligent. Confident. Certain. See [[CC_CREATIVE_IDENTITY]] for full creative DNA.
+- **Build-in-public authenticity** — shows real work, real clients, real losses. Dropped out of university, almost died as a child, eclectic life. [[berger-contagious-stepps]] scores high on Public + Stories.
 - **Sales calls** — closes above industry average when pipeline is warm. Pre-call teaser is the biggest lever (see [[oasis-ai]] funnel).
 - **Network access via Adon + Bennett + Skool** — warm-intro engine outperforms cold at his scale (see [[agency/lead-channels]]).
 - **Taste for clean aesthetics** — "no AI slop" instinct matches [[WRITING]] doctrine.
+- **Deep topic range** — AI (30+ min unscripted), masculinity/self-improvement, psychology, entrepreneurship, faith. See [[CC_CREATIVE_IDENTITY]] topic universe.
 
 ---
 
 ## CC's Non-Negotiables (Marketing Context)
 
-- **External comms:** Use "Conaugh McKenna" in B2B / professional / paid ads. NEVER "CC" externally.
+- **External comms:** Use "Conaugh McKenna" in B2B / professional / paid ads. The alter ego "CC" is the social media content persona -- used in personal brand content only, never in B2B outreach.
 - **Voice edit required:** no content publishes under CC's name without CC's final edit. Maven drafts; CC polishes.
 - **No "unlock the power of" openers.** See [[WRITING]] § Anti-Slop.
 - **No corporate speak.** Peer-to-peer register, contractions, lowercase when natural.
@@ -100,8 +102,11 @@ Partner: Adon — 50/50 on PropFlow only. CC owns 100% of OASIS AI.
 - **Morning** — creative + high-energy work. Content shoots, strategy, long-form writing.
 - **Afternoon** — execution + calls. Sales meetings, campaign execution, client work.
 - **Evening** — wind-down. Don't ask for Loom recordings after 8pm. Don't schedule creative deliverables past 10pm.
-- **Weekends** — mixed. Nicky's Donuts shifts, DJ gigs, gym, peptide research. Light-touch ops.
-- **High-volume content weeks are ~3 days/week**, not daily. CC over-estimates his own capacity. Maven should structure batch-shoots rather than assume daily production.
+- **Weekends** — mixed. Gym, DJ gigs when active, personal development. Light-touch ops.
+- **Content Day** — dedicated weekly batch day. 7 pieces (scaling to 14). Structured as 3.5-hour sprint: ideation → bullet points → warm-up → filming → schedule. See [[CC_CREATIVE_IDENTITY]] and batch_content_day.py.
+- **Warm-up ritual before filming:** push-ups, chest hits, humming, water, read bullet points.
+- **Life transition:** Moving to Montreal soon (first place with Adon). Better filming setup planned.
+- **Sobriety journey:** Active accountability content. Real, raw, no sugar-coating.
 
 ---
 

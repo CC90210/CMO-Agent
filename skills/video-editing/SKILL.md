@@ -1,139 +1,155 @@
 ---
 name: video-editing
-description: Video editing pipeline for ad creative — trimming, captioning, hooks, platform aspect ratios, thumbnail generation.
+description: Automated video editing pipeline for CC's personal brand content. Use whenever CC drops raw footage and needs it edited, captioned, graded, and sent for review. The primary tool is video_editor.py which handles the full 8-step pipeline.
+triggers: [video, edit, raw footage, silence, filler, caption, grade, master, review, content day, batch]
+tier: standard
+dependencies: [content-engine, elite-video-production]
 canon_references: [sutherland-signalling, dunford-positioning]
 canon_source: brain/MARKETING_CANON.md
 universal: true
-note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
 ---
 
 # SKILL: Video Editing & Production
 
-> Video processing pipeline for ad creative — trimming, captioning, formatting, and platform optimization.
+> **Primary tool:** `scripts/video_editor.py`  
+> **Supports:** `scripts/content_pipeline.py` (captions, transcription)
 
 ---
 
-## Overview
-This skill covers the video production pipeline for creating ad-ready video content from raw footage. Uses FFmpeg for processing, Whisper for auto-captioning, and platform APIs for uploading.
+## When to Activate
 
-## Tools Required
-- **FFmpeg** — Video processing, trimming, resizing, compression, caption burning
-- **Whisper** — AI speech-to-text for auto-captioning
-- **Playwright** — Screenshot thumbnails, preview verification
-- **Platform APIs** — Upload via Google Ads AssetService or Meta AdVideo endpoint
+- CC says "edit this", "make this a post", or drops raw video files
+- Content Day batch processing (7 videos at once)
+- Any request involving silence removal, filler cutting, captioning, or color grading
+- Platform-specific video export requests
 
-## Platform Video Specifications
+## Primary Tool: `video_editor.py`
 
-### Google Ads (YouTube)
-| Ad Type | Ratio | Duration | Notes |
-|---------|-------|----------|-------|
-| In-Stream (skippable) | 16:9 | 12s - 3min | Skip after 5s. Hook must be in first 5s. |
-| In-Stream (non-skip) | 16:9 | 15 or 20s | Full attention. Every second counts. |
-| Bumper | 16:9 | 6s max | Ultra-short brand awareness |
-| Shorts | 9:16 | Up to 60s | Vertical, mobile-first |
+### 8-Step Pipeline (`edit` command)
 
-### Meta Ads
-| Placement | Ratio | Duration | Resolution | Max Size |
-|-----------|-------|----------|------------|----------|
-| Feed | 1:1 or 4:5 | 15-30s | 1080x1080 / 1080x1350 | 4GB |
-| Stories/Reels | 9:16 | 15s | 1080x1920 | 4GB |
-| In-Stream | 16:9 | 5-15s | 1920x1080 | 4GB |
+```
+Step 1: Silence detection     (FFmpeg silencedetect, threshold -30dB, min 0.4s)
+Step 2: Filler word detection (Whisper word-level timestamps)
+Step 3: Apply cuts            (FFmpeg concat demuxer, keep segments only)
+Step 4: Audio mastering       (Gate→Highpass→Lowpass→Compand→Loudnorm -14 LUFS)
+Step 5: Color grading         (Pillar-auto-mapped: teal_orange, editorial, warm, clean)
+Step 6: Karaoke captions      (Word-by-word highlight via content_pipeline.py ASS format)
+Step 7: Background music      (Auto-ducked, mood-matched to pillar from media/music/)
+Step 8: Telegram review       (sendVideo to CC, awaits 'approve' or feedback)
+```
 
-## Video Production Pipeline
+### CLI Commands
 
-### Phase 1: Ingest & Analyze
 ```bash
-# Get video info
-ffprobe -v quiet -print_format json -show_format -show_streams input.mp4
-```
-- Check: duration, resolution, aspect ratio, audio codec, file size
-- Store raw in `media/raw/`
+# Full edit pipeline (raw → review-ready)
+python scripts/video_editor.py edit media/raw/piece_1.mp4 --pillar ai_oracle
 
-### Phase 2: Trim
+# Remove silence + fillers only (no captions, no music, no grading)
+python scripts/video_editor.py clean media/raw/piece_1.mp4
+
+# Preview what would be cut (non-destructive analysis)
+python scripts/video_editor.py analyze media/raw/piece_1.mp4
+
+# Export edited video to all platform formats
+python scripts/video_editor.py export media/exports/piece_1_final.mp4
+
+# Send edited video to Telegram for CC's review
+python scripts/video_editor.py review media/exports/piece_1_final.mp4
+
+# Content Day: batch edit all videos in a directory
+python scripts/video_editor.py batch media/raw/ --manifest data/content_day/2026-04-27_template.json
+```
+
+### Skip Flags (for partial runs)
+
 ```bash
-# Trim to 30 seconds starting at 5s
-ffmpeg -i input.mp4 -ss 00:00:05 -t 00:00:30 -c copy trimmed.mp4
-
-# Trim with re-encoding (more precise cut points)
-ffmpeg -i input.mp4 -ss 00:00:05 -t 00:00:30 -c:v libx264 -c:a aac trimmed.mp4
+--skip-music      # No background music overlay
+--skip-captions   # No karaoke captions
+--skip-review     # No Telegram notification
+--skip-grade      # No color grading
+--skip-master     # No audio mastering
+--grade warm      # Override auto-selected grade preset
 ```
 
-### Phase 3: Resize for Platforms
-```bash
-# Square (1:1) for Meta Feed
-ffmpeg -i input.mp4 -vf "scale=1080:1080:force_original_aspect_ratio=decrease,pad=1080:1080:(ow-iw)/2:(oh-ih)/2:black" feed_square.mp4
+## Color Grade Presets
 
-# Vertical (9:16) for Stories/Reels
-ffmpeg -i input.mp4 -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black" stories_vertical.mp4
+| Preset | Pillar Default | Look |
+|--------|---------------|------|
+| `teal_orange` | AI Oracle | Cinematic teal shadows, warm skin tones |
+| `editorial` | CEO Log | Desaturated, high contrast, professional |
+| `warm` | The Becoming, The Journey | Warm orange tones, gentle vignette |
+| `clean` | (manual) | Neutral with micro-contrast, minimal processing |
 
-# Landscape (16:9) for YouTube
-ffmpeg -i input.mp4 -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black" youtube_landscape.mp4
+## Audio Mastering Chain
 
-# Portrait (4:5) for Meta Feed optimal
-ffmpeg -i input.mp4 -vf "scale=1080:1350:force_original_aspect_ratio=decrease,pad=1080:1350:(ow-iw)/2:(oh-ih)/2:black" feed_portrait.mp4
+Applied automatically in step 4:
+- **Gate** (threshold 0.01) — kills breath noise between words
+- **Highpass** (100Hz) — removes rumble, HVAC, handling noise
+- **Lowpass** (10kHz) — tames harshness
+- **Compand** (3:1 ratio, -7dB ceiling) — consistent loudness
+- **Loudnorm** (-14 LUFS, -1.0 dBTP) — platform standard
+
+## Platform Export Specs
+
+| Platform | Max Duration | Resolution |
+|----------|-------------|------------|
+| Instagram Reels | 90s | 1080x1920 |
+| TikTok | 180s | 1080x1920 |
+| YouTube Shorts | 60s | 1080x1920 |
+| LinkedIn | 600s | 1080x1920 |
+| Facebook | 240s | 1080x1920 |
+| X/Twitter | 140s | 1080x1920 |
+
+## File Structure
+
+```
+media/
+  raw/                  # CC drops raw footage here
+  exports/              # Edited videos output here
+  music/
+    intense/            # AI Oracle pillar tracks
+    warm/               # The Becoming pillar tracks
+    emotional/          # The Journey pillar tracks
+    confident/          # CEO Log pillar tracks
 ```
 
-### Phase 4: Auto-Caption
-```bash
-# Generate captions with Whisper
-whisper input.mp4 --model medium --language en --output_format srt --output_dir ./captions/
+## Dependencies
 
-# Burn captions into video (white text, black outline)
-ffmpeg -i input.mp4 -vf "subtitles=captions/input.srt:force_style='FontName=Arial,FontSize=28,PrimaryColour=&HFFFFFF&,OutlineColour=&H000000&,Outline=2,Shadow=1,MarginV=40'" captioned.mp4
+| Package | Purpose | Status |
+|---------|---------|--------|
+| `openai-whisper` | Transcription + filler detection | Installed |
+| `auto-editor` | Silence removal (backup method) | Installed |
+| `pydub` | Audio analysis | Installed |
+| `ffmpeg` | All video/audio processing | Installed |
+
+## Integration Points
+
+- **content_pipeline.py** — Called internally for karaoke caption generation
+- **batch_content_day.py** — Schedules edited videos via Zernio API
+- **notify.py** — Telegram review notifications
+- **elite-video-production SKILL** — Reference spec for advanced techniques (zoom punches, SFX, B-roll)
+
+## Content Day Workflow (End-to-End)
+
+```
+1. CC films 7 pieces → drops into media/raw/
+2. python scripts/video_editor.py batch media/raw/ --manifest data/content_day/YYYY-MM-DD_template.json
+3. Each video: silence cut → filler cut → master → grade → caption → music → Telegram
+4. CC reviews each on phone, replies 'approve' or feedback
+5. python scripts/batch_content_day.py schedule --manifest data/content_day/YYYY-MM-DD_template.json
+6. Videos go live across 8 platforms over the next 7 days
 ```
 
-### Phase 5: Compress
-```bash
-# Standard compression (good quality, smaller file)
-ffmpeg -i input.mp4 -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 128k compressed.mp4
+## Key GitHub Repos (Reference)
 
-# Aggressive compression (for file size limits)
-ffmpeg -i input.mp4 -c:v libx264 -crf 28 -preset slow -c:a aac -b:a 96k small.mp4
-```
+| Repo | Stars | What We Use From It |
+|------|-------|-------------------|
+| [WyattBlue/auto-editor](https://github.com/WyattBlue/auto-editor) | 4.2k | Silence removal architecture, margin/threshold approach |
+| [SamurAIGPT/AI-Youtube-Shorts-Generator](https://github.com/SamurAIGPT/AI-Youtube-Shorts-Generator) | — | Viral highlight detection pattern |
+| [MatteoFasulo/Whisper-TikTok](https://github.com/MatteoFasulo/Whisper-TikTok) | — | Caption burn-in workflow |
+| [HubertKasperek/short-maker](https://github.com/HubertKasperek/short-maker) | — | Audio ducking + subtitle approach |
 
-### Phase 6: Thumbnail
-```bash
-# Extract frame at 3 seconds as thumbnail
-ffmpeg -i input.mp4 -ss 00:00:03 -frames:v 1 thumbnail.jpg
+---
 
-# Extract best frame (highest quality)
-ffmpeg -i input.mp4 -vf "select=eq(pict_type\,I)" -frames:v 1 thumbnail_best.jpg
-```
-
-### Phase 7: Export & Organize
-- Store all variants in `media/exports/[campaign_name]/`
-- Name convention: `[campaign]_[placement]_[variant].mp4`
-- Generate manifest listing all files with specs
-
-## Video Ad Creative Best Practices (Lending)
-
-### Structure (30-second template)
-```
-0-3s:  HOOK — Problem statement ("Need funds fast?")
-3-10s: AGITATE — Empathize ("We know applying for loans is stressful")
-10-20s: SOLUTION — Your offer ("Simple application, quick decisions")
-20-25s: PROOF — Trust signal ("Trusted by 10,000+ borrowers")
-25-30s: CTA — Clear action ("Apply now at [URL]")
-```
-
-### Must-Haves
-1. **Captions** — 85% of social video watched on mute
-2. **Brand logo** — Visible throughout or at end card
-3. **CTA overlay** — "Apply Now" button graphic in last 5 seconds
-4. **Professional tone** — Trustworthy, not flashy/scammy
-5. **Real people** — Testimonials outperform stock footage
-
-### Don'ts
-1. No fake check images or cash stacks
-2. No "guaranteed approval" text overlays
-3. No misleading before/after financial situations
-4. No tiny/unreadable disclaimer text
-5. No copyrighted music (use royalty-free)
-
-## A/B Testing Video Variants
-Create these variants from single source footage:
-1. **Duration test:** 15s vs. 30s
-2. **Hook test:** Different opening 3 seconds
-3. **CTA test:** "Apply Now" vs. "Check Your Rate"
-4. **Format test:** With captions vs. without
-5. **Aspect test:** Feed (1:1) vs. Stories (9:16) performance
+## Obsidian Links
+- [[skills/elite-video-production/SKILL]] | [[skills/content-engine/SKILL]] | [[brain/CAPABILITIES]]

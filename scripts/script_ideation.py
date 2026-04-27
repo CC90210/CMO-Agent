@@ -98,6 +98,7 @@ def load_foundation() -> dict[str, str]:
         "writing": _read("brain/WRITING.md"),
         "marketing_canon": _read("brain/MARKETING_CANON.md"),
         "content_bible": _read("brain/CONTENT_BIBLE.md"),
+        "cc_creative_identity": _read("brain/CC_CREATIVE_IDENTITY.md"),
         "video_production_bible": _read("brain/VIDEO_PRODUCTION_BIBLE.md", max_lines=80),
     }
 
@@ -141,10 +142,11 @@ def load_current_signal() -> dict[str, dict | None]:
 # ---------------------------------------------------------------------------
 
 PILLAR_OPTIONS = {
-    "sobriety_log": "60-Day Sobriety Log — talking-head accountability, transformation arc",
-    "quote_drop":   "Quote Drop — wisdom card with CC's own framing",
-    "ceo_log":      "CEO Log — building-in-public, behind-the-scenes operator content",
-    "any":          "Mix all 3 daily pillars — let context decide which fits each idea",
+    "ai_oracle":    "The AI Oracle — CC sees what others can't. AI impact, misinformation, showing systems. Time Traveler energy.",
+    "the_becoming": "The Becoming — self-improvement, masculinity, emotional regulation, psychology, relationships. Wise friend at 2am.",
+    "the_journey":  "The Journey — sobriety, dropping out, entrepreneurship at 22, Montreal move, growth arc. Raw and sentimental.",
+    "ceo_log":      "The CEO Log — building-in-public, behind-the-scenes OASIS AI. Effortless operator, 'another day at the office'.",
+    "any":          "Mix all 4 pillars — let context decide which fits each idea",
 }
 
 FORMAT_OPTIONS = {
@@ -185,9 +187,14 @@ def build_prompt(
     parts.append("=== MARKETING CANON (10 pillars framework) ===")
     parts.append(foundation.get("marketing_canon", "")[:3000])
     parts.append("")
-    parts.append("=== CONTENT BIBLE (3 daily pillars, hook bank, pacing) ===")
+    parts.append("=== CONTENT BIBLE (pillars, hook bank, pacing) ===")
     parts.append(foundation.get("content_bible", "")[:4000])
     parts.append("")
+
+    if foundation.get("cc_creative_identity"):
+        parts.append("=== CC'S CREATIVE IDENTITY (persona, voice, topics, archetype) ===")
+        parts.append(foundation["cc_creative_identity"][:5000])
+        parts.append("")
 
     if foundation.get("video_production_bible"):
         parts.append("=== VIDEO PRODUCTION BIBLE (top of) ===")

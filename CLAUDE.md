@@ -105,11 +105,57 @@ SunBiz's ads run on Meta too, but OASIS and the personal brand are your primary 
 
 ## SUB-AGENT ORCHESTRATION
 
-16 specialized agents in `agents/`:
+19 specialized agents in `agents/` (16 marketing + 3 cross-cutting from V1.1 parity):
 - **Strategy & Analytics**: ad-strategist, analytics-analyst, seo-specialist
 - **Content & Creative**: content-creator, video-editor, image-generator, media-manager
 - **Platform Execution**: google-ads-specialist, meta-ads-specialist, email-outbound, audience-builder
 - **System**: architect, debugger, explorer, documenter, workflow-builder
+- **Cross-cutting (Bravo parity)**: reviewer, researcher, writer
+
+---
+
+## TELEGRAM SURFACE (V1.3)
+
+Maven runs its OWN Telegram bot — distinct from Bravo's and Atlas's. The three never conflict because each polls a different token.
+
+**Setup (one-time):**
+1. Open Telegram, message `@BotFather`, send `/newbot`. Name it something like `Maven CMO`. Copy the token.
+2. Add to `.env.agents`:
+   ```
+   MAVEN_TELEGRAM_BOT_TOKEN=<token from BotFather>
+   MAVEN_TELEGRAM_ALLOWED_USERS=<your-telegram-user-id>
+   ```
+   Get your user ID by messaging `@userinfobot`. Multiple admins comma-separated.
+3. **Cross-agent file paths** — set per-machine in `.env.agents` so the bridge reads the right repos when the layout differs (especially on Mac):
+   ```
+   BRAVO_REPO=/Users/<you>/Business-Empire-Agent
+   ATLAS_REPO=/Users/<you>/APPS/CFO-Agent
+   AURA_REPO=/Users/<you>/AURA
+   MAVEN_REPO=/Users/<you>/CMO-Agent
+   ```
+   Defaults to Windows layout if unset.
+4. Start the bridge: `node telegram_agent.js`. Lock at `tmp/maven_telegram.lock.json` prevents two instances from polling the same token (so you can run on Windows + Mac without conflict — second machine exits cleanly).
+
+**In-chat commands** (only authorized chat IDs are answered):
+- `/status` — pulse status across Bravo/Atlas/Aura/Maven
+- `/spend` — Atlas spend-gate summary (cfo_pulse.json approvals)
+- `/campaigns` — send_gateway daily stats
+- `/killswitch` / `/unleash` — engage / disengage MAVEN_FORCE_DRY_RUN
+- `/pulse` — refresh cmo_pulse.json
+- `/sync` — full state_sync (STATE.md + SESSION_LOG.md + cmo_pulse + mem0)
+- `/audit` — health score
+- `/tests` — run all 6 test files, report pass/fail
+- `/inbox` — unread agent_inbox messages addressed to maven
+- `/post bravo|atlas|aura subject || body` — cross-repo agent_inbox post
+- Plain text → spawned to Maven's Claude Code session
+
+**Programmatic notifications** — every send_gateway block, daily-cap threshold, killswitch fire, draft-critic reject can route to your phone via `scripts/notify.py`:
+```python
+from notify import notify
+notify("Meta campaign launched: OASIS pulse-lead-gen — $50/day", category="campaign")
+notify("CFO blocked $500 Meta spend — pulse stale", category="cfo-block", force=True)
+```
+Categories filter automatically: `campaign`/`content-published` are silent; `cfo-block`/`brand-violation`/`killswitch`/`error` are loud. Every call also lands in `memory/notify.log` so nothing is lost when Telegram is down.
 
 ---
 

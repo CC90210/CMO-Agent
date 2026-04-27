@@ -82,10 +82,23 @@ except ImportError:
         }
 
 
-# ---- Telegram notify is optional in Maven (no Bravo notify dep) ------------
+# ---- Telegram notify (V1.3 — Maven-owned bot via scripts/notify.py) --------
 
-def _telegram_notify(*_a: Any, **_kw: Any) -> bool:
-    return False
+try:
+    from notify import notify as _maven_notify  # noqa: E402
+except Exception:  # pragma: no cover — fall back to no-op so gates never crash
+    def _maven_notify(*_a: Any, **_kw: Any) -> bool:  # type: ignore[misc]
+        return False
+
+
+def _telegram_notify(message: str, category: str = "send-gateway-error",
+                     **_kw: Any) -> bool:
+    """Forwarded to scripts/notify.notify so daily-cap warnings, killswitch
+    messages, and gate errors actually reach CC's phone instead of vanishing."""
+    try:
+        return bool(_maven_notify(message, category=category))
+    except Exception:
+        return False
 
 
 # ---- Canonical constants ----------------------------------------------------

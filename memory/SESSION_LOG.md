@@ -29,6 +29,10 @@
 - Await API credentials from client
 - Install MCP servers
 - Test connectivity
+### 2026-04-27 — Auto-sync
+**Agent:** MAVEN state_sync
+**Note:** V1.3 Telegram surface: notify.py + telegram_agent.js
+
 ### 2026-04-26 — Auto-sync
 **Agent:** MAVEN state_sync
 **Note:** V1.2 finalization: tests, gates, content_pipeline, attribution, adversarial review

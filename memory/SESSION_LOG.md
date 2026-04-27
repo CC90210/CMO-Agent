@@ -31,6 +31,10 @@
 - Test connectivity
 ### 2026-04-27 — Auto-sync
 **Agent:** MAVEN state_sync
+**Note:** V1.4 onboarding: Content Bible + Video Production Bible + Brand Guide + script_ideation
+
+### 2026-04-27 — Auto-sync
+**Agent:** MAVEN state_sync
 **Note:** V1.3 Telegram surface: notify.py + telegram_agent.js
 
 ### 2026-04-26 — Auto-sync

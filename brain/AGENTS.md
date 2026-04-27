@@ -35,6 +35,14 @@ These three were imported in the V1.1 structural upgrade (2026-04-26). They hand
 | 18 | researcher | `agents/researcher.md` | Market research, competitor ad-library scrapes | Sonnet | "research", "competitor", "ad library", "trend" |
 | 19 | writer | `agents/writer.md` | Briefs, retros, RFCs, memos to C-suite (NOT ad copy) | Sonnet | "draft a brief", "post-mortem", "memo to bravo", "RFC" |
 
+### Tools (callable from any agent)
+
+These are scripts in `scripts/` invoked via subprocess by sub-agents that need them. Not standalone agents — utilities the orchestration matrix can reach.
+
+| Tool | Path | Owner agents | Purpose |
+|------|------|--------------|---------|
+| script_ideation | `scripts/script_ideation.py` | content-creator, video-editor, writer | Generates pillar-tagged video/post script ideas grounded in `CONTENT_BIBLE` + `VIDEO_PRODUCTION_BIBLE` + cross-agent pulse signal. CLI: `--count`, `--pillar`, `--format`, `--topic`. Output: `data/ideation/<ts>.md`. Tested by `test_script_ideation.py` (21/21). |
+
 ---
 
 ## Orchestration Matrix

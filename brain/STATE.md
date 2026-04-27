@@ -79,6 +79,6 @@ tags: [state, ephemeral]
 
 - **Date:** 2026-04-27
 - **Agent:** MAVEN via Claude Code
-- **Result:** V1.3 Telegram surface: notify.py + telegram_agent.js
+- **Result:** V1.4 onboarding: Content Bible + Video Production Bible + Brand Guide + script_ideation
 
 *Last updated: 2026-04-27*

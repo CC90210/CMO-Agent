@@ -188,6 +188,10 @@ The CMO repo's `scripts/` directory holds these executables. Each is invoked fro
 - `state_sync.py` — end-of-session: STATE.md + SESSION_LOG.md + cmo_pulse.json.
 - `self_audit.py` — health score (frontmatter + send_gateway tests + pulse freshness + orphans).
 
+### Telegram surface (V1.3)
+- `notify.py` — programmatic Telegram alerts. Categories: campaign, cfo-block, brand-violation, draft-critic-block, daily-cap-threshold, killswitch, send-gateway-error, lead-captured, content-published, ab-test-winner, performance, error. Loud-by-default for blocks/errors, silent-by-default for high-volume content. Falls back to `BRAVO_TELEGRAM_BOT_TOKEN`/generic `TELEGRAM_BOT_TOKEN` if `MAVEN_TELEGRAM_BOT_TOKEN` is absent. Always writes `memory/notify.log` so nothing is lost when Telegram is down. Tested by `test_notify.py` (13 cases).
+- `../telegram_agent.js` — Maven's standalone Telegram bridge. Distinct bot token from Bravo/Atlas (no polling conflict). Reads cross-agent pulse files at `BRAVO_REPO`/`ATLAS_REPO`/`AURA_REPO` (env overrides). Slash commands: `/status`, `/spend`, `/campaigns`, `/killswitch`, `/unleash`, `/pulse`, `/sync`, `/audit`, `/tests`, `/inbox`, `/post`. Plain text spawns Maven's Claude Code CLI. Lock file at `tmp/maven_telegram.lock.json` prevents dual-instance polling.
+
 ### Marketing engines
 - `email_blast.py` — bulk marketing email (routes through send_gateway).
 - `meta_ads_engine.py` — Meta Marketing API CRUD (spend gated through send_gateway).

@@ -1,12 +1,16 @@
 {
   "name": "cmo-agent",
-  "version": "1.3.0",
-  "description": "Maven — AI Chief Marketing Officer. Multi-brand marketing pipeline with send-safety chokepoint and cross-agent Telegram bridge.",
+  "version": "1.5.0",
+  "description": "Maven — AI Chief Marketing Officer. Multi-brand marketing pipeline with send-safety chokepoint, cross-agent file awareness, and Telegram bridge with hard CFO spend gate.",
   "private": true,
   "scripts": {
     "setup": "python scripts/setup.py",
     "telegram": "node telegram_agent.js",
-    "test": "python scripts/test_send_gateway.py && python scripts/test_late_publisher.py && python scripts/test_instagram_engine.py && python scripts/test_content_pipeline.py && python scripts/test_performance_reporter.py && python scripts/test_notify.py",
+    "telegram:start": "pm2 start ecosystem.config.js && pm2 save",
+    "telegram:restart": "pm2 restart maven-telegram",
+    "telegram:logs": "pm2 logs maven-telegram --lines 50",
+    "telegram:status": "pm2 status maven-telegram",
+    "test": "python scripts/test_send_gateway.py && python scripts/test_late_publisher.py && python scripts/test_instagram_engine.py && python scripts/test_content_pipeline.py && python scripts/test_performance_reporter.py && python scripts/test_notify.py && python scripts/test_script_ideation.py && node scripts/test_c_suite_context.js",
     "audit": "python scripts/self_audit.py",
     "health": "echo 'Run /health in your IDE agent'"
   },

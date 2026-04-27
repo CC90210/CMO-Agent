@@ -24,6 +24,10 @@ The marketing pipeline, end to end. Maven writes here exclusively.
 - **A/B testing & creative iteration** — `scripts/ab_testing_engine.py`, design and analysis.
 - **Marketing automations** — n8n workflows for nurture sequences, re-engagement campaigns, lifecycle drips.
 - **Marketing canon** — `brain/MARKETING_CANON.md` and `brain/canon/*` are Maven's intellectual ledger; canon entries are append-only and require citation.
+- **Content Bible** — `brain/CONTENT_BIBLE.md`. The 3 daily pillars (Sobriety Log / Quote Drop / CEO Log), hook bank, 7 pacing rules, NEPQ outreach framework. Bravo can READ via `readSiblingRepo()` from its `scripts/c_suite_context.js`; cannot write. Maven owns updates to pillars, hooks, and pacing.
+- **Video Production Bible** — `brain/VIDEO_PRODUCTION_BIBLE.md`. Cinematic format reference (1080×1920 portrait, CRF 18, branded captions, WhisperX/faster-whisper transcription stack, ASS karaoke caption template). Same READ-only rule for Bravo.
+- **Brand Guide + assets** — `media/brand/BRAND_GUIDE.md` (visual + voice standards across CC's brands) and supporting assets in `media/brand/` (one-pager, logos when delivered). Authoritative source for any creative across the C-suite.
+- **Script ideation engine** — `scripts/script_ideation.py`. Generates pillar-tagged video/post script ideas grounded in Content Bible + Video Production Bible + Marketing Canon + live cross-agent pulse signal. Output to `data/ideation/<timestamp>.md`. Tested by `test_script_ideation.py` (21 cases).
 
 ---
 

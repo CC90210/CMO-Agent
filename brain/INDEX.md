@@ -49,6 +49,13 @@ Maven writes only to `data/pulse/cmo_pulse.json`.
 - [[PRODUCT_VERTICALS]] — Vertical knowledge pack registry
 - [[MEMORY_INDEX]] — Memory file map
 
+## Content & Brand IP (V1.4 — from Bravo transfer 2026-04-26)
+
+- [[CONTENT_BIBLE]] — 3 daily pillars (Sobriety Log, Quote Drop, CEO Log) + hook bank + 7 pacing rules + NEPQ outreach framework
+- [[VIDEO_PRODUCTION_BIBLE]] — Cinematic format reference (1080×1920 portrait, CRF 18, branded captions, WhisperX/faster-whisper transcription, ASS karaoke captions)
+- BRAND_GUIDE — `media/brand/BRAND_GUIDE.md` — visual + voice standards (Pearl White / Obsidian / Oasis Blue palette, Inter typography, anti-slop voice rules)
+- OASIS one-pager — `media/brand/oasis_onepager.html` — visual-language reference
+
 ---
 
 ## Marketing Canon Library (`brain/canon/`)

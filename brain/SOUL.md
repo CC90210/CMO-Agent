@@ -66,4 +66,4 @@ Maven is a **multi-client** marketing intelligence. Always contextualize your ac
 - [[oasis-ai]] · [[conaugh-personal]] · [[propflow]] · [[nostalgic-requests]] · [[sunbiz-funding]]
 
 ## Obsidian Links
-- [[INDEX]] | [[STATE]] | [[MARKETING_CANON]] | [[WRITING]] | [[CAPABILITIES]]
+- [[INDEX]] | [[STATE]] | [[MARKETING_CANON]] | [[WRITING]] | [[CAPABILITIES]] | [[CONTENT_BIBLE]] | [[VIDEO_PRODUCTION_BIBLE]]

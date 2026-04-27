@@ -816,6 +816,8 @@ bot.on('message', async (msg) => {
             '',
             'SLASH COMMANDS:',
             '  /status — pulse status across Bravo/Atlas/Aura/Maven',
+            '  /pulses — 3-agent C-suite snapshot (Bravo + Atlas + Maven)',
+            '  /sibling <agent> [file] — read a sibling\'s brain/*.md',
             '  /spend  — Atlas spend-gate summary',
             '  /campaigns — send_gateway daily stats',
             '  /killswitch / /unleash — engage / disengage MAVEN_FORCE_DRY_RUN',
@@ -850,6 +852,83 @@ bot.on('message', async (msg) => {
             loadMavenSiblingPulses(),
         ];
         return bot.sendMessage(chatId, lines.join('\n'));
+    }
+
+    // /pulses — 3-agent C-suite snapshot with role-specific headlines.
+    // Atlas-V3.2 parity: each agent gets the field that matters for its role.
+    if (text === '/pulses') {
+        const out = ['3-Agent Pulse Snapshot'];
+        const targets = [
+            { label: 'Bravo (CEO)', agent: 'bravo', file: 'data/pulse/ceo_pulse.json' },
+            { label: 'Atlas (CFO)', agent: 'atlas', file: 'data/pulse/cfo_pulse.json' },
+            { label: 'Maven (CMO)', agent: 'maven', file: 'data/pulse/cmo_pulse.json' },
+        ];
+        for (const t of targets) {
+            const raw = t.agent === 'maven'
+                ? (() => { try { return fs.readFileSync(path.join(__dirname, t.file), 'utf8'); } catch (_) { return ''; } })()
+                : readSiblingRepo(t.agent, t.file);
+            if (!raw) { out.push(`  ${t.label}: MISSING`); continue; }
+            let p; try { p = JSON.parse(raw); } catch (_) { out.push(`  ${t.label}: PARSE ERROR`); continue; }
+            const age = formatAge(p.updated_at || p.timestamp);
+            if (t.agent === 'atlas') {
+                const sg = p.spend_gate || {};
+                const cap = p.approved_ad_spend_monthly_cap_cad ?? 0;
+                const liquid = p.liquid_cad ?? 0;
+                out.push(`  ${t.label}: gate=${sg.status || '?'} | cap=$${cap}/mo | liquid=$${Number(liquid).toLocaleString()} | ${age}`);
+            } else if (t.agent === 'bravo') {
+                const rev = p.revenue || {};
+                const mrr = rev.net_mrr_usd ?? p.mrr_usd ?? 0;
+                const conc = rev.bennett_concentration_pct ?? '?';
+                out.push(`  ${t.label}: MRR=$${mrr} USD | conc=${conc}% | ${age}`);
+            } else {
+                const req = p.spend_request_cad ?? 0;
+                const cp = p.content_pipeline || {};
+                const drafts = cp.drafts_in_review ?? cp.in_review ?? '?';
+                out.push(`  ${t.label}: spend_request=$${req} CAD | drafts_in_review=${drafts} | ${age}`);
+            }
+        }
+        return bot.sendMessage(chatId, out.join('\n'));
+    }
+
+    // /sibling <agent> [file] — read a sibling agent's brain/*.md.
+    // Atlas-V3.2 parity: bare agent → list brain/, agent+file → first 3000 chars.
+    if (text.startsWith('/sibling')) {
+        const args = text.slice('/sibling'.length).trim().split(/\s+/).filter(Boolean);
+        if (!args.length) {
+            return bot.sendMessage(chatId, [
+                'Usage: /sibling <bravo|atlas|aura> [filename]',
+                'Examples:',
+                '  /sibling bravo            (list Bravo\'s brain/)',
+                '  /sibling bravo SOUL       (read Bravo\'s brain/SOUL.md)',
+                '  /sibling atlas CFO_GATE_CONTRACT',
+            ].join('\n'));
+        }
+        const agent = args[0].toLowerCase();
+        if (!SIBLING_REPOS[agent]) {
+            return bot.sendMessage(chatId, `Unknown agent '${agent}'. Try: ${Object.keys(SIBLING_REPOS).filter(a => a !== 'maven').join(', ')}`);
+        }
+        const repo = SIBLING_REPOS[agent];
+        if (!fs.existsSync(repo)) {
+            return bot.sendMessage(chatId, `${agent} repo not on this machine: ${repo}`);
+        }
+        const brainDir = path.join(repo, 'brain');
+        if (!fs.existsSync(brainDir)) {
+            return bot.sendMessage(chatId, `${agent} has no brain/ dir at ${brainDir}`);
+        }
+        if (args.length === 1) {
+            const names = fs.readdirSync(brainDir).filter(n => n.endsWith('.md')).sort();
+            return bot.sendMessage(chatId, `${agent}/brain/ contents:\n  ${names.join('\n  ')}`.substring(0, 3500));
+        }
+        let name = args.slice(1).join(' ').replace(/[\\/]/g, '');
+        if (!name.endsWith('.md')) name += '.md';
+        const file = path.join(brainDir, name);
+        if (!fs.existsSync(file)) {
+            const names = fs.readdirSync(brainDir).filter(n => n.endsWith('.md')).sort();
+            return bot.sendMessage(chatId, `${agent}/brain/${name} not found.\nAvailable: ${names.join(', ')}`.substring(0, 3500));
+        }
+        let body = fs.readFileSync(file, 'utf8');
+        if (body.length > 3000) body = body.slice(0, 3000) + `\n\n... (${body.length - 3000} more chars)`;
+        return bot.sendMessage(chatId, `=== ${agent}/brain/${name} ===\n${body}`);
     }
 
     if (text === '/spend') {

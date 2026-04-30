@@ -70,16 +70,17 @@ class _FakeAnthropicClient:
 # ============================================================================
 
 class TestLoadFoundation(unittest.TestCase):
-    """`load_foundation()` reads 5 files; each missing → empty string, no crash."""
+    """`load_foundation()` reads foundation files; each missing -> empty string, no crash."""
 
-    def test_returns_all_5_keys_even_when_files_missing(self):
+    def test_returns_all_keys_even_when_files_missing(self):
         # Point PROJECT_ROOT at an empty temp dir
         with tempfile.TemporaryDirectory() as tmp:
             with mock.patch.object(script_ideation, "PROJECT_ROOT", Path(tmp)):
                 f = script_ideation.load_foundation()
         self.assertEqual(set(f.keys()),
                          {"soul", "writing", "marketing_canon",
-                          "content_bible", "video_production_bible"})
+                          "short_form_hooks", "content_bible",
+                          "cc_creative_identity", "video_production_bible"})
         # All empty strings (files don't exist)
         self.assertTrue(all(v == "" for v in f.values()))
 
@@ -90,13 +91,17 @@ class TestLoadFoundation(unittest.TestCase):
             (root / "brain" / "SOUL.md").write_text("Maven's identity\n", encoding="utf-8")
             (root / "brain" / "WRITING.md").write_text("Voice rules\n", encoding="utf-8")
             (root / "brain" / "MARKETING_CANON.md").write_text("10 pillars\n", encoding="utf-8")
+            (root / "brain" / "SHORT_FORM_HOOKS.md").write_text("Hook system\n", encoding="utf-8")
             (root / "brain" / "CONTENT_BIBLE.md").write_text("Pillars + hooks\n", encoding="utf-8")
+            (root / "brain" / "CC_CREATIVE_IDENTITY.md").write_text("Creative identity\n", encoding="utf-8")
             (root / "brain" / "VIDEO_PRODUCTION_BIBLE.md").write_text(
                 "\n".join(f"line {i}" for i in range(120)), encoding="utf-8")
             with mock.patch.object(script_ideation, "PROJECT_ROOT", root):
                 f = script_ideation.load_foundation()
         self.assertEqual(f["soul"], "Maven's identity")
         self.assertEqual(f["writing"], "Voice rules")
+        self.assertEqual(f["short_form_hooks"], "Hook system")
+        self.assertEqual(f["cc_creative_identity"], "Creative identity")
         # video_production_bible is line-capped at 80
         self.assertLessEqual(len(f["video_production_bible"].split("\n")), 80)
 
@@ -165,7 +170,9 @@ class TestBuildPrompt(unittest.TestCase):
             "soul": "Maven SOUL content",
             "writing": "Maven WRITING content",
             "marketing_canon": "Maven CANON content",
+            "short_form_hooks": "Nobody mentions this.\nHere's a real truth:",
             "content_bible": "Maven BIBLE content",
+            "cc_creative_identity": "Maven CREATIVE IDENTITY content",
             "video_production_bible": "Maven VIDEO content",
         }
 
@@ -182,8 +189,10 @@ class TestBuildPrompt(unittest.TestCase):
             signal=self._signal(),
             count=10, pillar="any", fmt="short_video", topic=None,
         )
-        for marker in ["SOUL", "WRITING", "CANON", "BIBLE", "VIDEO PRODUCTION BIBLE"]:
+        for marker in ["SOUL", "WRITING", "CANON", "SHORT-FORM HOOK SYSTEM",
+                       "BIBLE", "CREATIVE IDENTITY", "VIDEO PRODUCTION BIBLE"]:
             self.assertIn(marker, prompt, f"missing section {marker}")
+        self.assertIn("Nobody mentions this.", prompt)
 
     def test_includes_spec_values(self):
         prompt = script_ideation.build_prompt(
@@ -223,6 +232,7 @@ class TestBuildPrompt(unittest.TestCase):
             count=10, pillar="any", fmt="any", topic=None,
         )
         self.assertIn("OUTPUT FORMAT", prompt)
+        self.assertIn("Hook pattern used", prompt)
         self.assertIn("Hook", prompt)
         self.assertIn("Beat sheet", prompt)
         self.assertIn("CTA", prompt)
@@ -356,8 +366,8 @@ class TestCLI(unittest.TestCase):
 # ============================================================================
 
 class TestConstants(unittest.TestCase):
-    def test_pillar_options_includes_3_daily_pillars(self):
-        for required in ["sobriety_log", "quote_drop", "ceo_log", "any"]:
+    def test_pillar_options_includes_cc_content_pillars(self):
+        for required in ["ai_oracle", "the_becoming", "the_journey", "ceo_log", "any"]:
             self.assertIn(required, script_ideation.PILLAR_OPTIONS)
 
     def test_format_options_includes_video_formats(self):

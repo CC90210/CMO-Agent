@@ -53,6 +53,7 @@ Maven writes only to `data/pulse/cmo_pulse.json`.
 
 - [[CONTENT_BIBLE]] — 3 daily pillars (Sobriety Log, Quote Drop, CEO Log) + hook bank + 7 pacing rules + NEPQ outreach framework
 - [[VIDEO_PRODUCTION_BIBLE]] — Cinematic format reference (1080×1920 portrait, CRF 18, branded captions, WhisperX/faster-whisper transcription, ASS karaoke captions)
+- [[SHORT_FORM_HOOKS]] -- CC's personal short-form hook system and locked starter patterns
 - BRAND_GUIDE — `media/brand/BRAND_GUIDE.md` — visual + voice standards (Pearl White / Obsidian / Oasis Blue palette, Inter typography, anti-slop voice rules)
 - OASIS one-pager — `media/brand/oasis_onepager.html` — visual-language reference
 

@@ -22,7 +22,18 @@ CC's content feels like a futuristic, intimate conversation -- someone from the 
 | **The Journey** | 2x/week | 30-60sec, raw and sentimental | Sobriety, dropping out, entrepreneurship at 22, Montreal move, growth arc |
 | **The CEO Log** | 1x/week | 30-60sec, effortless operator energy | Building in public, behind-the-scenes OASIS AI, "another day at the office" |
 
-### Hook Bank (4 Categories)
+### Hook Bank
+
+> Short-form source of truth: [[SHORT_FORM_HOOKS]]. For CC's personal content, use those patterns first before reaching for generic hooks.
+
+#### CC Short-Form Hook Starters
+- "Nobody mentions this."
+- "I wish I knew this earlier."
+- "Pause for a second."
+- "Ever notice this pattern?"
+- "Here's a real truth:"
+
+#### General Hook Categories
 - **Pattern Interrupt**: "Stop scrolling", "I wasn't gonna post this but...", "Nobody talks about this"
 - **Curiosity Gap**: "The thing they don't tell you about [X]...", "Most people do this wrong"
 - **Credibility/Proof**: "[X] days in -- here's exactly what changed", "I built this at 22 with no funding"

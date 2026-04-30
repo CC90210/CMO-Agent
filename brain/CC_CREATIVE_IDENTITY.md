@@ -99,9 +99,10 @@ What it means to be a true man: strong, confident, certain, free. Men and women 
 
 - At 20: truly lost, university safety bubble, didn't understand life
 - Now: focused, disciplined, ahead of the curve
-- Key lesson: momentum is earned, stay focused, not everything is funny
-- Sentimental retrospective content (looking back at growth arc, possibly with Adon)
-- Sobriety accountability -- real, raw, no sugar-coating
+- **The Core Mentality**: "Do not quit when it gets painful, and do not quit when it gets comfortable, because you continue to grow as a person."
+- **The Enemy of Momentum**: Complacency. Beating a challenge makes it easy, which breeds complacency. The goal is staying on the gas and maintaining a perpetual state of enthusiasm, charisma, and certainty.
+- **Sobriety accountability**: Real, raw, no sugar-coating. Specifically documenting the decision to stop weed to regain proactive thinking and kill the paranoia/distraction of entertainment nonsense.
+- Sentimental retrospective content (looking back at growth arc, handling down moments with perspective and humility)
 
 ### Pillar 4: The CEO Log (Business)
 Existing pillar from CONTENT_BIBLE. Building-in-public, behind-the-scenes operator content. But now filtered through the Time Traveler archetype -- CC's business moves should feel like someone playing chess while others play checkers.
@@ -197,15 +198,21 @@ Existing pillar from CONTENT_BIBLE. Building-in-public, behind-the-scenes operat
 CC wants to create retrospective content showing how far he's come:
 - At 20: no idea what life was, university safety bubble, truly lost
 - Now at 22: focused, disciplined, building, discovering himself
-- Learning self-love so he can appreciate others' specific skills
-- Battling imposter syndrome while knowing he's ahead because of AI access
-- Possibly collaborative content with Adon (YouTube: Adon Yess)
+- Battling complacency: The struggle of overcoming hard things, finding them easy, and losing the drive. Content focused on mind management, perspective, and humility.
+- Sobriety as a tool for focus: Cutting out weed to eliminate paranoia and passive consumption, unlocking proactive thinking.
+- The desired state: A perpetual state of enthusiasm, charisma, and certainty.
 
-**Key quote (CC's own words):** "Stay focused. The moment you lose focus, it's hard to get back. Momentum is earned and you must earn your keep with it."
+**Key quotes (CC's own words):**
+- "Stay focused. The moment you lose focus, it's hard to get back. Momentum is earned and you must earn your keep with it."
+- "Do not quit when it gets painful, and do not quit when it gets comfortable, because you continue to grow as a person."
 
 ---
 
+## Hook Discipline
+
+For personal short-form, default to [[SHORT_FORM_HOOKS]] before generic attention-grabbing formulas. Hooks should make CC sound observant, certain, and in motion -- not needy, salty, or like he is asking the audience to feel bad for him.
+
 ## Related
 
-- [[CONTENT_BIBLE]] | [[WRITING]] | [[SOUL]] | [[USER]] | [[VIDEO_PRODUCTION_BIBLE]]
+- [[CONTENT_BIBLE]] | [[SHORT_FORM_HOOKS]] | [[WRITING]] | [[SOUL]] | [[USER]] | [[VIDEO_PRODUCTION_BIBLE]]
 - [[conaugh-personal]] | [[oasis-ai]]

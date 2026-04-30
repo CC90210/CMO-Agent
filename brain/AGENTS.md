@@ -41,7 +41,7 @@ These are scripts in `scripts/` invoked via subprocess by sub-agents that need t
 
 | Tool | Path | Owner agents | Purpose |
 |------|------|--------------|---------|
-| script_ideation | `scripts/script_ideation.py` | content-creator, video-editor, writer | Generates pillar-tagged video/post script ideas grounded in `CONTENT_BIBLE` + `VIDEO_PRODUCTION_BIBLE` + cross-agent pulse signal. CLI: `--count`, `--pillar`, `--format`, `--topic`. Output: `data/ideation/<ts>.md`. Tested by `test_script_ideation.py` (21/21). |
+| script_ideation | `scripts/script_ideation.py` | content-creator, video-editor, writer | Generates pillar-tagged video/post script ideas grounded in `SHORT_FORM_HOOKS` + `CONTENT_BIBLE` + `VIDEO_PRODUCTION_BIBLE` + cross-agent pulse signal. CLI: `--count`, `--pillar`, `--format`, `--topic`. Output: `data/ideation/<ts>.md`. Tested by `test_script_ideation.py`. |
 
 ---
 

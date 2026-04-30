@@ -85,6 +85,13 @@ Before delivering:
 
 Every piece of content must pass these tests before it ships:
 
+**Short-form hook layer:**
+- [ ] Pick one CC hook pattern before drafting: "Nobody mentions this.", "I wish I knew this earlier.", "Pause for a second.", "Ever notice this pattern?", or "Here's a real truth:"
+- [ ] Use the pattern as thinking, not a rigid sentence if a tighter variant sounds more natural.
+- [ ] The opening creates recognition or curiosity without asking for sympathy.
+- [ ] For founder videos, avoid opening on rejection/no-show context unless the second sentence instantly turns it into a sharper asset, system, or market lesson.
+- [ ] If the content is personal brand short-form, reference `brain/SHORT_FORM_HOOKS.md`.
+
 **Tone checks:**
 - [ ] Reads like a conversation at 2am with a smart friend — not a LinkedIn influencer
 - [ ] Makes one specific claim — not a generic observation

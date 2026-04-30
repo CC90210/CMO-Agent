@@ -14,7 +14,8 @@ What it does
      - brain/SOUL.md (identity + voice)
      - brain/WRITING.md (voice/hook/anti-slop guardrails)
      - brain/MARKETING_CANON.md (10 pillars framework)
-     - brain/CONTENT_BIBLE.md (3 daily pillars, hook bank, pacing rules)
+     - brain/SHORT_FORM_HOOKS.md (CC's locked personal short-form hook patterns)
+     - brain/CONTENT_BIBLE.md (4 content pillars, hook bank, pacing rules)
      - brain/VIDEO_PRODUCTION_BIBLE.md (cinematic format reference)
 2. Pulls live signal:
      - Bravo's ceo_pulse.json (current focus / wins / blockers)
@@ -97,6 +98,7 @@ def load_foundation() -> dict[str, str]:
         "soul": _read("brain/SOUL.md"),
         "writing": _read("brain/WRITING.md"),
         "marketing_canon": _read("brain/MARKETING_CANON.md"),
+        "short_form_hooks": _read("brain/SHORT_FORM_HOOKS.md"),
         "content_bible": _read("brain/CONTENT_BIBLE.md"),
         "cc_creative_identity": _read("brain/CC_CREATIVE_IDENTITY.md"),
         "video_production_bible": _read("brain/VIDEO_PRODUCTION_BIBLE.md", max_lines=80),
@@ -175,7 +177,8 @@ def build_prompt(
         "for the next 1–2 weeks of content. Generate ideas that fit CC's "
         "voice, current life context, and the pillar/format spec below. "
         "No generic LinkedIn-bro slop. No 'Unlock the power of...' openers. "
-        "Every idea must feel like CC actually said it."
+        "For short-form ideas, rotate CC's hook patterns and make the first "
+        "line observational, not needy. Every idea must feel like CC actually said it."
     )
     parts.append("")
     parts.append("=== CC's IDENTITY (brain/SOUL.md) ===")
@@ -184,6 +187,10 @@ def build_prompt(
     parts.append("=== VOICE & ANTI-SLOP RULES (brain/WRITING.md) ===")
     parts.append(foundation.get("writing", "")[:3000])
     parts.append("")
+    if foundation.get("short_form_hooks"):
+        parts.append("=== SHORT-FORM HOOK SYSTEM (brain/SHORT_FORM_HOOKS.md) ===")
+        parts.append(foundation["short_form_hooks"][:3000])
+        parts.append("")
     parts.append("=== MARKETING CANON (10 pillars framework) ===")
     parts.append(foundation.get("marketing_canon", "")[:3000])
     parts.append("")
@@ -234,8 +241,9 @@ def build_prompt(
     parts.append(
         "For each idea, write a markdown block with these fields:\n"
         "  ### {N}. {Tight 6-10 word title}\n"
-        "  - **Pillar**: which of the 3 daily pillars this is\n"
+        "  - **Pillar**: which content pillar this is\n"
         "  - **Format**: short_video | long_video | carousel | thread | podcast_clip\n"
+        "  - **Hook pattern used**: one of SHORT_FORM_HOOKS, or a brief reason another pattern fits better\n"
         "  - **Hook (first 3 seconds)**: the literal opening line CC says or text on screen\n"
         "  - **Why this works**: 1 sentence — what tension or insight makes it pull\n"
         "  - **Beat sheet**: 3–6 bullet points covering the body\n"

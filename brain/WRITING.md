@@ -39,6 +39,17 @@ This is the craft layer. [[MARKETING_CANON]] is the strategy layer. Strategy dec
 
 ## Hook Formulas (Canon-Derived)
 
+### For CC personal short-form ([[SHORT_FORM_HOOKS]])
+Use CC's short-form hook system before generic templates when drafting personal Reels, TikToks, Shorts, X first lines, or LinkedIn openings. The current locked starter patterns are:
+
+- **"Nobody mentions this."** -- hidden cost, neglected truth, quiet problem
+- **"I wish I knew this earlier."** -- hindsight, earned lesson, avoidable mistake
+- **"Pause for a second."** -- attention command before a reframe
+- **"Ever notice this pattern?"** -- pattern recognition, repeated behavior, market observation
+- **"Here's a real truth:"** -- blunt principle, founder law, no-fluff claim
+
+Operating rule: choose a hook pattern first, then write the take. Do not open with wounded context if the same idea can be framed as competence, leverage, market insight, or founder reps.
+
 ### For top-of-funnel reach ([[MARKETING_CANON]] § Sharp, § Holmes)
 Targets the 30% "not thinking about this" — NOT the 3% actively shopping.
 

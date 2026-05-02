@@ -1,6 +1,7 @@
 node_modules/
 .next/
 dist/
+tmp/
 # ─── Credential files (NEVER commit values) ─────────────────────────
 .env
 .env.*

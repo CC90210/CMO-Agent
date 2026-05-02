@@ -838,6 +838,12 @@ bot.on('message', async (msg) => {
         return bot.sendMessage(chatId, `User ID: ${userId}\nUsername: ${user}\nChat ID: ${chatId}`);
     }
 
+    // /ping — fast bridge-only health check. Parity with Bravo + Atlas.
+    if (text === '/ping') {
+        const uptime = Math.round(process.uptime());
+        return bot.sendMessage(chatId, `pong — Maven bridge alive (uptime ${uptime}s)`);
+    }
+
     if (text === '/clear') {
         chatHistory[String(chatId)] = [];
         saveHistory();

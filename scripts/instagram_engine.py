@@ -7,6 +7,8 @@ and notifies CC via Telegram of all interactions.
 Usage:
   python scripts/instagram_engine.py check-dms          # Check and list new DMs
   python scripts/instagram_engine.py check-dms --reply   # Check DMs and auto-reply
+  python scripts/instagram_engine.py check-dms --daemon  # Continuously monitor DMs
+  python scripts/instagram_engine.py monitor-dms         # Continuously monitor DMs
   python scripts/instagram_engine.py check-comments      # Check for new comments
   python scripts/instagram_engine.py send-dm --to USER --msg "text"  # Send a DM
   python scripts/instagram_engine.py log-dm --username USER --summary "text"
@@ -20,10 +22,12 @@ Browser profile persists at tmp/ig-browser/ for session continuity.
 import argparse
 import calendar
 import json
+import random
 import subprocess
 import sys
 import os
 import time
+import traceback
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -34,6 +38,11 @@ SCREENSHOT_DIR = str(PROJECT_ROOT / "tmp")
 DM_REPLIED_PATH = PROJECT_ROOT / "tmp" / "dm_replied.json"
 BOOKING_STATE_PATH = PROJECT_ROOT / "tmp" / "dm_booking_state.json"
 NOTIFIED_PATH = PROJECT_ROOT / "tmp" / "dm_notified.json"
+INBOX_URL = "https://www.instagram.com/direct/inbox/"
+LOGIN_URL = "https://www.instagram.com/accounts/login/"
+PAGE_TIMEOUT_MS = 60000
+DEFAULT_POLL_MIN_SECONDS = 180
+DEFAULT_POLL_MAX_SECONDS = 420
 
 # Intent detection — only trigger booking when they EXPLICITLY ask for a call/meeting
 # Everything else gets a genuine conversational reply
@@ -107,6 +116,176 @@ def capture_lead_to_crm(username: str, intent: str, message_text: str):
     return False
 
 
+def get_env_value(env_vars: dict, *keys: str) -> str:
+    """Read a config value from .env.agents or process env, stripping NUL damage."""
+    for key in keys:
+        value = (env_vars.get(key) or os.environ.get(key) or "").replace("\x00", "").strip()
+        if value:
+            return value
+    return ""
+
+
+def get_pulse_webhook_url(env_vars: dict) -> str:
+    return (
+        get_env_value(env_vars, "PULSE_WEBHOOK_URL", "IG_SETTER_PRO_WEBHOOK_URL")
+        or "https://ig-setter-pro.vercel.app/api/webhook"
+    )
+
+
+def get_pulse_api_base(env_vars: dict) -> str:
+    configured = get_env_value(env_vars, "PULSE_API_BASE_URL", "IG_SETTER_PRO_BASE_URL")
+    if configured:
+        return configured.rstrip("/")
+    webhook_url = get_pulse_webhook_url(env_vars)
+    if webhook_url.endswith("/api/webhook"):
+        return webhook_url[:-len("/api/webhook")].rstrip("/")
+    return webhook_url.rstrip("/")
+
+
+def get_pulse_secret(env_vars: dict) -> str:
+    return get_env_value(
+        env_vars,
+        "PULSE_WEBHOOK_SECRET",
+        "IG_SETTER_PRO_WEBHOOK_SECRET",
+        "WEBHOOK_SECRET",
+    )
+
+
+def send_to_ig_setter_pro(env_vars: dict, username: str, message_text: str, direction: str, is_ai: bool = False, intent: str = "active", ig_message_id: str | None = None):
+    """Send DM interaction to ig-setter-pro dashboard webhook."""
+    import hashlib
+    try:
+        import requests
+    except ImportError:
+        safe_print("ig-setter-pro webhook skipped: requests package is not installed")
+        return False
+
+    webhook_url = get_pulse_webhook_url(env_vars)
+    webhook_secret = get_pulse_secret(env_vars)
+    account_id = get_env_value(env_vars, "PULSE_ACCOUNT_ID", "IG_SETTER_PRO_ACCOUNT_ID")
+    ig_page_id = get_env_value(env_vars, "PULSE_IG_PAGE_ID", "IG_SETTER_PRO_IG_PAGE_ID")
+
+    if not webhook_url:
+        webhook_url = "https://ig-setter-pro.vercel.app/api/webhook"
+    if not webhook_url or not webhook_secret:
+        safe_print("ig-setter-pro webhook skipped: PULSE_WEBHOOK_SECRET is not configured")
+        return False
+
+    clean_username = username.strip().lstrip("@")
+    username_hash = hashlib.md5(clean_username.lower().encode("utf-8")).hexdigest()[:16]
+    user_id = "ig_user_" + username_hash
+    thread_id = f"{ig_page_id}_{user_id}" if ig_page_id else "ig_thread_" + username_hash
+
+    ai_status = "active"
+    if intent in {"BOOKING", "PRICING", "PAYMENT"}:
+        ai_status = "qualified"
+    if intent == "BOOKING_CONFIRMED":
+        ai_status = "booked"
+
+    msg_hash = hashlib.md5(
+        f"{direction}:{clean_username.lower()}:{message_text}".encode("utf-8")
+    ).hexdigest()[:16]
+
+    payload = {
+        "account_id": account_id,
+        "ig_thread_id": thread_id,
+        "ig_user_id": user_id,
+        "username": clean_username,
+        "display_name": clean_username,
+        "message": message_text,
+        "direction": direction,
+        "is_ai": is_ai,
+        "ai_status": ai_status,
+        "status": ai_status,
+        "ig_message_id": ig_message_id or f"msg_{msg_hash}",
+        "pending_ai_draft": None,
+    }
+
+    try:
+        resp = requests.post(
+            webhook_url,
+            json=payload,
+            headers={"x-webhook-secret": webhook_secret, "Content-Type": "application/json"},
+            timeout=10
+        )
+        if resp.status_code == 200:
+            try:
+                data = resp.json()
+                if data.get("ok") is False:
+                    safe_print(f"ig-setter-pro webhook rejected payload: {data}")
+                    return False
+            except ValueError:
+                pass
+            return True
+        else:
+            safe_print(f"ig-setter-pro webhook error: {resp.status_code} - {resp.text}")
+    except Exception as e:
+        safe_print(f"ig-setter-pro webhook failed: {e}")
+    return False
+
+
+def fetch_ig_setter_pro_outbox(env_vars: dict, limit: int = 5) -> list[dict]:
+    """Claim pending dashboard-originated sends for the Python Playwright daemon."""
+    try:
+        import requests
+    except ImportError:
+        safe_print("ig-setter-pro outbox skipped: requests package is not installed")
+        return []
+
+    secret = get_pulse_secret(env_vars)
+    if not secret:
+        safe_print("ig-setter-pro outbox skipped: PULSE_WEBHOOK_SECRET is not configured")
+        return []
+
+    url = f"{get_pulse_api_base(env_vars)}/api/python/outbox"
+    account_id = get_env_value(env_vars, "PULSE_ACCOUNT_ID", "IG_SETTER_PRO_ACCOUNT_ID")
+    params = {"limit": str(max(1, min(limit, 20)))}
+    if account_id:
+        params["account_id"] = account_id
+
+    try:
+        resp = requests.get(
+            url,
+            params=params,
+            headers={"x-webhook-secret": secret},
+            timeout=10,
+        )
+        if resp.status_code != 200:
+            safe_print(f"ig-setter-pro outbox fetch error: {resp.status_code} - {resp.text}")
+            return []
+        data = resp.json()
+        return data.get("commands") or []
+    except Exception as exc:
+        safe_print(f"ig-setter-pro outbox fetch failed: {exc}")
+        return []
+
+
+def mark_ig_setter_pro_outbox(env_vars: dict, command_id: str, status: str, error: str | None = None) -> bool:
+    """Mark a dashboard-originated send as sent or failed."""
+    try:
+        import requests
+    except ImportError:
+        return False
+
+    secret = get_pulse_secret(env_vars)
+    if not secret:
+        return False
+
+    try:
+        resp = requests.post(
+            f"{get_pulse_api_base(env_vars)}/api/python/outbox",
+            json={"id": command_id, "status": status, "error": error},
+            headers={"x-webhook-secret": secret, "Content-Type": "application/json"},
+            timeout=10,
+        )
+        if resp.status_code == 200:
+            return True
+        safe_print(f"ig-setter-pro outbox mark error: {resp.status_code} - {resp.text}")
+    except Exception as exc:
+        safe_print(f"ig-setter-pro outbox mark failed: {exc}")
+    return False
+
+
 def _read_config_model(key: str, fallback: str) -> str:
     """Read a model name from .agents/config.toml."""
     config_path = PROJECT_ROOT / ".agents" / "config.toml"
@@ -133,10 +312,13 @@ def load_env() -> dict:
     env_vars = {}
     with open(env_path, "r", encoding="utf-8") as f:
         for line in f:
-            line = line.strip()
+            line = line.replace("\x00", "").strip().lstrip("\ufeff")
             if line and not line.startswith("#") and "=" in line:
                 key, _, value = line.partition("=")
-                env_vars[key.strip()] = value.strip()
+                key = key.replace("\x00", "").strip()
+                value = value.replace("\x00", "").strip().strip('"').strip("'")
+                if key:
+                    env_vars[key] = value
     return env_vars
 
 
@@ -146,6 +328,82 @@ def safe_print(text):
         print(text)
     except UnicodeEncodeError:
         print(text.encode("ascii", "replace").decode("ascii"))
+
+
+def log_exception(context: str, exc: BaseException | None = None):
+    """Print a clear exception plus stack trace without breaking Windows output."""
+    if exc is not None:
+        safe_print(f"{context}: {type(exc).__name__}: {exc}")
+    else:
+        safe_print(context)
+    tb = traceback.format_exc()
+    if tb and tb.strip() != "NoneType: None":
+        safe_print(tb)
+
+
+def _is_playwright_timeout(exc: BaseException) -> bool:
+    """Return True for Playwright timeout exceptions without importing at module load."""
+    try:
+        from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+    except Exception:
+        return isinstance(exc, TimeoutError)
+    return isinstance(exc, (PlaywrightTimeoutError, TimeoutError))
+
+
+def _sleep(seconds: float):
+    """Tiny wrapper so long sleeps stay easy to patch in tests."""
+    time.sleep(seconds)
+
+
+def _dismiss_ig_prompts(page) -> bool:
+    """Dismiss common Instagram modals without failing the caller."""
+    try:
+        return bool(page.evaluate("""() => {
+            const targets = ['Not Now', 'Not now'];
+            const bs = document.querySelectorAll('button, div[role="button"]');
+            for (const b of bs) {
+                const t = (b.textContent || '').trim();
+                if (targets.includes(t)) {
+                    b.click();
+                    return true;
+                }
+            }
+            return false;
+        }"""))
+    except Exception as exc:
+        log_exception("Instagram prompt dismissal failed", exc)
+        return False
+
+
+def _session_needs_login(page) -> bool:
+    url = (getattr(page, "url", "") or "").lower().rstrip("/")
+    return "/accounts/login" in url or url == "https://www.instagram.com"
+
+
+def recover_inbox_page(page, env_vars: dict, reason: str) -> bool:
+    """Reload the active page and re-run login recovery for daemon resilience."""
+    safe_print(f"{reason}; attempting Instagram inbox recovery...")
+    try:
+        page.reload(wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+        _sleep(6)
+    except Exception as exc:
+        log_exception("Instagram page reload during recovery failed", exc)
+
+    try:
+        return ensure_logged_in(page, env_vars)
+    except Exception as exc:
+        log_exception("Instagram login recovery failed", exc)
+        return False
+
+
+def _return_to_inbox(page, env_vars: dict) -> bool:
+    try:
+        page.goto(INBOX_URL, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+        _sleep(4)
+        return True
+    except Exception as exc:
+        log_exception("Failed navigating back to Instagram inbox", exc)
+        return recover_inbox_page(page, env_vars, "Inbox navigation failed")
 
 
 def get_browser_context(playwright):
@@ -163,102 +421,144 @@ def get_browser_context(playwright):
     )
 
 
+def _open_ig_page(playwright):
+    context = get_browser_context(playwright)
+    page = context.pages[0] if context.pages else context.new_page()
+    return context, page
+
+
+def _close_context_safely(context):
+    try:
+        context.close()
+    except Exception as exc:
+        log_exception("Failed closing Instagram browser context", exc)
+
+
 def ensure_logged_in(page, env_vars):
     """Check if logged into Instagram; if not, log in with credentials."""
-    page.goto(
-        "https://www.instagram.com/direct/inbox/",
-        wait_until="domcontentloaded",
-        timeout=60000,
-    )
-    time.sleep(6)
+    try:
+        page.goto(INBOX_URL, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+        _sleep(6)
 
-    # If redirected to login, authenticate
-    if "/accounts/login" in page.url or page.url == "https://www.instagram.com/":
-        safe_print("Session expired. Logging in...")
-        ig_user = env_vars.get("INSTAGRAM_USERNAME", "")
-        ig_pass = env_vars.get("INSTAGRAM_PASSWORD", "")
-        if not ig_user or not ig_pass:
-            return False
+        # If redirected to login, authenticate.
+        if _session_needs_login(page):
+            safe_print("Session expired or missing. Logging into Instagram...")
+            ig_user = env_vars.get("INSTAGRAM_USERNAME", "")
+            ig_pass = env_vars.get("INSTAGRAM_PASSWORD", "")
+            if not ig_user or not ig_pass:
+                safe_print("ERROR: INSTAGRAM_USERNAME or INSTAGRAM_PASSWORD missing in .env.agents")
+                return False
 
-        page.goto(
-            "https://www.instagram.com/accounts/login/",
-            wait_until="domcontentloaded",
-            timeout=60000,
-        )
-        time.sleep(4)
+            page.goto(LOGIN_URL, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+            _sleep(4)
 
-        # Handle "Continue" screen (saved session, needs re-auth)
-        user_field = page.query_selector('input[name="username"]') or page.query_selector('input[name="email"]')
-        pass_field = page.query_selector('input[name="password"]') or page.query_selector('input[name="pass"]')
+            # Handle "Continue" screen (saved session, needs re-auth).
+            user_field = (
+                page.query_selector('input[name="username"]')
+                or page.query_selector('input[name="email"]')
+                or page.query_selector('input[autocomplete="username"]')
+            )
+            pass_field = (
+                page.query_selector('input[name="password"]')
+                or page.query_selector('input[name="pass"]')
+                or page.query_selector('input[type="password"]')
+            )
 
-        if not user_field or not pass_field:
-            # Click "Use another profile" to get full login form
-            page.evaluate("""() => {
-                const els = document.querySelectorAll('button, div[role="button"], a, span');
-                for (const el of els) {
-                    if (el.textContent.trim().includes('Use another profile')) {
-                        el.click(); return true;
+            if not user_field or not pass_field:
+                safe_print("Login form not visible yet; trying alternate profile flow...")
+                try:
+                    page.evaluate("""() => {
+                        const els = document.querySelectorAll('button, div[role="button"], a, span');
+                        for (const el of els) {
+                            const text = (el.textContent || '').trim();
+                            if (text.includes('Use another profile') || text.includes('Switch accounts')) {
+                                el.click();
+                                return true;
+                            }
+                        }
+                        return false;
+                    }""")
+                    _sleep(3)
+                except Exception as exc:
+                    log_exception("Instagram alternate login flow click failed", exc)
+
+                user_field = (
+                    page.query_selector('input[name="username"]')
+                    or page.query_selector('input[name="email"]')
+                    or page.query_selector('input[autocomplete="username"]')
+                )
+                pass_field = (
+                    page.query_selector('input[name="password"]')
+                    or page.query_selector('input[name="pass"]')
+                    or page.query_selector('input[type="password"]')
+                )
+
+            if not user_field or not pass_field:
+                safe_print(f"ERROR: Could not find Instagram login form. Current URL: {page.url}")
+                safe_print("Login form lookup stack:\n" + "".join(traceback.format_stack(limit=8)))
+                try:
+                    page.screenshot(path=os.path.join(SCREENSHOT_DIR, "ig_login_form_missing.png"))
+                    safe_print("Saved debug screenshot: tmp/ig_login_form_missing.png")
+                except Exception as screenshot_exc:
+                    log_exception("Could not save login debug screenshot", screenshot_exc)
+                return False
+
+            user_field.click()
+            user_field.fill("")
+            user_field.type(ig_user, delay=30)
+            _sleep(0.3)
+            pass_field.click()
+            pass_field.fill("")
+            pass_field.type(ig_pass, delay=30)
+            _sleep(0.5)
+
+            clicked_login = page.evaluate("""() => {
+                const buttons = document.querySelectorAll('button[type="submit"], button, div[role="button"]');
+                for (const b of buttons) {
+                    const t = (b.textContent || '').trim().toLowerCase();
+                    if (t === 'log in' || t === 'login') {
+                        b.click();
+                        return true;
                     }
                 }
                 return false;
             }""")
-            time.sleep(3)
-            user_field = page.query_selector('input[name="username"]') or page.query_selector('input[name="email"]')
-            pass_field = page.query_selector('input[name="password"]') or page.query_selector('input[name="pass"]')
+            if not clicked_login:
+                safe_print("ERROR: Could not find Instagram Log In button")
+                return False
+            _sleep(10)
 
-        if not user_field or not pass_field:
-            safe_print("ERROR: Could not find login form")
-            return False
+            # Dismiss prompts (Save Login Info, Notifications).
+            for _ in range(3):
+                _dismiss_ig_prompts(page)
+                _sleep(2)
 
-        user_field.click()
-        user_field.fill("")
-        user_field.type(ig_user, delay=30)
-        time.sleep(0.3)
-        pass_field.click()
-        pass_field.fill("")
-        pass_field.type(ig_pass, delay=30)
-        time.sleep(0.5)
+            page.goto(INBOX_URL, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+            _sleep(6)
 
-        # Click Log In button
-        page.evaluate("""() => {
-            const buttons = document.querySelectorAll('button[type="submit"], button, div[role="button"]');
-            for (const b of buttons) {
-                const t = b.textContent.trim().toLowerCase();
-                if (t === 'log in' || t === 'login') { b.click(); return; }
-            }
-        }""")
-        time.sleep(10)
+        _dismiss_ig_prompts(page)
+        _sleep(1)
 
-        # Dismiss prompts (Save Login Info, Notifications)
-        for _ in range(3):
-            page.evaluate("""() => {
-                const bs = document.querySelectorAll('button, div[role="button"]');
-                for (const b of bs) {
-                    const t = b.textContent.trim();
-                    if (t === 'Not Now' || t === 'Not now') { b.click(); return; }
-                }
-            }""")
-            time.sleep(2)
+        logged_in = "/direct/" in (page.url or "")
+        if not logged_in:
+            safe_print(f"ERROR: Instagram login/session check ended at unexpected URL: {page.url}")
+        return logged_in
+    except Exception as exc:
+        if _is_playwright_timeout(exc):
+            log_exception("Timeout while checking Instagram login/session", exc)
+            try:
+                page.reload(wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+                _sleep(6)
+                if _session_needs_login(page):
+                    safe_print("Instagram session expired after timeout recovery; login will be retried.")
+                    return False
+                return "/direct/" in (page.url or "")
+            except Exception as retry_exc:
+                log_exception("Instagram timeout recovery failed", retry_exc)
+                return False
 
-        # Navigate to DMs after login
-        page.goto(
-            "https://www.instagram.com/direct/inbox/",
-            wait_until="domcontentloaded",
-            timeout=60000,
-        )
-        time.sleep(6)
-
-    # Dismiss notification prompt on DMs page
-    page.evaluate("""() => {
-        const bs = document.querySelectorAll('button, div[role="button"]');
-        for (const b of bs) {
-            const t = b.textContent.trim();
-            if (t === 'Not Now' || t === 'Not now') { b.click(); return; }
-        }
-    }""")
-    time.sleep(1)
-
-    return "/direct/" in page.url
+        log_exception("Instagram login/session check failed", exc)
+        return False
 
 
 def read_dm_list(page):
@@ -272,20 +572,55 @@ def read_dm_list(page):
         Line 4: 'Unread' (if unread)
     Returns a JSON string of parsed conversation objects.
     """
-    return page.evaluate("""() => {
-        const btns = document.querySelectorAll('div[role="button"]');
+    script = """() => {
+        const candidates = document.querySelectorAll(
+            'div[role="button"], a[role="link"], a[href*="/direct/t/"]'
+        );
         const results = [];
-        for (const btn of btns) {
-            const text = btn.innerText.trim();
-            if (text.length < 10 || text.length > 500) continue;
+        const seen = new Set();
+        for (const node of candidates) {
+            const text = (node.innerText || node.textContent || '').trim();
+            if (text.length < 10 || text.length > 700) continue;
             if (text.includes('Instagram') || text.includes('Send message')) continue;
-            const lines = text.split(String.fromCharCode(10)).map(l => l.trim()).filter(l => l.length > 0);
-            if (lines.length >= 2) {
-                results.push(lines);
-            }
+            if (text.includes('Search') && text.includes('Messages')) continue;
+
+            const lines = text
+                .split(String.fromCharCode(10))
+                .map(l => l.trim())
+                .filter(l => l.length > 0);
+            if (lines.length < 2) continue;
+
+            const key = lines.slice(0, 5).join('|');
+            if (seen.has(key)) continue;
+            seen.add(key);
+            results.push(lines);
         }
         return JSON.stringify(results);
-    }""")
+    }"""
+
+    try:
+        try:
+            page.wait_for_load_state("domcontentloaded", timeout=15000)
+        except Exception as wait_exc:
+            if _is_playwright_timeout(wait_exc):
+                safe_print("Timed out waiting for Instagram DM DOM; attempting scrape from current page.")
+            else:
+                log_exception("Instagram DM DOM wait failed", wait_exc)
+
+        return page.evaluate(script)
+    except Exception as exc:
+        if _is_playwright_timeout(exc):
+            log_exception("Timeout while reading Instagram DM list", exc)
+            try:
+                page.reload(wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+                _sleep(6)
+                return page.evaluate(script)
+            except Exception as retry_exc:
+                log_exception("Instagram DM list recovery failed", retry_exc)
+                return "[]"
+
+        log_exception("Failed to read Instagram DM list", exc)
+        return "[]"
 
 
 def parse_conversations(inbox_data):
@@ -466,21 +801,8 @@ def _handle_booking_confirmation(
 
 # -- Commands -----------------------------------------------------------------
 
-def cmd_check_dms(env_vars, args):
-    """Check Instagram DMs and auto-reply to unread messages in one atomic pass.
-
-    This is the ONLY DM handler that runs on cron. It:
-    1. Opens inbox, reads conversations
-    2. For each unread DM: opens it, reads last message, detects intent
-    3. Sends auto-reply if appropriate (respects 24h cooldown + CC manual reply check)
-    4. Notifies CC on Telegram with the username AND what action was taken
-    """
-    try:
-        from playwright.sync_api import sync_playwright
-    except ImportError:
-        safe_print("ERROR: playwright not installed. Run: pip install playwright")
-        return {"status": "error", "message": "playwright not installed"}
-
+def _check_dms_on_page(env_vars, args, page):
+    """Run one complete DM check using an already-open Playwright page."""
     replied_log = load_replied_log()
     booking_state = load_booking_state()
     notified_log = load_notified_log()
@@ -488,102 +810,98 @@ def cmd_check_dms(env_vars, args):
     skipped_replies = []
     result = {"action": "check_dms", "status": "error", "message": "Unknown error"}
 
-    with sync_playwright() as p:
-        context = get_browser_context(p)
-        page = context.pages[0] if context.pages else context.new_page()
-
-        try:
-            if not ensure_logged_in(page, env_vars):
-                result = {
-                    "action": "check_dms",
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
-                    "status": "login_failed",
-                    "message": "Could not log into Instagram. Check credentials.",
-                }
-                notify("Instagram login failed - check credentials", category="instagram")
-                if getattr(args, "output_json", False):
-                    print(json.dumps(result, indent=2))
-                else:
-                    safe_print(f"Instagram DMs: {result['message']}")
-                return result
-
-            # Read inbox
-            inbox_text = read_dm_list(page)
-            convos = parse_conversations(inbox_text)
-            unread = [c for c in convos if c.get("unread")]
-
+    try:
+        if not ensure_logged_in(page, env_vars):
             result = {
                 "action": "check_dms",
                 "timestamp": datetime.now(timezone.utc).isoformat(),
-                "status": "checked",
-                "total_visible": len(convos),
-                "unread_count": len(unread),
-                "conversations": convos[:10],
-                "unread": unread,
-                "auto_replies": [],
+                "status": "login_failed",
+                "message": "Could not log into Instagram. Check credentials/session.",
             }
+            notify("Instagram login failed - check credentials/session", category="instagram")
+            if getattr(args, "output_json", False):
+                print(json.dumps(result, indent=2))
+            else:
+                safe_print(f"Instagram DMs: {result['message']}")
+            return result
 
-            # ONLY process conversations Instagram marks as "Unread"
-            # Do NOT auto-reply to every unreplied conversation — CC handles
-            # personal conversations himself. The bot only responds to genuinely
-            # new, unread DMs that CC hasn't seen yet.
-            actionable = list(unread)
+        inbox_text = read_dm_list(page)
+        convos = parse_conversations(inbox_text)
+        unread = [c for c in convos if c.get("unread")]
 
-            if not actionable:
-                result["message"] = "No DMs needing reply"
-                if getattr(args, "output_json", False):
-                    print(json.dumps(result, indent=2, default=str))
-                return result
+        result = {
+            "action": "check_dms",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "status": "checked",
+            "total_visible": len(convos),
+            "unread_count": len(unread),
+            "conversations": convos[:10],
+            "unread": unread,
+            "auto_replies": [],
+        }
 
-            # Process each actionable conversation — detect intent and auto-reply.
-            #
-            # NOTIFICATION RULES (non-negotiable):
-            #   - ONLY notify CC on Telegram when we SUCCESSFULLY auto-reply
-            #   - ONLY notify CC on Telegram when a booking is CONFIRMED
-            #   - NEVER notify about skips, errors, unknown intents, or failures
-            #   - NEVER re-notify about the same DM preview we already reported
-            #
-            for convo in actionable:
-                username = convo.get("username", "").strip()
-                preview = convo.get("preview", "")[:100]
-                if not username:
-                    continue
+        # Only process conversations Instagram marks as unread.
+        actionable = list(unread)
+        if not actionable:
+            result["message"] = "No DMs needing reply"
+            if getattr(args, "output_json", False):
+                print(json.dumps(result, indent=2, default=str))
+            else:
+                safe_print("Instagram DMs: No DMs needing reply")
+            return result
 
-                # Skip group chats — they contain "and" in the preview or
-                # have "Active" as username with multi-person previews
+        for convo in actionable:
+            username = convo.get("username", "").strip()
+            preview = convo.get("preview", "")[:100]
+            if not username:
+                continue
+
+            try:
+                # Skip group chats. They often show as "Active" with multi-user previews.
                 if " and " in preview and username == "Active":
                     skipped_replies.append({"username": username, "reason": "group_chat"})
                     continue
 
-                # Skip if we already notified about this exact DM preview
                 if already_notified(notified_log, username, preview):
                     skipped_replies.append({"username": username, "reason": "already_notified"})
                     continue
 
-                # Open the conversation to read the actual messages
                 convo_text = read_conversation_text(page, username)
-                # Extract just the LAST message from the other person
-                last_msg = extract_last_incoming_message(convo_text)
-                if not last_msg:
-                    last_msg = preview  # Fallback to inbox preview
+                last_msg = extract_last_incoming_message(convo_text) or preview
 
-                # --- Multi-turn booking flow ---
+                # Push inbound unread message to ig-setter-pro. The backend dedupes by id.
+                send_to_ig_setter_pro(
+                    env_vars,
+                    username,
+                    last_msg,
+                    direction="inbound",
+                    intent="active",
+                )
+
+                # Multi-turn booking flow.
                 user_booking = booking_state.get(username)
                 if user_booking and user_booking.get("stage") == "awaiting_time":
-                    # ONLY parse the last incoming message — NOT the whole convo
                     parsed = parse_datetime_from_text(last_msg)
                     if parsed:
                         reply_text = _handle_booking_confirmation(
                             env_vars, page, username, parsed, booking_state,
                         )
                         if reply_text:
+                            send_to_ig_setter_pro(
+                                env_vars,
+                                username,
+                                reply_text,
+                                direction="outbound",
+                                is_ai=True,
+                                intent="BOOKING_CONFIRMED",
+                            )
                             auto_replies.append({
                                 "username": username,
                                 "intent": "BOOKING_CONFIRMED",
                                 "reply_preview": reply_text[:80],
                             })
                             notify(
-                                f"Booking confirmed! {username} — {parsed['display']}\n"
+                                f"Booking confirmed! {username} - {parsed['display']}\n"
                                 f"Sent Meet link via DM",
                                 category="instagram",
                             )
@@ -592,39 +910,50 @@ def cmd_check_dms(env_vars, args):
                         else:
                             skipped_replies.append({
                                 "username": username,
-                                "reason": "calendar_error",
+                                "reason": "calendar_or_send_error",
                             })
                     else:
-                        # Their message doesn't contain a date/time — respond
-                        # conversationally instead of robotically re-asking
                         intent = detect_intent(last_msg)
                         if intent == "CONVO":
-                            reply_text = build_reply("CONVO", last_msg=last_msg, convo_context=convo_text)
+                            reply_text = build_reply(
+                                "CONVO",
+                                last_msg=last_msg,
+                                convo_context=convo_text,
+                            )
                         else:
                             reply_text = (
                                 "just lmk a day and time that works, "
                                 "like \"thursday at 2pm\" or something"
                             )
-                        _send_dm_reply(page, reply_text, recipient=username)
-                        auto_replies.append({
-                            "username": username,
-                            "intent": "BOOKING_FOLLOWUP",
-                            "reply_preview": reply_text[:80],
-                        })
-                        mark_notified(notified_log, username, preview)
-                        save_notified_log(notified_log)
 
-                    page.goto(
-                        "https://www.instagram.com/direct/inbox/",
-                        wait_until="domcontentloaded",
-                        timeout=60000,
-                    )
-                    time.sleep(4)
+                        sent = _send_dm_reply(page, reply_text, recipient=username)
+                        if sent:
+                            send_to_ig_setter_pro(
+                                env_vars,
+                                username,
+                                reply_text,
+                                direction="outbound",
+                                is_ai=True,
+                                intent="BOOKING_FOLLOWUP",
+                            )
+                            auto_replies.append({
+                                "username": username,
+                                "intent": "BOOKING_FOLLOWUP",
+                                "reply_preview": reply_text[:80],
+                            })
+                            mark_notified(notified_log, username, preview)
+                            save_notified_log(notified_log)
+                        else:
+                            skipped_replies.append({
+                                "username": username,
+                                "reason": "booking_followup_send_failed",
+                            })
+
+                    _return_to_inbox(page, env_vars)
                     continue
 
-                # --- Normal flow ---
+                # Normal flow.
                 intent = detect_intent(last_msg)
-
                 should_reply = True
                 skip_reason = None
 
@@ -649,12 +978,18 @@ def cmd_check_dms(env_vars, args):
                             }
                             save_replied_log(replied_log)
                             log_auto_reply_to_supabase(env_vars, username, intent, reply_text)
+                            send_to_ig_setter_pro(
+                                env_vars,
+                                username,
+                                reply_text,
+                                direction="outbound",
+                                is_ai=True,
+                                intent=intent,
+                            )
 
-                            # Capture business-interest DMs as CRM leads
                             if intent in _CRM_INTEREST_INTENTS:
                                 capture_lead_to_crm(username, intent, last_msg)
 
-                            # Only enter booking flow on EXPLICIT booking intent
                             if intent == "BOOKING":
                                 booking_state[username] = {
                                     "stage": "awaiting_time",
@@ -668,8 +1003,6 @@ def cmd_check_dms(env_vars, args):
                                 "intent": intent,
                                 "reply_preview": reply_text[:80],
                             })
-                            # Only notify CC on Telegram for BOOKING intents
-                            # (not every routine auto-reply — that's spam)
                             if intent == "BOOKING":
                                 notify(
                                     f"IG DM from {username}: \"{last_msg[:60]}\"\n"
@@ -687,36 +1020,224 @@ def cmd_check_dms(env_vars, args):
                     mark_notified(notified_log, username, preview)
                     save_notified_log(notified_log)
 
-                # Navigate back to inbox for next conversation
-                page.goto(
-                    "https://www.instagram.com/direct/inbox/",
-                    wait_until="domcontentloaded",
-                    timeout=60000,
-                )
-                time.sleep(4)
+                _return_to_inbox(page, env_vars)
 
-            result["auto_replies"] = auto_replies
-            result["skipped_replies"] = skipped_replies
-            result["actionable_count"] = len(actionable)
-            result["message"] = (
-                f"{len(actionable)} DM(s) needing reply — "
-                f"{len(auto_replies)} auto-replied, "
-                f"{len(skipped_replies)} skipped"
-            )
+            except Exception as exc:
+                reason = "timeout" if _is_playwright_timeout(exc) else "exception"
+                skipped_replies.append({"username": username, "reason": reason})
+                log_exception(f"Error processing Instagram DM for @{username}", exc)
+                recover_inbox_page(page, env_vars, f"Conversation recovery for @{username}")
+                continue
 
-            if getattr(args, "output_json", False):
-                print(json.dumps(result, indent=2, default=str))
-            else:
-                safe_print(f"Instagram DMs: {result['message']}")
-                for a in auto_replies:
-                    safe_print(f"  -> @{a['username']} [{a['intent']}]: {a['reply_preview']}")
-                for s in skipped_replies:
-                    safe_print(f"  -- @{s['username']}: {s['reason']}")
+        result["auto_replies"] = auto_replies
+        result["skipped_replies"] = skipped_replies
+        result["actionable_count"] = len(actionable)
+        result["message"] = (
+            f"{len(actionable)} DM(s) needing reply - "
+            f"{len(auto_replies)} auto-replied, "
+            f"{len(skipped_replies)} skipped"
+        )
 
+        if getattr(args, "output_json", False):
+            print(json.dumps(result, indent=2, default=str))
+        else:
+            safe_print(f"Instagram DMs: {result['message']}")
+            for a in auto_replies:
+                safe_print(f"  -> @{a['username']} [{a['intent']}]: {a['reply_preview']}")
+            for s in skipped_replies:
+                safe_print(f"  -- @{s['username']}: {s['reason']}")
+
+        return result
+
+    except Exception as exc:
+        status = "timeout" if _is_playwright_timeout(exc) else "error"
+        log_exception("Instagram DM check failed", exc)
+        recover_inbox_page(page, env_vars, "Instagram DM check failed")
+        result = {
+            "action": "check_dms",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "status": status,
+            "message": f"DM check failed: {type(exc).__name__}: {exc}",
+        }
+        if getattr(args, "output_json", False):
+            print(json.dumps(result, indent=2, default=str))
+        else:
+            safe_print(f"Instagram DMs: {result['message']}")
+        return result
+
+
+def _cmd_check_dms_once_with_context(env_vars, args):
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        safe_print("ERROR: playwright not installed. Run: pip install playwright")
+        return {"status": "error", "message": "playwright not installed"}
+
+    with sync_playwright() as p:
+        context, page = _open_ig_page(p)
+        try:
+            return _check_dms_on_page(env_vars, args, page)
         finally:
-            context.close()
+            _close_context_safely(context)
+
+
+def _poll_delay_bounds(args):
+    poll_min = int(getattr(args, "poll_min", DEFAULT_POLL_MIN_SECONDS) or DEFAULT_POLL_MIN_SECONDS)
+    poll_max = int(getattr(args, "poll_max", DEFAULT_POLL_MAX_SECONDS) or DEFAULT_POLL_MAX_SECONDS)
+    poll_min = max(30, poll_min)
+    poll_max = max(poll_min, poll_max)
+    return poll_min, poll_max
+
+
+def process_dashboard_outbox(env_vars, page, limit: int = 5) -> dict:
+    """Send dashboard-approved/manual replies through the same Playwright session."""
+    commands = fetch_ig_setter_pro_outbox(env_vars, limit=limit)
+    result = {"checked": True, "claimed": len(commands), "sent": 0, "failed": 0}
+    if not commands:
+        return result
+
+    if not ensure_logged_in(page, env_vars):
+        safe_print("[ig-daemon] Outbox skipped: Instagram session is not logged in.")
+        for command in commands:
+            mark_ig_setter_pro_outbox(
+                env_vars,
+                command.get("id", ""),
+                "failed",
+                "Instagram session not logged in",
+            )
+            result["failed"] += 1
+        return result
+
+    for command in commands:
+        command_id = command.get("id", "")
+        username = (command.get("username") or "").strip().lstrip("@")
+        message = (command.get("message") or "").strip()
+        is_ai = bool(command.get("is_ai"))
+        if not command_id or not username or not message:
+            mark_ig_setter_pro_outbox(env_vars, command_id, "failed", "Invalid outbox command")
+            result["failed"] += 1
+            continue
+
+        try:
+            convo_text = read_conversation_text(page, username)
+            if not convo_text:
+                raise RuntimeError(f"Could not open Instagram conversation for @{username}")
+
+            sent = _send_dm_reply(page, message, recipient=username)
+            if not sent:
+                raise RuntimeError("Playwright send failed or send gate blocked")
+
+            send_to_ig_setter_pro(
+                env_vars,
+                username,
+                message,
+                direction="outbound",
+                is_ai=is_ai,
+                intent=command.get("intent") or "active",
+                ig_message_id=f"outbox_{command_id}",
+            )
+            mark_ig_setter_pro_outbox(env_vars, command_id, "sent")
+            result["sent"] += 1
+        except Exception as exc:
+            log_exception(f"[ig-daemon] Dashboard outbox send failed for @{username}", exc)
+            mark_ig_setter_pro_outbox(env_vars, command_id, "failed", str(exc)[:500])
+            result["failed"] += 1
+        finally:
+            _return_to_inbox(page, env_vars)
 
     return result
+
+
+def cmd_monitor_dms(env_vars, args):
+    """Continuously monitor Instagram DMs using one persistent browser context."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        safe_print("ERROR: playwright not installed. Run: pip install playwright")
+        return {"status": "error", "message": "playwright not installed"}
+
+    poll_min, poll_max = _poll_delay_bounds(args)
+    safe_print(
+        "Starting Instagram DM daemon "
+        f"(polling every {poll_min}-{poll_max} seconds; Ctrl+C to stop)."
+    )
+
+    last_result = None
+    pass_count = 0
+    with sync_playwright() as p:
+        context, page = _open_ig_page(p)
+        try:
+            while True:
+                pass_count += 1
+                safe_print(
+                    f"[ig-daemon] Poll #{pass_count} at "
+                    f"{datetime.now(timezone.utc).isoformat()}"
+                )
+                try:
+                    last_result = _check_dms_on_page(env_vars, args, page)
+                    if last_result.get("status") == "login_failed":
+                        safe_print("[ig-daemon] Login/session recovery will retry on the next poll.")
+                    elif last_result.get("status") in {"error", "timeout"}:
+                        recovered = recover_inbox_page(
+                            page,
+                            env_vars,
+                            "[ig-daemon] Error result from DM poll",
+                        )
+                        if not recovered:
+                            safe_print("[ig-daemon] Reopening persistent browser context after failed recovery.")
+                            _close_context_safely(context)
+                            context, page = _open_ig_page(p)
+                    outbox_result = process_dashboard_outbox(env_vars, page)
+                    if outbox_result["claimed"]:
+                        safe_print(
+                            "[ig-daemon] Dashboard outbox: "
+                            f"{outbox_result['sent']} sent, {outbox_result['failed']} failed"
+                        )
+                except KeyboardInterrupt:
+                    raise
+                except Exception as exc:
+                    log_exception("[ig-daemon] Unhandled poll failure", exc)
+                    recovered = recover_inbox_page(page, env_vars, "[ig-daemon] Poll failure")
+                    if not recovered:
+                        safe_print("[ig-daemon] Reopening persistent browser context after poll failure.")
+                        _close_context_safely(context)
+                        context, page = _open_ig_page(p)
+                    last_result = {
+                        "action": "monitor_dms",
+                        "status": "error",
+                        "message": str(exc),
+                    }
+
+                delay = random.randint(poll_min, poll_max)
+                safe_print(
+                    f"[ig-daemon] Sleeping {delay // 60}m {delay % 60}s "
+                    "before next inbox check."
+                )
+                _sleep(delay)
+        except KeyboardInterrupt:
+            safe_print("[ig-daemon] Shutdown requested; closing browser context.")
+            return {
+                "action": "monitor_dms",
+                "status": "stopped",
+                "polls": pass_count,
+                "last_result": last_result,
+            }
+        finally:
+            _close_context_safely(context)
+
+
+def cmd_check_dms(env_vars, args):
+    """Check Instagram DMs and auto-reply to unread messages in one atomic pass.
+
+    This is the ONLY DM handler that runs on cron. It:
+    1. Opens inbox, reads conversations
+    2. For each unread DM: opens it, reads last message, detects intent
+    3. Sends auto-reply if appropriate (respects 24h cooldown + CC manual reply check)
+    4. Notifies CC on Telegram with the username AND what action was taken
+    """
+    if getattr(args, "daemon", False):
+        return cmd_monitor_dms(env_vars, args)
+    return _cmd_check_dms_once_with_context(env_vars, args)
 
 
 def cmd_check_comments(env_vars, args):
@@ -1760,6 +2281,36 @@ def main():
     # check-dms
     p_dms = subparsers.add_parser("check-dms", help="Check for new Instagram DMs")
     p_dms.add_argument("--reply", action="store_true", help="Auto-reply to unread DMs")
+    p_dms.add_argument("--daemon", action="store_true", help="Continuously monitor DMs")
+    p_dms.add_argument(
+        "--poll-min",
+        type=int,
+        default=DEFAULT_POLL_MIN_SECONDS,
+        help="Minimum daemon delay between inbox checks, in seconds",
+    )
+    p_dms.add_argument(
+        "--poll-max",
+        type=int,
+        default=DEFAULT_POLL_MAX_SECONDS,
+        help="Maximum daemon delay between inbox checks, in seconds",
+    )
+
+    # monitor-dms
+    p_monitor = subparsers.add_parser("monitor-dms", help="Continuously monitor Instagram DMs")
+    p_monitor.add_argument("--reply", action="store_true", help="Auto-reply to unread DMs")
+    p_monitor.add_argument("--daemon", action="store_true", default=True, help=argparse.SUPPRESS)
+    p_monitor.add_argument(
+        "--poll-min",
+        type=int,
+        default=DEFAULT_POLL_MIN_SECONDS,
+        help="Minimum daemon delay between inbox checks, in seconds",
+    )
+    p_monitor.add_argument(
+        "--poll-max",
+        type=int,
+        default=DEFAULT_POLL_MAX_SECONDS,
+        help="Maximum daemon delay between inbox checks, in seconds",
+    )
 
     # check-comments
     subparsers.add_parser("check-comments", help="Check for new Instagram comments")
@@ -1793,6 +2344,7 @@ def main():
 
     handlers = {
         "check-dms": cmd_check_dms,
+        "monitor-dms": cmd_monitor_dms,
         "check-comments": cmd_check_comments,
         "send-dm": cmd_send_dm,
         "log-dm": cmd_log_dm,

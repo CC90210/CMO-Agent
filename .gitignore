@@ -37,3 +37,9 @@ __pycache__/
 ad-engine/node_modules/
 ad-engine/out/
 ad-engine/exports/
+
+# ─── Operator scaffolding (local-only, never push) ───────────────────
+brain/operator.profile.json
+!brain/operator.profile.example.json
+brain/USER.md
+!brain/USER.template.md

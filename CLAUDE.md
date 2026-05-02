@@ -174,3 +174,12 @@ Categories filter automatically: `campaign`/`content-published` are silent; `cfo
 2. Append to `memory/SESSION_LOG.md`.
 3. Update `data/pulse/cmo_pulse.json` (in THIS repo — never write to Bravo's or Atlas's pulse files).
 4. Commit: `maven: sync — session YYYY-MM-DD`
+
+## V6 superintelligence stack (operational scripts)
+
+Maven inherits the V6 stack from Bravo. Every script below is `--help` clean and `--json` capable.
+
+- Multi-provider LLM routing — `scripts/model_router.py` (reads `brain/MODEL_CONFIG.md`, fallbacks across Claude/OpenAI/OpenRouter/Groq/DeepSeek/local).
+- 3-layer memory consolidation — `scripts/memory_consolidation.py` (working → episodic → semantic with Haiku-scored importance routing).
+- DL stack — `scripts/gnn_skill_router.py`, `scripts/rlhf_outreach.py`, `scripts/neural_memory.py`, `scripts/maml_onboard.py`, `scripts/tft_forecast.py`, `scripts/neuro_symbolic_gate.py` (graph neural net, RLHF, Neural Turing Machine, MAML for rapid brand-voice adaptation, Temporal Fusion Transformer for engagement/follower forecasting, Datalog compliance with Maven-domain rules — platform character limits, hashtag count, brand-voice consistency, approval-required-for-paid-promotion).
+- System cleanup — `scripts/system_cleanup.py` (find + delete redundant install clones, pip/npm caches, old `tmp/` files, `__pycache__` trees, scaffold backups).

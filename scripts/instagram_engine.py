@@ -152,8 +152,13 @@ def get_pulse_secret(env_vars: dict) -> str:
     )
 
 
-def send_to_ig_setter_pro(env_vars: dict, username: str, message_text: str, direction: str, is_ai: bool = False, intent: str = "active", ig_message_id: str | None = None):
-    """Send DM interaction to ig-setter-pro dashboard webhook."""
+def send_to_ig_setter_pro(env_vars: dict, username: str, message_text: str, direction: str, is_ai: bool = False, intent: str = "active", ig_message_id: str | None = None, display_name: str | None = None):
+    """Send DM interaction to ig-setter-pro dashboard webhook.
+
+    `username` should be the IG @handle (URL slug) when known; PULSE keys
+    threads by it. `display_name` is the human-readable name (defaults to
+    username if not provided).
+    """
     import hashlib
     try:
         import requests
@@ -192,7 +197,7 @@ def send_to_ig_setter_pro(env_vars: dict, username: str, message_text: str, dire
         "ig_thread_id": thread_id,
         "ig_user_id": user_id,
         "username": clean_username,
-        "display_name": clean_username,
+        "display_name": (display_name or clean_username).strip() or clean_username,
         "message": message_text,
         "direction": direction,
         "is_ai": is_ai,
@@ -652,6 +657,16 @@ def _read_requests_inbox(page, env_vars: dict) -> list[dict]:
     return parsed
 
 
+def _user_blocklist() -> set[str]:
+    """Lowercase usernames to never process. From IG_DM_BLOCKLIST env (comma-separated)
+    plus a small built-in spam/troll filter."""
+    raw = (os.environ.get("IG_DM_BLOCKLIST") or "").strip()
+    user_set = {u.strip().lower().lstrip("@") for u in raw.split(",") if u.strip()}
+    # Built-in: obvious slurs / spam handles we never want to engage.
+    user_set.update({"whore", "slut", "spam", "test"})
+    return user_set
+
+
 def parse_conversations(inbox_data):
     """Parse conversation data from read_dm_list (JSON string of line arrays).
 
@@ -672,6 +687,7 @@ def parse_conversations(inbox_data):
         "You sent an attachment.", "Sent an attachment.", "Reacted", "Liked",
         "Edit", "More", "New message",
     }
+    BLOCKLIST = _user_blocklist()
     # Parse the JSON string from read_dm_list
     try:
         raw_convos = json.loads(inbox_data) if isinstance(inbox_data, str) else inbox_data
@@ -688,6 +704,9 @@ def parse_conversations(inbox_data):
             continue
         # Drop "Active <Xm ago>" presence labels
         if username.lower().startswith("active "):
+            continue
+        # Spam / troll handles never get processed and never reach PULSE.
+        if username.lower() in BLOCKLIST:
             continue
         # Real IG handles fit USERNAME_RE; display names may include spaces
         # (e.g. "Conaugh McKenna"), but our downstream send-DM-by-search flow
@@ -932,6 +951,16 @@ def _check_dms_on_page(env_vars, args, page):
                 convo_text = read_conversation_text(page, username)
                 last_msg = extract_last_incoming_message(convo_text) or preview
 
+                # Try to upgrade the username from "display name" to the actual
+                # @handle by scraping the conversation header. If that fails,
+                # fall back to the inbox-parsed name. display_name keeps the
+                # human-readable label for PULSE.
+                display_name = username
+                handle = get_open_conversation_handle(page) or username
+                if handle and handle != username:
+                    safe_print(f"[ig-daemon] Resolved @{handle} from display name '{username}'")
+                username = handle
+
                 # Push inbound unread message to ig-setter-pro. The backend dedupes by id.
                 send_to_ig_setter_pro(
                     env_vars,
@@ -939,6 +968,7 @@ def _check_dms_on_page(env_vars, args, page):
                     last_msg,
                     direction="inbound",
                     intent="active",
+                    display_name=display_name,
                 )
 
                 # Multi-turn booking flow.
@@ -2603,6 +2633,38 @@ def already_replied_within_24h(log: dict, username: str) -> bool:
     if last_ts.tzinfo is None:
         last_ts = last_ts.replace(tzinfo=timezone.utc)
     return (now - last_ts).total_seconds() < 86400
+
+
+def get_open_conversation_handle(page) -> str | None:
+    """After a conversation is opened, scrape the actual @handle from the
+    header. The header shows the display name as a clickable link to /<handle>/
+    so we can extract the canonical handle even when the inbox sidebar only
+    showed a display name."""
+    try:
+        raw = page.evaluate("""() => {
+            // Header link is the most reliable: it points at /<handle>/
+            const links = document.querySelectorAll('a[href^="/"][role="link"]');
+            for (const link of links) {
+                const href = link.getAttribute('href') || '';
+                const m = href.match(/^\\/([A-Za-z0-9._]+)\\/$/);
+                if (!m) continue;
+                const slug = m[1];
+                // Skip the page-owner's own profile and known IG paths
+                const reserved = ['p','reel','reels','explore','direct','accounts','stories','tv','notifications'];
+                if (reserved.includes(slug)) continue;
+                // Header link is at the top of the conversation panel
+                const rect = link.getBoundingClientRect();
+                if (rect.top < 200 && rect.left > 200) {
+                    return slug;
+                }
+            }
+            return null;
+        }""")
+        if raw and isinstance(raw, str):
+            return raw.strip()
+    except Exception as exc:
+        log_exception("[ig-handle] header scrape failed", exc)
+    return None
 
 
 def read_conversation_text(page, username: str) -> str:

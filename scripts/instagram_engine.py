@@ -116,7 +116,42 @@ def capture_lead_to_crm(username: str, intent: str, message_text: str):
     return False
 
 
-def send_to_ig_setter_pro(env_vars: dict, username: str, message_text: str, direction: str, is_ai: bool = False, intent: str = "active"):
+def get_env_value(env_vars: dict, *keys: str) -> str:
+    """Read a config value from .env.agents or process env, stripping NUL damage."""
+    for key in keys:
+        value = (env_vars.get(key) or os.environ.get(key) or "").replace("\x00", "").strip()
+        if value:
+            return value
+    return ""
+
+
+def get_pulse_webhook_url(env_vars: dict) -> str:
+    return (
+        get_env_value(env_vars, "PULSE_WEBHOOK_URL", "IG_SETTER_PRO_WEBHOOK_URL")
+        or "https://ig-setter-pro.vercel.app/api/webhook"
+    )
+
+
+def get_pulse_api_base(env_vars: dict) -> str:
+    configured = get_env_value(env_vars, "PULSE_API_BASE_URL", "IG_SETTER_PRO_BASE_URL")
+    if configured:
+        return configured.rstrip("/")
+    webhook_url = get_pulse_webhook_url(env_vars)
+    if webhook_url.endswith("/api/webhook"):
+        return webhook_url[:-len("/api/webhook")].rstrip("/")
+    return webhook_url.rstrip("/")
+
+
+def get_pulse_secret(env_vars: dict) -> str:
+    return get_env_value(
+        env_vars,
+        "PULSE_WEBHOOK_SECRET",
+        "IG_SETTER_PRO_WEBHOOK_SECRET",
+        "WEBHOOK_SECRET",
+    )
+
+
+def send_to_ig_setter_pro(env_vars: dict, username: str, message_text: str, direction: str, is_ai: bool = False, intent: str = "active", ig_message_id: str | None = None):
     """Send DM interaction to ig-setter-pro dashboard webhook."""
     import hashlib
     try:
@@ -125,17 +160,10 @@ def send_to_ig_setter_pro(env_vars: dict, username: str, message_text: str, dire
         safe_print("ig-setter-pro webhook skipped: requests package is not installed")
         return False
 
-    def first_env(*keys: str) -> str:
-        for key in keys:
-            value = (env_vars.get(key) or os.environ.get(key) or "").replace("\x00", "").strip()
-            if value:
-                return value
-        return ""
-
-    webhook_url = first_env("PULSE_WEBHOOK_URL", "IG_SETTER_PRO_WEBHOOK_URL")
-    webhook_secret = first_env("PULSE_WEBHOOK_SECRET", "IG_SETTER_PRO_WEBHOOK_SECRET", "WEBHOOK_SECRET")
-    account_id = first_env("PULSE_ACCOUNT_ID", "IG_SETTER_PRO_ACCOUNT_ID")
-    ig_page_id = first_env("PULSE_IG_PAGE_ID", "IG_SETTER_PRO_IG_PAGE_ID")
+    webhook_url = get_pulse_webhook_url(env_vars)
+    webhook_secret = get_pulse_secret(env_vars)
+    account_id = get_env_value(env_vars, "PULSE_ACCOUNT_ID", "IG_SETTER_PRO_ACCOUNT_ID")
+    ig_page_id = get_env_value(env_vars, "PULSE_IG_PAGE_ID", "IG_SETTER_PRO_IG_PAGE_ID")
 
     if not webhook_url:
         webhook_url = "https://ig-setter-pro.vercel.app/api/webhook"
@@ -169,7 +197,7 @@ def send_to_ig_setter_pro(env_vars: dict, username: str, message_text: str, dire
         "is_ai": is_ai,
         "ai_status": ai_status,
         "status": ai_status,
-        "ig_message_id": f"msg_{msg_hash}",
+        "ig_message_id": ig_message_id or f"msg_{msg_hash}",
         "pending_ai_draft": None,
     }
 
@@ -193,6 +221,68 @@ def send_to_ig_setter_pro(env_vars: dict, username: str, message_text: str, dire
             safe_print(f"ig-setter-pro webhook error: {resp.status_code} - {resp.text}")
     except Exception as e:
         safe_print(f"ig-setter-pro webhook failed: {e}")
+    return False
+
+
+def fetch_ig_setter_pro_outbox(env_vars: dict, limit: int = 5) -> list[dict]:
+    """Claim pending dashboard-originated sends for the Python Playwright daemon."""
+    try:
+        import requests
+    except ImportError:
+        safe_print("ig-setter-pro outbox skipped: requests package is not installed")
+        return []
+
+    secret = get_pulse_secret(env_vars)
+    if not secret:
+        safe_print("ig-setter-pro outbox skipped: PULSE_WEBHOOK_SECRET is not configured")
+        return []
+
+    url = f"{get_pulse_api_base(env_vars)}/api/python/outbox"
+    account_id = get_env_value(env_vars, "PULSE_ACCOUNT_ID", "IG_SETTER_PRO_ACCOUNT_ID")
+    params = {"limit": str(max(1, min(limit, 20)))}
+    if account_id:
+        params["account_id"] = account_id
+
+    try:
+        resp = requests.get(
+            url,
+            params=params,
+            headers={"x-webhook-secret": secret},
+            timeout=10,
+        )
+        if resp.status_code != 200:
+            safe_print(f"ig-setter-pro outbox fetch error: {resp.status_code} - {resp.text}")
+            return []
+        data = resp.json()
+        return data.get("commands") or []
+    except Exception as exc:
+        safe_print(f"ig-setter-pro outbox fetch failed: {exc}")
+        return []
+
+
+def mark_ig_setter_pro_outbox(env_vars: dict, command_id: str, status: str, error: str | None = None) -> bool:
+    """Mark a dashboard-originated send as sent or failed."""
+    try:
+        import requests
+    except ImportError:
+        return False
+
+    secret = get_pulse_secret(env_vars)
+    if not secret:
+        return False
+
+    try:
+        resp = requests.post(
+            f"{get_pulse_api_base(env_vars)}/api/python/outbox",
+            json={"id": command_id, "status": status, "error": error},
+            headers={"x-webhook-secret": secret, "Content-Type": "application/json"},
+            timeout=10,
+        )
+        if resp.status_code == 200:
+            return True
+        safe_print(f"ig-setter-pro outbox mark error: {resp.status_code} - {resp.text}")
+    except Exception as exc:
+        safe_print(f"ig-setter-pro outbox mark failed: {exc}")
     return False
 
 
@@ -999,6 +1089,65 @@ def _poll_delay_bounds(args):
     return poll_min, poll_max
 
 
+def process_dashboard_outbox(env_vars, page, limit: int = 5) -> dict:
+    """Send dashboard-approved/manual replies through the same Playwright session."""
+    commands = fetch_ig_setter_pro_outbox(env_vars, limit=limit)
+    result = {"checked": True, "claimed": len(commands), "sent": 0, "failed": 0}
+    if not commands:
+        return result
+
+    if not ensure_logged_in(page, env_vars):
+        safe_print("[ig-daemon] Outbox skipped: Instagram session is not logged in.")
+        for command in commands:
+            mark_ig_setter_pro_outbox(
+                env_vars,
+                command.get("id", ""),
+                "failed",
+                "Instagram session not logged in",
+            )
+            result["failed"] += 1
+        return result
+
+    for command in commands:
+        command_id = command.get("id", "")
+        username = (command.get("username") or "").strip().lstrip("@")
+        message = (command.get("message") or "").strip()
+        is_ai = bool(command.get("is_ai"))
+        if not command_id or not username or not message:
+            mark_ig_setter_pro_outbox(env_vars, command_id, "failed", "Invalid outbox command")
+            result["failed"] += 1
+            continue
+
+        try:
+            convo_text = read_conversation_text(page, username)
+            if not convo_text:
+                raise RuntimeError(f"Could not open Instagram conversation for @{username}")
+
+            sent = _send_dm_reply(page, message, recipient=username)
+            if not sent:
+                raise RuntimeError("Playwright send failed or send gate blocked")
+
+            send_to_ig_setter_pro(
+                env_vars,
+                username,
+                message,
+                direction="outbound",
+                is_ai=is_ai,
+                intent=command.get("intent") or "active",
+                ig_message_id=f"outbox_{command_id}",
+            )
+            mark_ig_setter_pro_outbox(env_vars, command_id, "sent")
+            result["sent"] += 1
+        except Exception as exc:
+            log_exception(f"[ig-daemon] Dashboard outbox send failed for @{username}", exc)
+            mark_ig_setter_pro_outbox(env_vars, command_id, "failed", str(exc)[:500])
+            result["failed"] += 1
+        finally:
+            _return_to_inbox(page, env_vars)
+
+    return result
+
+
 def cmd_monitor_dms(env_vars, args):
     """Continuously monitor Instagram DMs using one persistent browser context."""
     try:
@@ -1038,6 +1187,12 @@ def cmd_monitor_dms(env_vars, args):
                             safe_print("[ig-daemon] Reopening persistent browser context after failed recovery.")
                             _close_context_safely(context)
                             context, page = _open_ig_page(p)
+                    outbox_result = process_dashboard_outbox(env_vars, page)
+                    if outbox_result["claimed"]:
+                        safe_print(
+                            "[ig-daemon] Dashboard outbox: "
+                            f"{outbox_result['sent']} sent, {outbox_result['failed']} failed"
+                        )
                 except KeyboardInterrupt:
                     raise
                 except Exception as exc:
@@ -1083,259 +1238,6 @@ def cmd_check_dms(env_vars, args):
     if getattr(args, "daemon", False):
         return cmd_monitor_dms(env_vars, args)
     return _cmd_check_dms_once_with_context(env_vars, args)
-
-    try:
-        from playwright.sync_api import sync_playwright
-    except ImportError:
-        safe_print("ERROR: playwright not installed. Run: pip install playwright")
-        return {"status": "error", "message": "playwright not installed"}
-
-    replied_log = load_replied_log()
-    booking_state = load_booking_state()
-    notified_log = load_notified_log()
-    auto_replies = []
-    skipped_replies = []
-    result = {"action": "check_dms", "status": "error", "message": "Unknown error"}
-
-    with sync_playwright() as p:
-        context = get_browser_context(p)
-        page = context.pages[0] if context.pages else context.new_page()
-
-        try:
-            if not ensure_logged_in(page, env_vars):
-                result = {
-                    "action": "check_dms",
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
-                    "status": "login_failed",
-                    "message": "Could not log into Instagram. Check credentials.",
-                }
-                notify("Instagram login failed - check credentials", category="instagram")
-                if getattr(args, "output_json", False):
-                    print(json.dumps(result, indent=2))
-                else:
-                    safe_print(f"Instagram DMs: {result['message']}")
-                return result
-
-            # Read inbox
-            inbox_text = read_dm_list(page)
-            convos = parse_conversations(inbox_text)
-            unread = [c for c in convos if c.get("unread")]
-
-            result = {
-                "action": "check_dms",
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "status": "checked",
-                "total_visible": len(convos),
-                "unread_count": len(unread),
-                "conversations": convos[:10],
-                "unread": unread,
-                "auto_replies": [],
-            }
-
-            # ONLY process conversations Instagram marks as "Unread"
-            # Do NOT auto-reply to every unreplied conversation — CC handles
-            # personal conversations himself. The bot only responds to genuinely
-            # new, unread DMs that CC hasn't seen yet.
-            actionable = list(unread)
-
-            if not actionable:
-                result["message"] = "No DMs needing reply"
-                if getattr(args, "output_json", False):
-                    print(json.dumps(result, indent=2, default=str))
-                return result
-
-            # Process each actionable conversation — detect intent and auto-reply.
-            #
-            # NOTIFICATION RULES (non-negotiable):
-            #   - ONLY notify CC on Telegram when we SUCCESSFULLY auto-reply
-            #   - ONLY notify CC on Telegram when a booking is CONFIRMED
-            #   - NEVER notify about skips, errors, unknown intents, or failures
-            #   - NEVER re-notify about the same DM preview we already reported
-            #
-            for convo in actionable:
-                username = convo.get("username", "").strip()
-                preview = convo.get("preview", "")[:100]
-                if not username:
-                    continue
-
-                # Skip group chats — they contain "and" in the preview or
-                # have "Active" as username with multi-person previews
-                if " and " in preview and username == "Active":
-                    skipped_replies.append({"username": username, "reason": "group_chat"})
-                    continue
-
-                # Skip if we already notified about this exact DM preview
-                if already_notified(notified_log, username, preview):
-                    skipped_replies.append({"username": username, "reason": "already_notified"})
-                    continue
-
-                # Open the conversation to read the actual messages
-                convo_text = read_conversation_text(page, username)
-                # Extract just the LAST message from the other person
-                last_msg = extract_last_incoming_message(convo_text)
-                if not last_msg:
-                    last_msg = preview  # Fallback to inbox preview
-
-                # Send the inbound message to the dashboard
-                send_to_ig_setter_pro(env_vars, username, last_msg, direction="inbound", intent="active")
-
-                # --- Multi-turn booking flow ---
-                user_booking = booking_state.get(username)
-                if user_booking and user_booking.get("stage") == "awaiting_time":
-                    # ONLY parse the last incoming message — NOT the whole convo
-                    parsed = parse_datetime_from_text(last_msg)
-                    if parsed:
-                        reply_text = _handle_booking_confirmation(
-                            env_vars, page, username, parsed, booking_state,
-                        )
-                        if reply_text:
-                            auto_replies.append({
-                                "username": username,
-                                "intent": "BOOKING_CONFIRMED",
-                                "reply_preview": reply_text[:80],
-                            })
-                            notify(
-                                f"Booking confirmed! {username} — {parsed['display']}\n"
-                                f"Sent Meet link via DM",
-                                category="instagram",
-                            )
-                            mark_notified(notified_log, username, preview)
-                            save_notified_log(notified_log)
-                        else:
-                            skipped_replies.append({
-                                "username": username,
-                                "reason": "calendar_error",
-                            })
-                    else:
-                        # Their message doesn't contain a date/time — respond
-                        # conversationally instead of robotically re-asking
-                        intent = detect_intent(last_msg)
-                        if intent == "CONVO":
-                            reply_text = build_reply("CONVO", last_msg=last_msg, convo_context=convo_text)
-                        else:
-                            reply_text = (
-                                "just lmk a day and time that works, "
-                                "like \"thursday at 2pm\" or something"
-                            )
-                        _send_dm_reply(page, reply_text, recipient=username)
-
-                        # Send to dashboard
-                        send_to_ig_setter_pro(env_vars, username, reply_text, direction="outbound", is_ai=True, intent="BOOKING_FOLLOWUP")
-
-                        auto_replies.append({
-                            "username": username,
-                            "intent": "BOOKING_FOLLOWUP",
-                            "reply_preview": reply_text[:80],
-                        })
-                        mark_notified(notified_log, username, preview)
-                        save_notified_log(notified_log)
-
-                    page.goto(
-                        "https://www.instagram.com/direct/inbox/",
-                        wait_until="domcontentloaded",
-                        timeout=60000,
-                    )
-                    time.sleep(4)
-                    continue
-
-                # --- Normal flow ---
-                intent = detect_intent(last_msg)
-
-                should_reply = True
-                skip_reason = None
-
-                if already_replied_within_24h(replied_log, username):
-                    should_reply = False
-                    skip_reason = "replied_within_24h"
-                elif intent == "UNKNOWN":
-                    should_reply = False
-                    skip_reason = "unknown_intent"
-
-                if should_reply:
-                    reply_text = build_reply(intent, last_msg=last_msg, convo_context=convo_text)
-                    if not reply_text:
-                        should_reply = False
-                        skip_reason = "empty_reply"
-                    else:
-                        sent = _send_dm_reply(page, reply_text, recipient=username)
-                        if sent:
-                            replied_log[username] = {
-                                "replied_at": datetime.now(timezone.utc).isoformat(),
-                                "intent": intent,
-                            }
-                            save_replied_log(replied_log)
-                            log_auto_reply_to_supabase(env_vars, username, intent, reply_text)
-
-                            # Send outbound to dashboard
-                            send_to_ig_setter_pro(env_vars, username, reply_text, direction="outbound", is_ai=True, intent=intent)
-
-                            # Capture business-interest DMs as CRM leads
-                            if intent in _CRM_INTEREST_INTENTS:
-                                capture_lead_to_crm(username, intent, last_msg)
-
-                            # Only enter booking flow on EXPLICIT booking intent
-                            if intent == "BOOKING":
-                                booking_state[username] = {
-                                    "stage": "awaiting_time",
-                                    "intent": intent,
-                                    "started_at": datetime.now(timezone.utc).isoformat(),
-                                }
-                                save_booking_state(booking_state)
-
-                            auto_replies.append({
-                                "username": username,
-                                "intent": intent,
-                                "reply_preview": reply_text[:80],
-                            })
-                            # Only notify CC on Telegram for BOOKING intents
-                            # (not every routine auto-reply — that's spam)
-                            if intent == "BOOKING":
-                                notify(
-                                    f"IG DM from {username}: \"{last_msg[:60]}\"\n"
-                                    f"Auto-replied ({intent}): {reply_text[:80]}",
-                                    category="instagram",
-                                )
-                            mark_notified(notified_log, username, preview)
-                            save_notified_log(notified_log)
-                        else:
-                            skip_reason = "no_input_found"
-                            should_reply = False
-
-                if not should_reply:
-                    skipped_replies.append({"username": username, "reason": skip_reason})
-                    mark_notified(notified_log, username, preview)
-                    save_notified_log(notified_log)
-
-                # Navigate back to inbox for next conversation
-                page.goto(
-                    "https://www.instagram.com/direct/inbox/",
-                    wait_until="domcontentloaded",
-                    timeout=60000,
-                )
-                time.sleep(4)
-
-            result["auto_replies"] = auto_replies
-            result["skipped_replies"] = skipped_replies
-            result["actionable_count"] = len(actionable)
-            result["message"] = (
-                f"{len(actionable)} DM(s) needing reply — "
-                f"{len(auto_replies)} auto-replied, "
-                f"{len(skipped_replies)} skipped"
-            )
-
-            if getattr(args, "output_json", False):
-                print(json.dumps(result, indent=2, default=str))
-            else:
-                safe_print(f"Instagram DMs: {result['message']}")
-                for a in auto_replies:
-                    safe_print(f"  -> @{a['username']} [{a['intent']}]: {a['reply_preview']}")
-                for s in skipped_replies:
-                    safe_print(f"  -- @{s['username']}: {s['reason']}")
-
-        finally:
-            context.close()
-
-    return result
 
 
 def cmd_check_comments(env_vars, args):

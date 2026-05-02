@@ -233,6 +233,62 @@ def send_to_ig_setter_pro(env_vars: dict, username: str, message_text: str, dire
     return False
 
 
+def fetch_archived_handles(env_vars: dict) -> set[str]:
+    """Return the set of @handles whose PULSE thread.status == 'closed'.
+
+    The daemon reads this every poll and silently skips replies to those
+    threads — CC archives a thread in PULSE and Maven goes quiet on it
+    forever (until CC re-opens). Empty set if the call fails (fail-open).
+    """
+    try:
+        import requests
+    except ImportError:
+        return set()
+    secret = get_pulse_secret(env_vars)
+    if not secret:
+        return set()
+    try:
+        account_id = get_env_value(env_vars, "PULSE_ACCOUNT_ID", "IG_SETTER_PRO_ACCOUNT_ID")
+        url = f"{get_pulse_api_base(env_vars)}/api/threads"
+        params = {"account_id": account_id} if account_id else {}
+        resp = requests.get(url, params=params, timeout=8)
+        if resp.status_code != 200:
+            return set()
+        threads = (resp.json() or {}).get("threads") or []
+        archived = set()
+        for t in threads:
+            if (t.get("status") or "").lower() == "closed":
+                u = (t.get("username") or "").strip().lower()
+                if u:
+                    archived.add(u)
+        return archived
+    except Exception:
+        return set()
+
+
+_HIGH_INTENT_KEYS = ("BOOKING", "PRICING", "PAYMENT", "BOOKING_CONFIRMED")
+
+
+def maybe_alert_high_intent(intent: str, username: str, last_msg: str) -> None:
+    """Telegram-notify CC when a thread crosses into commercial territory.
+
+    Categories used by notify(): cfo-block / brand-violation / killswitch /
+    error are loud; everything else is silent. We use 'lead' (loud) for
+    booking/payment/pricing intent so CC's phone pings.
+    """
+    if intent not in _HIGH_INTENT_KEYS:
+        return
+    try:
+        notify(
+            f"\U0001f9ed High-intent IG DM from @{username} ({intent}): "
+            f"{last_msg[:140]}",
+            category="lead",
+            force=True,
+        )
+    except Exception as exc:
+        log_exception("[ig-intent] Telegram notify failed", exc)
+
+
 def fetch_ig_setter_pro_outbox(env_vars: dict, limit: int = 5) -> list[dict]:
     """Claim pending dashboard-originated sends for the Python Playwright daemon."""
     try:
@@ -872,11 +928,65 @@ def _handle_booking_confirmation(
 
 # -- Commands -----------------------------------------------------------------
 
+CATCH_UP_WINDOW_HOURS = int(os.environ.get("IG_CATCHUP_WINDOW_HOURS", "6") or "6")
+
+
+def _is_within_catchup_window(time_ago: str) -> bool:
+    """Decide whether an unread conversation is fresh enough to auto-reply to.
+
+    IG's relative time labels look like "2m", "1h", "3d", "1w", "2mo".
+    On daemon restart after downtime we don't want Maven blasting replies to
+    a 3-day-old "hey" — that reads as a sales bot. Default window: 6 hours
+    (override via IG_CATCHUP_WINDOW_HOURS env var). Empty/unparseable
+    time_ago is treated as "fresh" since the inbox shows it at the top.
+    """
+    if not time_ago:
+        return True
+    import re as _re
+    m = _re.match(r"^(\d{1,3})(mo|m|h|d|w)$", time_ago.strip().lower())
+    if not m:
+        return True
+    n = int(m.group(1))
+    unit = m.group(2)
+    hours = {
+        "m": n / 60.0,
+        "h": float(n),
+        "d": n * 24.0,
+        "w": n * 24.0 * 7,
+        "mo": n * 24.0 * 30,
+    }.get(unit, 0)
+    return hours <= CATCH_UP_WINDOW_HOURS
+
+
+def _prune_notified_log(log: dict, max_age_days: int = 30) -> dict:
+    """Drop notified-log entries older than max_age_days. Prevents tmp/dm_notified.json
+    from growing unbounded. Returns the pruned dict (in place)."""
+    if not isinstance(log, dict):
+        return {}
+    now_dt = datetime.now(timezone.utc)
+    cutoff = now_dt - timedelta(days=max_age_days)
+    pruned = {}
+    for key, value in log.items():
+        try:
+            # value may be ISO timestamp string or a dict {"timestamp": "..."}
+            ts_raw = value.get("timestamp") if isinstance(value, dict) else value
+            if not ts_raw:
+                continue
+            ts = datetime.fromisoformat(str(ts_raw).replace("Z", "+00:00"))
+            if ts >= cutoff:
+                pruned[key] = value
+        except (ValueError, TypeError):
+            # If we can't parse a timestamp, keep the entry — safer than dropping
+            pruned[key] = value
+    return pruned
+
+
 def _check_dms_on_page(env_vars, args, page):
     """Run one complete DM check using an already-open Playwright page."""
     replied_log = load_replied_log()
     booking_state = load_booking_state()
-    notified_log = load_notified_log()
+    notified_log = _prune_notified_log(load_notified_log(), max_age_days=30)
+    archived_handles = fetch_archived_handles(env_vars)
     auto_replies = []
     skipped_replies = []
     result = {"action": "check_dms", "status": "error", "message": "Unknown error"}
@@ -949,6 +1059,29 @@ def _check_dms_on_page(env_vars, args, page):
 
                 if already_notified(notified_log, username, preview):
                     skipped_replies.append({"username": username, "reason": "already_notified"})
+                    continue
+
+                # PULSE-side archive flag: CC archived this thread → daemon
+                # stays silent until they re-open it. Cheap fail-open: if the
+                # PULSE fetch failed, archived_handles is empty and nothing is
+                # skipped here.
+                if username.lower() in archived_handles:
+                    skipped_replies.append({"username": username, "reason": "thread_archived"})
+                    mark_notified(notified_log, username, preview)
+                    save_notified_log(notified_log)
+                    continue
+
+                # Catch-up window: don't reply to old unread threads after a
+                # daemon outage. Keeps Maven from sounding like a "I just
+                # noticed your message from 3 days ago" spam bot.
+                if not _is_within_catchup_window(convo.get("time_ago", "")):
+                    safe_print(
+                        f"  [catch-up SKIP] @{username} message is "
+                        f"{convo.get('time_ago')} old (window={CATCH_UP_WINDOW_HOURS}h)"
+                    )
+                    skipped_replies.append({"username": username, "reason": "outside_catchup_window"})
+                    mark_notified(notified_log, username, preview)
+                    save_notified_log(notified_log)
                     continue
 
                 convo_text = read_conversation_text(page, username)
@@ -1069,6 +1202,11 @@ def _check_dms_on_page(env_vars, args, page):
 
                 # Normal flow.
                 intent = detect_intent(last_msg)
+                # Loud Telegram alert when CC needs to know personally —
+                # booking, pricing, payment intent. Fires even with auto-send
+                # OFF so CC can jump in.
+                maybe_alert_high_intent(intent, username, last_msg)
+
                 should_reply = True
                 skip_reason = None
 

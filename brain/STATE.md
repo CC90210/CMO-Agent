@@ -82,3 +82,9 @@ tags: [state, ephemeral]
 - **Result:** V1.7 bridge: /pulses + /sibling slash commands (Atlas V3.2 parity)
 
 *Last updated: 2026-04-27*
+
+## V6 Scaffolding (Obsidian Links)
+
+- [[brain/MODEL_CONFIG]] — multi-provider routing config
+- [[brain/USER.template]] — public-fork operator profile template
+- [[memory/WORKING]] — V6 ephemeral working memory

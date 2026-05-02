@@ -1105,7 +1105,9 @@ bot.on('message', async (msg) => {
 
         addToHistory(chatId, 'user', workingText);
         await bot.sendChatAction(chatId, 'typing');
-        await bot.sendMessage(chatId, modelOverride ? `Claude (${modelOverride}) thinking...` : 'Claude thinking...');
+        // Brand as Maven, not Claude — user is talking to Maven; underlying
+        // model is an implementation detail. Parity with Bravo + Atlas bridges.
+        await bot.sendMessage(chatId, modelOverride ? `Maven (${modelOverride}) thinking...` : 'Maven thinking...');
 
         const result = await executeClaude(workingText, chatId, modelOverride);
 

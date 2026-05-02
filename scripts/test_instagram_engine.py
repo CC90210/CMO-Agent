@@ -137,7 +137,10 @@ class TestInstagramEngineDMGate(unittest.TestCase):
         bob_ids = [c["lead_id"] for c in captured if c["metadata"]["recipient"] == "bob"]
         self.assertEqual(len(set(alice_ids)), 1, "alice lead_id should be stable")
         self.assertNotEqual(alice_ids[0], bob_ids[0], "different recipients → different lead_ids")
-        self.assertTrue(alice_ids[0].startswith("ig_dm_"))
+        # lead_id must be a valid UUID — Supabase rejects anything else.
+        import uuid as _uuid
+        _uuid.UUID(alice_ids[0])
+        _uuid.UUID(bob_ids[0])
 
 
 def _run_all(verbose=False):

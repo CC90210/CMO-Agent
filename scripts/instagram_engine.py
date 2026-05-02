@@ -39,6 +39,7 @@ DM_REPLIED_PATH = PROJECT_ROOT / "tmp" / "dm_replied.json"
 BOOKING_STATE_PATH = PROJECT_ROOT / "tmp" / "dm_booking_state.json"
 NOTIFIED_PATH = PROJECT_ROOT / "tmp" / "dm_notified.json"
 INBOX_URL = "https://www.instagram.com/direct/inbox/"
+REQUESTS_URL = "https://www.instagram.com/direct/requests/"
 LOGIN_URL = "https://www.instagram.com/accounts/login/"
 PAGE_TIMEOUT_MS = 60000
 DEFAULT_POLL_MIN_SECONDS = 180
@@ -623,6 +624,34 @@ def read_dm_list(page):
         return "[]"
 
 
+def _read_requests_inbox(page, env_vars: dict) -> list[dict]:
+    """Navigate to /direct/requests/ and scrape pending message requests.
+
+    DMs from people who do not follow you live here, not in /direct/inbox/.
+    Returns parsed conversation dicts. Always returns to inbox before exiting
+    so the next poll starts in the canonical place.
+    """
+    try:
+        page.goto(REQUESTS_URL, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+        _sleep(5)
+    except Exception as exc:
+        log_exception("[ig-requests] navigation failed", exc)
+        return []
+
+    raw = read_dm_list(page)
+    parsed = parse_conversations(raw)
+
+    # Return to inbox so subsequent flows (open conversation, send DM) work
+    # against the standard view.
+    try:
+        page.goto(INBOX_URL, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+        _sleep(3)
+    except Exception as exc:
+        log_exception("[ig-requests] return-to-inbox failed", exc)
+
+    return parsed
+
+
 def parse_conversations(inbox_data):
     """Parse conversation data from read_dm_list (JSON string of line arrays).
 
@@ -635,8 +664,14 @@ def parse_conversations(inbox_data):
     """
     import re
     TIME_PATTERN = re.compile(r"^\d{1,3}[mhdw]$|^\d{1,2}(mo|w)$")
-    SKIP_NAMES = {"Your note", "First note of the week...", "OPEN MIC", "Send message"}
-
+    # IG injects presence + UI labels into the conversation list. Drop them.
+    SKIP_NAMES = {
+        "Your note", "First note of the week...", "OPEN MIC", "Send message",
+        "Active", "Active now", "Sent", "Seen", "Typing...", "Delivered",
+        "Requests", "Notes", "Messages", "Search", "Primary", "General",
+        "You sent an attachment.", "Sent an attachment.", "Reacted", "Liked",
+        "Edit", "More", "New message",
+    }
     # Parse the JSON string from read_dm_list
     try:
         raw_convos = json.loads(inbox_data) if isinstance(inbox_data, str) else inbox_data
@@ -648,8 +683,18 @@ def parse_conversations(inbox_data):
         if not isinstance(lines, list) or len(lines) < 2:
             continue
 
-        username = lines[0]
-        if username in SKIP_NAMES:
+        username = (lines[0] or "").strip()
+        if not username or username in SKIP_NAMES:
+            continue
+        # Drop "Active <Xm ago>" presence labels
+        if username.lower().startswith("active "):
+            continue
+        # Real IG handles fit USERNAME_RE; display names may include spaces
+        # (e.g. "Conaugh McKenna"), but our downstream send-DM-by-search flow
+        # needs the @handle, not the display name. If the name has spaces or
+        # weird chars we still allow it through, but skip if it looks like
+        # raw UI text rather than a person.
+        if username.lower() in {"active", "you", "instagram", "messages"}:
             continue
 
         # Filter out dot separators and find preview, time, unread
@@ -691,12 +736,16 @@ def _send_dm_reply(page, reply_text: str, recipient: str | None = None) -> bool:
     # send_gateway gate
     try:
         from send_gateway import send as _gateway_send
-        # lead_id is a stable hash of the username so per-recipient cooldown
-        # works even if Maven doesn't have a CRM lead row for this DM.
+        # lead_id must be a valid UUID — Supabase lead_interactions.lead_id is
+        # a uuid column. Derive a deterministic UUIDv5 from the recipient so
+        # per-recipient cooldown still works without a CRM row.
         lead_id = None
         if recipient:
-            import hashlib
-            lead_id = "ig_dm_" + hashlib.sha1(recipient.encode("utf-8")).hexdigest()[:16]
+            import uuid
+            # Stable namespace for IG DM lead_ids — random uuid is fine; the
+            # value just needs to be the same across runs.
+            _IG_DM_NS = uuid.UUID("9b8d77c1-4d6e-5a2f-8e4d-1b7a6c2e9f01")
+            lead_id = str(uuid.uuid5(_IG_DM_NS, recipient.lower()))
         gate_result = _gateway_send(
             channel="instagram_dm",
             agent_source="instagram_engine",
@@ -827,6 +876,20 @@ def _check_dms_on_page(env_vars, args, page):
 
         inbox_text = read_dm_list(page)
         convos = parse_conversations(inbox_text)
+
+        # Also scan the Message Requests folder — strangers (people you don't
+        # follow) land here, NOT in the main inbox. Tag them so downstream
+        # send/parse logic can opt in/out, and so we mark them all as unread
+        # (IG strips the "Unread" label in the requests view).
+        try:
+            requests_convos = _read_requests_inbox(page, env_vars)
+            for r in requests_convos:
+                r["from_requests"] = True
+                r["unread"] = True  # any item in Requests is by definition fresh
+            convos.extend(requests_convos)
+        except Exception as exc:
+            log_exception("[ig-daemon] requests folder scrape failed", exc)
+
         unread = [c for c in convos if c.get("unread")]
 
         result = {
@@ -1482,25 +1545,53 @@ def _scrape_recent_followers(page, ig_username: str, limit: int = 30) -> list[st
         log_exception(f"[ig-followers] profile navigation failed", exc)
         return []
 
-    # Click the followers link to open the modal
+    # Click the followers link to open the modal. Instagram has shipped
+    # multiple layouts (anchor, button, span-with-text) so we try each.
     try:
         clicked = page.evaluate(f"""() => {{
-            const links = document.querySelectorAll('a[href*="/{ig_username}/followers"]');
-            for (const link of links) {{
-                link.click();
-                return true;
+            const lower = '{ig_username.lower()}';
+
+            // 1. Direct anchor whose href matches /<user>/followers
+            const anchors = document.querySelectorAll('a');
+            for (const a of anchors) {{
+                const href = (a.getAttribute('href') || '').toLowerCase();
+                if (href.includes('/' + lower + '/followers') || href.endsWith('/followers/') || href.endsWith('/followers')) {{
+                    a.click();
+                    return 'anchor';
+                }}
             }}
-            // Fallback: any link containing /followers
-            const fallback = document.querySelectorAll('a[href$="/followers/"]');
-            for (const link of fallback) {{
-                link.click();
-                return true;
+
+            // 2. Header text fallback: find an element whose text reads
+            //    "<n> followers" and click its closest button/anchor parent.
+            const all = document.querySelectorAll('a, button, span, li');
+            for (const el of all) {{
+                const t = (el.textContent || '').trim().toLowerCase();
+                // accepts "1,234 followers", "12 followers", "12k followers"
+                if (/^[\\d.,kKmM]+\\s+followers?$/.test(t)) {{
+                    const target = el.closest('a') || el.closest('button') || el;
+                    target.click();
+                    return 'text';
+                }}
             }}
+
             return false;
         }}""")
         if not clicked:
-            safe_print("[ig-followers] Could not open followers modal.")
-            return []
+            # Last resort: navigate directly to /<user>/followers/ as its own
+            # page. This works on web even when the modal route fails.
+            try:
+                page.goto(
+                    f"https://www.instagram.com/{ig_username}/followers/",
+                    wait_until="domcontentloaded",
+                    timeout=PAGE_TIMEOUT_MS,
+                )
+                _sleep(5)
+                clicked = "direct-nav"
+            except Exception as nav_exc:
+                log_exception("[ig-followers] direct followers nav failed", nav_exc)
+                return []
+
+        safe_print(f"[ig-followers] Opened followers via {clicked}.")
         _sleep(5)
     except Exception as exc:
         log_exception("[ig-followers] modal open failed", exc)

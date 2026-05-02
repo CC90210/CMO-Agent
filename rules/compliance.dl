@@ -1,0 +1,59 @@
+% compliance.dl — Datalog-style compliance rules for Maven content verification
+%
+% Format: rule_name(Args) :- condition1, condition2, ...
+%
+% Lines starting with % are comments.
+% Each rule block is separated by a blank line and starts with a %% header
+% that includes the human-readable description used by `explain`.
+%
+% Rules are evaluated by the pure-Python evaluator in neuro_symbolic_gate.py.
+% The clingo ASP solver is used when available (pip install clingo) for
+% full recursive Datalog; the Python fallback handles the exact rules here.
+%
+% Maven content rules:
+% - CASL / cooldown still apply for DM and email sends
+% - Content-specific rules: platform char limits, hashtag caps, brand voice,
+%   paid promotion disclosure, unverified claim detection
+
+%% PLATFORM_CHARACTER_LIMIT
+%% Description: Caption must not exceed the target platform's character limit.
+%% Violation: Caption exceeds platform character limit.
+%% Fix: Shorten the caption to fit within the platform's limit (Instagram 2200, X 280, LinkedIn 3000).
+platform_char_limit_ok(Draft) :- within_char_limit(Draft).
+
+%% HASHTAG_COUNT_LIMIT
+%% Description: Number of hashtags must not exceed the platform cap (Instagram 30, X/LinkedIn 5).
+%% Violation: Too many hashtags — reduces reach and looks spammy.
+%% Fix: Remove hashtags until within the platform cap.
+hashtag_count_ok(Draft) :- hashtag_count_ok(Draft).
+
+%% NO_UNVERIFIED_CLAIMS
+%% Description: Content must not make absolute or unverified claims (guaranteed results, clinically proven, etc.).
+%% Violation: Draft contains unverified or absolute claim language.
+%% Fix: Replace absolute claims with qualified language (e.g., "helped me" instead of "guaranteed to help you").
+no_unverified_claims_ok(Draft) :- not has_unverified_claims(Draft).
+
+%% BRAND_VOICE_CONSISTENCY
+%% Description: Caption must align with CC's brand voice (introspective, raw, direct, first-person) as defined in brain/CONTENT_BIBLE.md.
+%% Violation: Brand voice score below threshold (0.60) — draft reads as generic or AI-slop.
+%% Fix: Rewrite using first-person voice, specific details, and raw honesty. Avoid: "unlock the power", "synergy", "game-changer".
+brand_voice_ok(Draft) :- brand_voice_score(Draft, S), brand_voice_threshold(T), S >= T.
+
+%% APPROVAL_REQUIRED_FOR_PAID_PROMOTION
+%% Description: Any paid/sponsored/gifted content must include explicit disclosure (#ad, #sponsored, #paid, #gifted, or "paid partnership").
+%% Violation: Paid promotion detected but disclosure is missing or unclear.
+%% Fix: Add #ad or #sponsored to the caption, or use the platform's built-in paid partnership label.
+paid_promo_disclosure_ok(Draft) :- not is_paid_promotion(Draft).
+paid_promo_disclosure_ok(Draft) :- is_paid_promotion(Draft), has_paid_disclosure(Draft).
+
+%% COOLDOWN
+%% Description: Minimum 24-hour gap between DM or email messages to the same recipient.
+%% Violation: Last message to this recipient was sent less than 24 hours ago.
+%% Fix: Schedule for tomorrow or later.
+cooldown_ok(Lead) :- last_sent_hours_ago(Lead, H), H >= 24.
+
+%% HOURLY_CAP
+%% Description: Maximum hourly outbound volume must not exceed HOURLY_CAP env var.
+%% Violation: Current-hour send count meets or exceeds the configured cap.
+%% Fix: Wait until the next hour or raise HOURLY_CAP if intentional.
+hourly_cap_ok :- sends_this_hour(N), hourly_cap(Cap), N < Cap.

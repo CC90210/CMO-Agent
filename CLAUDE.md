@@ -188,3 +188,11 @@ Maven inherits the V6 stack from Bravo. Every script below is `--help` clean and
 ## Multi-Machine Bridge Arbitration
 
 `scripts/bridge_lock.py` — shared lockfile arbiter so the Mac and Windows Maven bridges never poll the same Telegram token simultaneously. Acquire at startup, heartbeat every 15s, release on shutdown. CLI: `python scripts/bridge_lock.py status --json`.
+
+## Capability Graph (V6.6)
+
+`brain/CAPABILITY_GRAPH.json` is the canonical machine-readable registry of every skill, script, agent, MCP server, and workflow in this repo. Three scripts maintain it:
+
+- `scripts/build_capability_graph.py` — auto-discovers capabilities from frontmatter + docstrings + MCP configs. Run after adding any new file in skills/, scripts/, agents/, or .agents/workflows/.
+- `scripts/capability_query.py` — runtime resolver. `resolve "send outreach email"` returns top-N matching skills by trigger overlap. Use this at decision time instead of grepping markdown.
+- `scripts/register.py` — one-command "add new capability" wizard. `register.py skill <name> --description "..." --triggers "..."` scaffolds the file with proper frontmatter, rebuilds the graph, runs self_audit, prints next-steps. Ends the 6-step add-a-skill ritual.

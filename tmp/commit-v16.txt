@@ -1,0 +1,91 @@
+maven: V1.6 Content Day pipeline + video_editor hardening pass
+
+Ships the autonomous Content Day workflow + audit fixes for three
+turnkey-blocking bugs in the new video_editor pipeline.
+
+NEW SCRIPTS
+  - scripts/video_editor.py — 8-step pipeline: silence detect, filler cut,
+    apply cuts, audio master to -14 LUFS, color grade, karaoke captions,
+    music overlay with auto-ducking, Telegram review gate. Plus `export`
+    sub-command for per-platform reformatting (TikTok, Reels, Shorts,
+    LinkedIn, X, Facebook).
+  - scripts/batch_content_day.py — schedules approved videos across the
+    week via Zernio API, writes to Supabase content_calendar for tracking,
+    generates blank manifest templates.
+  - scripts/script_ideation.py (already shipped V1.4) — minor refresh
+    pulled in.
+
+NEW DOCS
+  - brain/CONTENT_BIBLE.md — content pillar updates pulled from Bravo.
+  - brain/CC_CREATIVE_IDENTITY.md — creative identity reference for
+    script_ideation grounding.
+  - brain/USER.md — operator profile updates.
+  - skills/video-editing/SKILL.md — 8-step pipeline reference + CLI specs
+    + per-platform export table.
+  - data/content_day/2026-04-27_template.json — first manifest template.
+  - brain/CAPABILITIES.md — registers video_editor.py as the primary
+    automated video editor.
+
+AUDIT FIXES (turnkey-blocking)
+
+  Fix 1 — Cut accuracy. Original `apply_cuts` used `-ss BEFORE -i` with
+  `-c copy`, which snaps to the nearest preceding keyframe and leaves a
+  frozen frame at the start of every segment. Across 30+ cuts on a 5-min
+  voice video, the output looked visibly broken. Now transcodes each
+  segment with libx264/aac at frame-accurate boundaries (CRF 18, veryfast)
+  with `-ss AFTER -i` for slow-but-accurate seek. Concat step still
+  stream-copies because all segments share codec params.
+
+  Fix 2 — Real auto-ducking. The skill claims music is "auto-ducked under
+  speech" but the original `add_music` only set static volume=-18dB and
+  amix'd. That is not ducking — music sat at -18dB the whole time,
+  drowning quiet speech and competing with loud. Replaced with
+  sidechaincompress keyed off the speech track (threshold 0.05, ratio 8,
+  attack 5ms, release 300ms): when speech is present, music ducks
+  dynamically; when speech is quiet, music swells back up. Also switched
+  `aloop=loop=-1:size=2e9` to `-stream_loop -1` (cleaner; no in-memory
+  ringbuffer). Falls back to the original static-mix path if sidechain
+  fails for any reason — better to ship music at fixed level than ship
+  none.
+
+  Fix 3 — Telegram 50MB fallback. Original code dropped to a text-only
+  notification when video > 50MB, breaking the review UX (a typical 90s
+  1080p clip at CRF 18 commonly hits 60-100MB). Now auto-shrinks to 720p
+  (or 540p for very large files) at CRF 28 and retries sendVideo. Falls
+  back to text-only ONLY if even the shrunk version is over 50MB. The
+  caption notes that the phone preview is a downscaled transcode and the
+  full version is on disk.
+
+  Fix 4 — Format-spec crash. `cmd_edit` final summary used `:.1f` on
+  values that could be the placeholder `'?'` string when no cuts were
+  applied. Replaced with a `_fmt_secs` helper that handles missing/string
+  values without raising TypeError.
+
+  Fix 5 — `resp.json()` guard. Telegram normally returns JSON, but proxy
+  failures and timeouts can return empty bodies or HTML error pages.
+  Wrapped in `_safe_json()` to return `{}` instead of crashing.
+
+ALSO
+  - telegram_agent.js — minor refresh from prior linter edits preserved.
+  - State sync run; cmo_pulse refreshed.
+
+VERIFICATION
+  - All 168 tests still pass (send_gateway 65, late_publisher 5,
+    instagram_engine 6, content_pipeline 10, performance_reporter 10,
+    notify 13, script_ideation 21, c_suite_context 38).
+  - self_audit 100/100, 0 orphans.
+  - argparse smoke OK on `video_editor.py --help` + all subcommand helps.
+
+KNOWN LIMITATIONS (deferred to V1.7)
+  - Audio master step uses `-c:v copy`, which fails on ProRes/MOV input
+    if the container can't hold the source codec. Real-world fix: probe
+    codec, transcode video on incompatibility. Acceptable today because
+    CC films on iPhone (h264) and uploads .mp4. (LOW)
+  - `add_captions` re-runs Whisper instead of reusing the transcription
+    from `detect_filler_words`. Duplicate work but adds < 30s on small
+    model. (LOW)
+  - `random.choice` for music track selection is non-deterministic — same
+    video re-edited gets a different track each run. Documented; not yet
+    fixed. (LOW)
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>

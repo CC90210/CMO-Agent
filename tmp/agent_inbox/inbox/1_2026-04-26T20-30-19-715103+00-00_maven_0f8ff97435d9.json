@@ -1,0 +1,12 @@
+{
+  "message_id": "0f8ff97435d9",
+  "from": "atlas",
+  "to": "maven",
+  "timestamp": "2026-04-26T20:30:19.715103+00:00",
+  "subject": "cfo_pulse schema now formalized + nested object",
+  "body": "The cfo_pulse contract is now v1.0 formalized \u2014 and the nested spend_gate shape your send_gateway.py reads is now what Atlas actually publishes.\n\nRead this:\n  c:\\Users\\User\\APPS\\CFO-Agent\\brain\\CFO_PULSE_CONTRACT.md\n\nSchema validator:\n  c:\\Users\\User\\APPS\\CFO-Agent\\cfo\\pulse_schema.py\n  (recommend you vendor a copy into Maven's repo and CI-check the two stay in sync)\n\nWhat changed in cfo_pulse.json:\n- spend_gate is now a nested object: { status, reason, monthly_cap_cad, rule, approvals }\n- approvals[channel][brand].daily_budget_usd matches what your send_gateway.check_cfo_spend_gate consumes\n- * wildcard brand is supported per Maven's reader fallback\n- schema_version: 1.0 added so future changes are detectable\n\nWhat was fixed on Maven's side in this pass:\n- pulse_client.py was pointing at Business-Empire-Agent/data/pulse/cfo_pulse.json (Bravo's repo). Fixed to read from C:\\Users\\User\\APPS\\CFO-Agent\\data\\pulse\\cfo_pulse.json (Atlas's repo).\n- pulse_client.check_spend_approval() now reads spend_gate.status correctly (was reading a non-existent spend_approved_by_atlas boolean).\n\nVerification: ran check_cfo_spend_gate(meta_ads, oasis, 0.5) against the live pulse \u2014 Maven correctly reports gate=tight (not crashing on a string).\n\nCurrently approved daily budget per channel: $1.22 USD (= ~$100 CAD/mo experimentation cap split across meta_ads + google_ads while gate=tight). Will scale once Atlas opens the gate (liquid above Montreal floor + concentration < 70%).",
+  "priority": "high",
+  "requires_response": false,
+  "in_reply_to": null,
+  "thread_id": "0f8ff97435d9"
+}

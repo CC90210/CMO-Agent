@@ -1,57 +1,61 @@
-# CMO Agent — Maven
+# Maven — Autonomous AI CMO
 
-> **Maven (CMO)** — brand, content, ads, funnels, distribution, growth, research. One third of CC's 3-agent AI C-Suite. Paired with **Bravo (CEO)** for strategy + clients + revenue, and **Atlas (CFO)** for money + tax + wealth. Multi-client marketing intelligence managing OASIS AI, PropFlow, Nostalgic Requests, CC's personal brand, and SunBiz Funding.
+> Maven is CC's Chief Marketing Officer agent — brand, content, ads, funnels, distribution, growth, research. One third of a 3-agent AI C-Suite. Paired with Bravo (CEO) for strategy and Atlas (CFO) for spend approval.
 
-Built by one person with AI. Evolves every session.
+```bash
+python scripts/setup_wizard.py
+```
 
-**The C-Suite:**
-- 🏛️ **Bravo (CEO)** — [CC90210/CEO-Agent](https://github.com/CC90210/CEO-Agent)
-- 💰 **Atlas (CFO)** — [CC90210/CFO-Agent](https://github.com/CC90210/CFO-Agent)
-- 🎨 **Maven (CMO)** — this repo: [CC90210/CMO-Agent](https://github.com/CC90210/CMO-Agent)
+Clone, run the wizard, and you have a fully configured AI CMO running on your identity, brand voice, and marketing goals. Total setup: ~5 minutes.
 
-## What This Does
+---
 
-Maven is the marketing brain. Not a template bot — a cutting-edge, multi-client CMO that:
+## What Maven Does
 
-- **Runs paid ads** — Meta + Google Ads SDK integrations, campaign creation, budget optimization, A/B testing
-- **Produces content** — 29 skills including content-engine (voice + calendar), elite-video-production (15-step cinematic pipeline), persona-content-creator, SEO/AEO, image-generation, competitive-intelligence
-- **Renders video ads** — `ad-engine/` sidecar (Remotion 4.0 + Meta Ads SDK, 5 production templates)
-- **Orchestrates funnels** — integrates with PULSE (ig-setter-pro) for DM automation, cc-funnel for lead capture, Skool for community
-- **Respects the spend gate** — never launches a paid campaign without Atlas's approval via `cfo_pulse.json`
+- **Runs paid ads** — Meta + Google Ads SDK integrations, campaign creation, budget optimization, A/B testing. Spend gate: every dollar requires Atlas pulse approval before launch.
+- **Produces content** — 29 skills including content-engine (voice + calendar), elite-video-production (15-step cinematic pipeline), persona-content-creator, SEO/AEO, image-generation, competitive-intelligence.
+- **Renders video ads** — `ad-engine/` sidecar (Remotion 4.0 + Meta Ads SDK, 5 production-ready templates). Cinematic output from a Python script.
+- **Enforces brand voice** — marketing canon (Dunford, Hormozi, Sharp) baked into every draft. Anti-slop rules hard-coded. Your voice, not a generic AI voice.
+- **Orchestrates funnels** — integrates with PULSE (ig-setter-pro) for DM automation, cc-funnel for lead capture, Skool for community growth.
+- **Multi-platform publishing** — Zernio scheduling, Instagram native, email blasts (CASL-compliant). One batch session, five platforms.
 
 ## Architecture
 
 ```
 CMO-Agent/
-├── CLAUDE.md           # Maven identity + entry point
-├── brain/              # Agent memory, strategy, client profiles, doctrine
-│   ├── SOUL.md         # Immutable identity
-│   ├── SHARED_DB.md    # Supabase shared DB protocol
-│   ├── clients/        # 5 client brand profiles (OASIS, PropFlow, Nostalgic, CC personal, SunBiz)
+├── CLAUDE.md                   # Maven identity + runtime entry point
+├── brain/                      # Agent memory, strategy, client profiles, doctrine
+│   ├── SOUL.md                 # Immutable identity
+│   ├── USER.template.md        # Operator profile template (committed)
+│   ├── USER.md                 # Rendered operator profile (gitignored — local only)
+│   ├── operator.profile.json   # Your credentials/identity (gitignored — local only)
+│   ├── operator.profile.example.json  # Example for forks
+│   ├── clients/                # Brand profiles (OASIS, PropFlow, Nostalgic, personal, SunBiz)
 │   └── ...
-├── skills/             # 29 marketing skills
-├── agents/             # 16 specialized sub-agents (ad-strategist, content-creator, video-editor, etc.)
-├── campaigns/          # Active campaigns — currently pulse-lead-gen
-│   └── pulse-lead-gen/ # Free-PULSE-repo ad campaign + teaser + email templates
-├── ad-engine/          # Cloned Shopify-Ad-Engine — Remotion video ad rendering
-├── data/pulse/         # cmo_pulse.json (sovereign — Maven writes only here)
-├── scripts/            # Python + Node CLIs
-└── memory/             # Session logs, patterns, active tasks
+├── skills/                     # 29 marketing skills
+├── agents/                     # 16 specialized sub-agents
+├── campaigns/                  # Active campaign artifacts
+├── ad-engine/                  # Remotion video ad rendering
+├── data/pulse/                 # cmo_pulse.json (Maven writes only here)
+├── scripts/                    # Python + Node CLIs (personalize.py, scaffold.py, content_engine.py, ...)
+└── memory/                     # Session logs, patterns, active tasks
 ```
 
-## Quick Install (One Line) ⭐ Recommended
+## Fork Mechanism (V6 Scaffolding)
 
-**macOS / Linux / WSL:**
+Maven ships as CC's personal agent. To run it as your own:
+
 ```bash
-curl -sSL https://raw.githubusercontent.com/CC90210/CMO-Agent/main/install/quickstart.sh | bash
+# 1. Edit brain/operator.profile.json with your identity
+# 2. Preview what changes:
+python scripts/scaffold.py --json
+# 3. Apply the fork:
+python scripts/scaffold.py --apply --backup
+# 4. Render your personal brain/USER.md:
+python scripts/personalize.py apply
 ```
 
-**Windows (PowerShell):**
-```powershell
-irm https://raw.githubusercontent.com/CC90210/CMO-Agent/main/install/quickstart.ps1 | iex
-```
-
-What it does: auto-installs missing prereqs (python ≥3.10, git, node, npm), clones this repo into `~/maven-repo`, runs `npm install` for Remotion + ad-engine, walks you through an interactive wizard (Anthropic required; Meta Ads / Google Ads / ElevenLabs / Late optional). Total time: ~5–10 minutes including npm. Full details: [`install/README.md`](install/README.md).
+`scaffold.py` rewrites CC's name, brand, email, and goals across all tracked files. `personalize.py` renders templated brain files from your profile. Both are idempotent and safe to re-run. Full docs: [`docs/INSTALL.md`](docs/INSTALL.md).
 
 ---
 
@@ -63,20 +67,15 @@ Maven operates under three non-negotiable rules:
 2. **Strategic Alignment** — reads `ceo_pulse.json` on every session for Bravo's current directive
 3. **Sovereignty** — writes only to this repo; other agents READ from here
 
-See `brain/C_SUITE_ARCHITECTURE.md` in the Bravo repo for the full governance contract.
-
-## Shared Database
-
-All three C-Suite agents share Supabase project `phctllmtsogkovoilwos` as long-term memory. See `brain/SHARED_DB.md` for schema + conventions.
-
 ## Runtimes Supported
 
-Maven can operate under multiple AI runtimes:
-- **Claude Code** — this file (`CLAUDE.md`)
-- **Gemini CLI** — `GEMINI.md`
-- **Antigravity IDE** — `ANTIGRAVITY.md`
+| Runtime | Entry point |
+|---------|-------------|
+| Claude Code | `CLAUDE.md` |
+| Gemini CLI | `GEMINI.md` |
+| Antigravity IDE | `ANTIGRAVITY.md` |
 
-Each runtime reads the same brain + skills; all writes funnel to `data/pulse/cmo_pulse.json`.
+Each runtime reads the same `brain/` and `skills/`. All writes funnel to `data/pulse/cmo_pulse.json`.
 
 ---
 

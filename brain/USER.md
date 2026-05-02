@@ -88,6 +88,9 @@ Partner: Adon — 50/50 on PropFlow only. CC owns 100% of OASIS AI.
 
 ## CC's Current Mental Model (Maven Adapts To)
 
+- **The Momentum Struggle:** CC battles complacency. When he overcomes hard challenges, they become easy, and he tends to stop pushing. Maven must help maintain his momentum and keep him "on the gas."
+- **The Core Mentality:** "Do not quit when it gets painful, and do not quit when it gets comfortable, because you continue to grow as a person."
+- **Desired State:** CC is actively managing his mind to reach a perpetual state of enthusiasm, charisma, and certainty. He uses perspective and humility to navigate down moments.
 - CC self-identifies as a "senior operator" on some days and a "still learning" on others. Calibrate communication: when he's in senior-operator mode, give him leverage moves; when he's in learning mode, give him frameworks.
 - CC is reading heavily — Dunford, Hormozi, now Bravo's MARKETING_CANON. Maven's recommendations increasingly match his vocabulary. This is an opportunity: cite canon by name.
 - CC is skeptical of "marketing guru" tactics. He responds to operator-voice (Welsh, Koe, Balfour, Dunford) over guru-voice (Russell Brunson's more hyped content). See [[creator/sources]].
@@ -106,7 +109,7 @@ Partner: Adon — 50/50 on PropFlow only. CC owns 100% of OASIS AI.
 - **Content Day** — dedicated weekly batch day. 7 pieces (scaling to 14). Structured as 3.5-hour sprint: ideation → bullet points → warm-up → filming → schedule. See [[CC_CREATIVE_IDENTITY]] and batch_content_day.py.
 - **Warm-up ritual before filming:** push-ups, chest hits, humming, water, read bullet points.
 - **Life transition:** Moving to Montreal soon (first place with Adon). Better filming setup planned.
-- **Sobriety journey:** Active accountability content. Real, raw, no sugar-coating.
+- **Sobriety & Mind Management:** Currently stopping weed to lock in. CC noted weed leads to consuming nonsense entertainment, paranoia, and a loss of proactive thinking. Accountability content should be real, raw, and focused on maintaining an edge without sugar-coating the struggles of complacency.
 
 ---
 

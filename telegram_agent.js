@@ -140,7 +140,15 @@ function bridgeLock(action) {
     try {
         const r = require('child_process').spawnSync(
             PYTHON_BIN, [BRIDGE_LOCK_SCRIPT, action, '--agent', BRIDGE_LOCK_AGENT, '--json'],
-            { encoding: 'utf-8', timeout: 5000 }
+            {
+                encoding: 'utf-8',
+                timeout: 5000,
+                // CRITICAL on Windows: without windowsHide, every spawnSync
+                // pops a console window. Heartbeat at 15s would flash a window
+                // every 15 seconds. Same fix as Bravo's bridge.
+                windowsHide: true,
+                shell: false,
+            }
         );
         // r.status === null when spawn itself failed (ENOENT, missing python, etc.)
         // Treat that as "lock unverifiable" — log and proceed (don't block startup).

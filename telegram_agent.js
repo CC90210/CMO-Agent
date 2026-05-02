@@ -145,8 +145,9 @@ function bridgeLock(action) {
                 timeout: 5000,
                 // CRITICAL on Windows: without windowsHide, every spawnSync
                 // pops a console window. Heartbeat at 15s would flash a window
-                // every 15 seconds. Same fix as Bravo's bridge.
-                windowsHide: true,
+                // every 15 seconds. Match Bravo's pattern: `windowsHide: IS_WIN`
+                // (no-op on macOS, suppression on Windows).
+                windowsHide: IS_WIN,
                 shell: false,
             }
         );

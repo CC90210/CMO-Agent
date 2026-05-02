@@ -119,16 +119,38 @@ process.on('exit', releaseInstanceLock);
 // the same Telegram token at once. Owner heartbeats every 15s; loser exits.
 const BRIDGE_LOCK_AGENT = 'maven';
 const BRIDGE_LOCK_SCRIPT = path.join(__dirname, 'scripts', 'bridge_lock.py');
-const PYTHON_BIN = IS_MAC ? 'python3' : path.join(__dirname, '.venv', 'Scripts', 'python.exe');
+// Resolve Python interpreter robustly. Try local venv first, then system python.
+// Maven historically didn't have a project-local .venv; clients may or may not.
+function _resolvePython() {
+    const candidates = IS_MAC
+        ? [path.join(__dirname, '.venv', 'bin', 'python'), 'python3', 'python']
+        : [path.join(__dirname, '.venv', 'Scripts', 'python.exe'), 'python', 'python3'];
+    for (const c of candidates) {
+        if (c.includes('/') || c.includes('\\')) {
+            try { if (fs.existsSync(c)) return c; } catch (_) {}
+        } else {
+            // bare name — let spawn resolve via PATH
+            return c;
+        }
+    }
+    return 'python';
+}
+const PYTHON_BIN = _resolvePython();
 function bridgeLock(action) {
     try {
         const r = require('child_process').spawnSync(
             PYTHON_BIN, [BRIDGE_LOCK_SCRIPT, action, '--agent', BRIDGE_LOCK_AGENT, '--json'],
             { encoding: 'utf-8', timeout: 5000 }
         );
+        // r.status === null when spawn itself failed (ENOENT, missing python, etc.)
+        // Treat that as "lock unverifiable" — log and proceed (don't block startup).
+        if (r.status === null) {
+            return { ok: true, status: -1, stdout: '', warn: `python not found (${PYTHON_BIN}); skipping multi-machine arbitration` };
+        }
         return { ok: r.status === 0, status: r.status, stdout: (r.stdout || '').trim() };
     } catch (e) {
-        return { ok: false, status: -1, error: String(e).slice(0, 200) };
+        // Same fallback: don't block bridge startup if subprocess can't run.
+        return { ok: true, status: -1, stdout: '', warn: String(e).slice(0, 200) };
     }
 }
 const lockAcquire = bridgeLock('acquire');
@@ -136,6 +158,9 @@ if (!lockAcquire.ok) {
     log(`[BRIDGE-LOCK] CONFLICT — another machine owns Maven's bridge: ${lockAcquire.stdout || lockAcquire.error}`);
     log(`[BRIDGE-LOCK] Exiting with code 1 so PM2 backs off and retries when the other machine releases.`);
     process.exit(1);
+}
+if (lockAcquire.warn) {
+    log(`[BRIDGE-LOCK] WARN: ${lockAcquire.warn}`);
 }
 log(`[BRIDGE-LOCK] Acquired (${BRIDGE_LOCK_AGENT}) — this machine now owns Maven's Telegram bridge.`);
 setInterval(() => bridgeLock('heartbeat'), 15000);

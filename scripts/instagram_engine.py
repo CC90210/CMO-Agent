@@ -220,6 +220,9 @@ def send_to_ig_setter_pro(env_vars: dict, username: str, message_text: str, dire
                 if data.get("ok") is False:
                     safe_print(f"ig-setter-pro webhook rejected payload: {data}")
                     return False
+                # Return the parsed response so callers can read
+                # auto_send_enabled + the generated doctrine draft.
+                return data
             except ValueError:
                 pass
             return True
@@ -961,8 +964,10 @@ def _check_dms_on_page(env_vars, args, page):
                     safe_print(f"[ig-daemon] Resolved @{handle} from display name '{username}'")
                 username = handle
 
-                # Push inbound unread message to ig-setter-pro. The backend dedupes by id.
-                send_to_ig_setter_pro(
+                # Push inbound unread message to ig-setter-pro. The backend
+                # dedupes by id and returns whether auto-send is enabled for
+                # this account + a doctrine-generated draft (if configured).
+                webhook_resp = send_to_ig_setter_pro(
                     env_vars,
                     username,
                     last_msg,
@@ -970,6 +975,23 @@ def _check_dms_on_page(env_vars, args, page):
                     intent="active",
                     display_name=display_name,
                 )
+
+                # Auto-send gate: if PULSE has auto_send_enabled=false for this
+                # account, the daemon stops here. The doctrine draft is already
+                # waiting in the dashboard for CC to approve via Override.
+                auto_send_enabled = bool(
+                    isinstance(webhook_resp, dict)
+                    and webhook_resp.get("auto_send_enabled")
+                )
+                if not auto_send_enabled:
+                    safe_print(
+                        f"  [auto-send OFF] @{username} draft saved to PULSE — "
+                        "approve via Override panel."
+                    )
+                    skipped_replies.append({"username": username, "reason": "auto_send_off"})
+                    mark_notified(notified_log, username, preview)
+                    save_notified_log(notified_log)
+                    continue
 
                 # Multi-turn booking flow.
                 user_booking = booking_state.get(username)
@@ -2728,7 +2750,48 @@ def read_conversation_text(page, username: str) -> str:
         const main = document.querySelector('main') || document.body;
         return main.innerText.slice(-3000);
     }""")
-    return raw or ""
+    return _strip_ui_placeholder_chrome(raw or "")
+
+
+_UI_PLACEHOLDER_TAILS = (
+    "message...", "message…", "send a message...", "send a message…",
+    "message", "send message", "your message", "type a message",
+    "search...", "search", "active",
+)
+
+
+def _strip_ui_placeholder_chrome(text: str) -> str:
+    """Remove the IG textbox placeholder + trailing UI labels from a scraped
+    conversation. The right-panel innerText scrape includes the input box's
+    placeholder ('Message...'), the bottom action row ('Send'), and the
+    'Active <Xm ago>' presence string in the header — all of which leak into
+    PULSE message previews and AI context.
+    """
+    if not text:
+        return ""
+    out = text
+    # Iteratively strip whichever known UI tail is present (case-insensitive)
+    # so multi-element tails like "Message...\nSend" both come off.
+    drop_tails = (
+        "message...", "message…", "message",
+        "send a message...", "send a message…", "send a message",
+        "send", "send message", "type a message", "your message",
+        "search...", "search", "💬", "❤", "♥", "👍",
+    )
+    changed = True
+    while changed:
+        changed = False
+        stripped = out.rstrip()
+        if stripped != out:
+            out = stripped
+            changed = True
+        # Pop trailing lines that are pure UI chrome
+        lines = out.split("\n")
+        while lines and lines[-1].strip().lower() in drop_tails:
+            lines.pop()
+            changed = True
+        out = "\n".join(lines)
+    return out
 
 
 def cc_has_replied(conversation_text: str) -> bool:

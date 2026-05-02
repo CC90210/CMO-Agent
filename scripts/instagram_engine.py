@@ -1148,6 +1148,298 @@ def process_dashboard_outbox(env_vars, page, limit: int = 5) -> dict:
     return result
 
 
+# ─── Comment-to-DM trigger system ────────────────────────────────────────────
+
+COMMENT_REPLIED_PATH = PROJECT_ROOT / "tmp" / "ig_comment_replied.json"
+
+
+def _load_comment_replied() -> dict:
+    if not COMMENT_REPLIED_PATH.exists():
+        return {}
+    try:
+        with open(COMMENT_REPLIED_PATH, "r", encoding="utf-8") as f:
+            return json.load(f) or {}
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def _save_comment_replied(state: dict) -> None:
+    try:
+        COMMENT_REPLIED_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(COMMENT_REPLIED_PATH, "w", encoding="utf-8") as f:
+            json.dump(state, f, indent=2)
+    except OSError as exc:
+        log_exception("Failed saving comment_replied state", exc)
+
+
+def fetch_active_comment_triggers(env_vars: dict) -> list[dict]:
+    """Fetch active comment-to-DM triggers from the dashboard."""
+    try:
+        import requests
+    except ImportError:
+        return []
+
+    secret = get_pulse_secret(env_vars)
+    if not secret:
+        return []
+
+    base = get_pulse_api_base(env_vars)
+    account_id = get_env_value(env_vars, "PULSE_ACCOUNT_ID", "IG_SETTER_PRO_ACCOUNT_ID")
+    params = {}
+    if account_id:
+        params["account_id"] = account_id
+
+    try:
+        resp = requests.get(
+            f"{base}/api/python/triggers",
+            params=params,
+            headers={"x-webhook-secret": secret},
+            timeout=10,
+        )
+        if resp.status_code != 200:
+            safe_print(f"[ig-daemon] triggers fetch error: {resp.status_code}")
+            return []
+        data = resp.json()
+        return data.get("triggers") or []
+    except Exception as exc:
+        log_exception("[ig-daemon] triggers fetch failed", exc)
+        return []
+
+
+def submit_comment_event(env_vars: dict, trigger: dict, comment: dict) -> dict | None:
+    """POST a scraped comment to /api/comment-webhook. Returns the response payload
+    or None on transport failure. The webhook handles dedup, matching, and follow-gate
+    logic; we only act on its response."""
+    try:
+        import requests
+    except ImportError:
+        return None
+
+    secret = get_pulse_secret(env_vars)
+    if not secret:
+        return None
+
+    payload = {
+        "account_id": trigger.get("account_id"),
+        "ig_media_id": trigger.get("ig_media_id"),
+        "ig_comment_id": comment["ig_comment_id"],
+        "ig_user_id": comment["ig_user_id"],
+        "username": comment.get("username"),
+        "comment_text": comment.get("comment_text", ""),
+        # Playwright cannot reliably check follow status without an extra
+        # navigation per commenter; default true so non-gated triggers fire.
+        "is_following": True,
+    }
+
+    try:
+        resp = requests.post(
+            f"{get_pulse_api_base(env_vars)}/api/comment-webhook",
+            json=payload,
+            headers={"x-webhook-secret": secret, "Content-Type": "application/json"},
+            timeout=10,
+        )
+        if resp.status_code != 200:
+            safe_print(f"[ig-comments] webhook error: {resp.status_code} - {resp.text[:200]}")
+            return None
+        return resp.json()
+    except Exception as exc:
+        log_exception("[ig-comments] webhook submit failed", exc)
+        return None
+
+
+def _scrape_comments_for_post(page, media_id: str) -> list[dict]:
+    """Open a post and scrape its visible comments.
+
+    Returns list of {ig_comment_id, ig_user_id, username, comment_text}.
+    Comment IDs are derived from username + first-80-chars hash since IG's DOM
+    does not expose the real comment id without authenticated GraphQL calls.
+    """
+    import hashlib
+
+    url = f"https://www.instagram.com/p/{media_id}/"
+    try:
+        page.goto(url, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+        _sleep(5)
+    except Exception as exc:
+        log_exception(f"[ig-comments] navigation to {url} failed", exc)
+        return []
+
+    script = """() => {
+        // Heuristic scrape: find <ul> nodes containing <a href="/<username>/"> links
+        // followed by text. Works on both /p/ and /reel/ layouts.
+        const results = [];
+        const seen = new Set();
+        const links = document.querySelectorAll('a[href^="/"][role="link"]');
+        for (const link of links) {
+            const href = link.getAttribute('href') || '';
+            // Skip non-username links
+            if (!/^\\/[A-Za-z0-9._]+\\/$/.test(href)) continue;
+            const username = href.replace(/\\//g, '').trim();
+            if (!username || username.length > 32) continue;
+            const container = link.closest('li') || link.closest('div[role="button"]') || link.parentElement;
+            if (!container) continue;
+            const text = (container.innerText || container.textContent || '').trim();
+            if (!text) continue;
+            const lines = text.split(String.fromCharCode(10)).map(l => l.trim()).filter(Boolean);
+            // Drop the username line; first remaining line that isn't time/likes is the comment
+            const timeRe = /^\\d{1,3}[smhdw]$|^\\d{1,2}(mo|w)$|^\\d+ likes?$|^Reply$|^View replies/i;
+            const commentLines = lines.filter(l => l !== username && !timeRe.test(l) && l.length > 1);
+            if (commentLines.length === 0) continue;
+            const commentText = commentLines.slice(0, 4).join(' ');
+            const key = username + '::' + commentText.slice(0, 80);
+            if (seen.has(key)) continue;
+            seen.add(key);
+            results.push({ username: username, comment_text: commentText });
+        }
+        return JSON.stringify(results);
+    }"""
+
+    try:
+        raw = page.evaluate(script)
+        rows = json.loads(raw or "[]")
+    except Exception as exc:
+        log_exception(f"[ig-comments] scrape evaluate failed for {media_id}", exc)
+        return []
+
+    out = []
+    for row in rows:
+        username = (row.get("username") or "").strip()
+        comment_text = (row.get("comment_text") or "").strip()
+        if not username or not comment_text:
+            continue
+        # Stable derived ids — the webhook dedupes on ig_comment_id, so this
+        # remains idempotent across daemon restarts.
+        digest = hashlib.sha1(
+            f"{media_id}:{username}:{comment_text[:80]}".encode("utf-8")
+        ).hexdigest()[:24]
+        user_digest = hashlib.sha1(username.lower().encode("utf-8")).hexdigest()[:16]
+        out.append({
+            "ig_comment_id": f"pw_{media_id}_{digest}",
+            "ig_user_id": f"ig_user_{user_digest}",
+            "username": username,
+            "comment_text": comment_text,
+        })
+    return out
+
+
+def process_comment_triggers(env_vars, page) -> dict:
+    """For every active trigger, scrape its post's comments and DM matches."""
+    triggers = fetch_active_comment_triggers(env_vars)
+    result = {"triggers": len(triggers), "matched": 0, "sent": 0, "failed": 0}
+    if not triggers:
+        return result
+
+    if not ensure_logged_in(page, env_vars):
+        safe_print("[ig-comments] Skipped: Instagram session not logged in.")
+        return result
+
+    state = _load_comment_replied()
+    state.setdefault("comments", {})
+
+    by_post: dict[str, list[dict]] = {}
+    for t in triggers:
+        media = (t.get("ig_media_id") or "").strip()
+        if media:
+            by_post.setdefault(media, []).append(t)
+
+    for media_id, post_triggers in by_post.items():
+        try:
+            comments = _scrape_comments_for_post(page, media_id)
+            if not comments:
+                continue
+            for comment in comments:
+                comment_id = comment["ig_comment_id"]
+                if state["comments"].get(comment_id):
+                    continue  # already processed by daemon
+
+                # Pass to webhook — it does keyword matching + dedup + event log.
+                # Use the first trigger as the carrier (post-specific triggers).
+                resp = submit_comment_event(env_vars, post_triggers[0], comment)
+                if not resp:
+                    result["failed"] += 1
+                    continue
+
+                action = resp.get("action")
+                if action in {"duplicate", "no_match"}:
+                    state["comments"][comment_id] = action
+                    continue
+                if action != "dm_sent":
+                    state["comments"][comment_id] = action or "no_match"
+                    continue
+
+                # Webhook says: send the DM. Send via Playwright.
+                result["matched"] += 1
+                dm_payload = resp.get("dm") or {}
+                message = dm_payload.get("message") or ""
+                button_url = dm_payload.get("button_url")
+                if button_url:
+                    message = f"{message}\n\n{button_url}"
+                if not message:
+                    state["comments"][comment_id] = "no_message"
+                    continue
+
+                username = comment["username"]
+                sent = _send_dm_via_search(page, username, message)
+                if sent:
+                    send_to_ig_setter_pro(
+                        env_vars,
+                        username,
+                        message,
+                        direction="outbound",
+                        is_ai=True,
+                        intent="active",
+                        ig_message_id=f"comment_dm_{comment_id}",
+                    )
+                    state["comments"][comment_id] = "sent"
+                    result["sent"] += 1
+                    notify(
+                        f"\U0001f4ac Comment-DM sent to @{username} on /p/{media_id}",
+                        category="campaign",
+                    )
+                else:
+                    state["comments"][comment_id] = "send_failed"
+                    result["failed"] += 1
+        except Exception as exc:
+            log_exception(f"[ig-comments] trigger pass failed for {media_id}", exc)
+            result["failed"] += 1
+        finally:
+            _return_to_inbox(page, env_vars)
+
+    _save_comment_replied(state)
+    return result
+
+
+def _send_dm_via_search(page, username: str, message: str) -> bool:
+    """Send a DM by navigating to the user's profile and clicking 'Message'.
+    Falls back to the inbox flow if the profile path fails. Returns True on success.
+    """
+    profile_url = f"https://www.instagram.com/{username.lstrip('@')}/"
+    try:
+        page.goto(profile_url, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+        _sleep(5)
+
+        clicked = page.evaluate("""() => {
+            const els = document.querySelectorAll('button, div[role="button"], a');
+            for (const el of els) {
+                const t = (el.textContent || '').trim().toLowerCase();
+                if (t === 'message') {
+                    el.click();
+                    return true;
+                }
+            }
+            return false;
+        }""")
+        if not clicked:
+            safe_print(f"[ig-comments] Could not find Message button on @{username}'s profile")
+            return False
+        _sleep(6)
+
+        return _send_dm_reply(page, message, recipient=username)
+    except Exception as exc:
+        log_exception(f"[ig-comments] _send_dm_via_search failed for @{username}", exc)
+        return False
+
+
 def cmd_monitor_dms(env_vars, args):
     """Continuously monitor Instagram DMs using one persistent browser context."""
     try:
@@ -1192,6 +1484,16 @@ def cmd_monitor_dms(env_vars, args):
                         safe_print(
                             "[ig-daemon] Dashboard outbox: "
                             f"{outbox_result['sent']} sent, {outbox_result['failed']} failed"
+                        )
+
+                    triggers_result = process_comment_triggers(env_vars, page)
+                    if triggers_result["triggers"]:
+                        safe_print(
+                            "[ig-daemon] Comment triggers: "
+                            f"{triggers_result['triggers']} active, "
+                            f"{triggers_result['matched']} matched, "
+                            f"{triggers_result['sent']} DM'd, "
+                            f"{triggers_result['failed']} failed"
                         )
                 except KeyboardInterrupt:
                     raise

@@ -1210,12 +1210,18 @@ def _check_dms_on_page(env_vars, args, page):
                 should_reply = True
                 skip_reason = None
 
-                if already_replied_within_24h(replied_log, username):
+                # Per-message gate: only skip if CC (or Maven on a previous
+                # poll) has ALREADY responded to the latest inbound. This is
+                # a position check on the conversation transcript, NOT a
+                # global 24h cooldown — that would silently kill multi-turn
+                # conversations after the first reply.
+                if cc_has_replied(convo_text):
                     should_reply = False
-                    skip_reason = "replied_within_24h"
+                    skip_reason = "already_responded_to_last_inbound"
                 elif intent == "UNKNOWN":
-                    should_reply = False
-                    skip_reason = "unknown_intent"
+                    # CONVO is the catch-all conversational handler; build_reply
+                    # will route through it. Don't skip on UNKNOWN.
+                    intent = "CONVO"
 
                 if should_reply:
                     reply_text = build_reply(intent, last_msg=last_msg, convo_context=convo_text)
@@ -2964,26 +2970,10 @@ def cc_has_replied(conversation_text: str) -> bool:
 
 
 def log_auto_reply_to_supabase(env_vars: dict, username: str, intent: str, reply: str) -> None:
-    """Write the auto-reply event to Supabase dm_interactions table.
-    Fails silently so it never blocks the send flow."""
-    try:
-        from supabase import create_client
-        url = env_vars.get("BRAVO_SUPABASE_URL")
-        key = env_vars.get("BRAVO_SUPABASE_SERVICE_ROLE_KEY")
-        if not url or not key:
-            return
-        db = create_client(url, key)
-        db.table("dm_interactions").insert({
-            "channel": "instagram_dm",
-            "direction": "outbound",
-            "ig_username": username,
-            "intent": intent,
-            "reply_preview": reply[:200],
-            "auto_replied": True,
-            "created_at": datetime.now(timezone.utc).isoformat(),
-        }).execute()
-    except Exception as e:
-        safe_print(f"[supabase] dm_interactions insert failed: {e}")
+    """Deprecated. The dm_interactions table was removed in favor of PULSE
+    (Turso) as the single source of truth for DM activity. This shim stays
+    only to avoid breaking call sites; it's a no-op."""
+    return
 
 
 def cmd_auto_reply(env_vars, args):

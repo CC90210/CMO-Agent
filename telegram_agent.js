@@ -114,6 +114,35 @@ if (!TELEGRAM_TOKEN) {
 acquireInstanceLock();
 process.on('exit', releaseInstanceLock);
 
+// ── Multi-machine arbitration via scripts/bridge_lock.py ────────────────────
+// Same pattern as Bravo: prevents Mac and Windows bridges from both polling
+// the same Telegram token at once. Owner heartbeats every 15s; loser exits.
+const BRIDGE_LOCK_AGENT = 'maven';
+const BRIDGE_LOCK_SCRIPT = path.join(__dirname, 'scripts', 'bridge_lock.py');
+const PYTHON_BIN = IS_MAC ? 'python3' : path.join(__dirname, '.venv', 'Scripts', 'python.exe');
+function bridgeLock(action) {
+    try {
+        const r = require('child_process').spawnSync(
+            PYTHON_BIN, [BRIDGE_LOCK_SCRIPT, action, '--agent', BRIDGE_LOCK_AGENT, '--json'],
+            { encoding: 'utf-8', timeout: 5000 }
+        );
+        return { ok: r.status === 0, status: r.status, stdout: (r.stdout || '').trim() };
+    } catch (e) {
+        return { ok: false, status: -1, error: String(e).slice(0, 200) };
+    }
+}
+const lockAcquire = bridgeLock('acquire');
+if (!lockAcquire.ok) {
+    log(`[BRIDGE-LOCK] CONFLICT — another machine owns Maven's bridge: ${lockAcquire.stdout || lockAcquire.error}`);
+    log(`[BRIDGE-LOCK] Exiting with code 1 so PM2 backs off and retries when the other machine releases.`);
+    process.exit(1);
+}
+log(`[BRIDGE-LOCK] Acquired (${BRIDGE_LOCK_AGENT}) — this machine now owns Maven's Telegram bridge.`);
+setInterval(() => bridgeLock('heartbeat'), 15000);
+process.on('exit', () => bridgeLock('release'));
+process.on('SIGINT',  () => { bridgeLock('release'); process.exit(0); });
+process.on('SIGTERM', () => { bridgeLock('release'); process.exit(0); });
+
 const bot = new TelegramBot(TELEGRAM_TOKEN, {
     polling: { autoStart: false, params: { timeout: 30 } },
     request: { timeout: 60000 },

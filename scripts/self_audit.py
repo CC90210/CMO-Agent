@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Self-Audit — Maven's automated health check.
+Self-Audit — Bravo's automated health check.
 
 Scans the knowledge graph for orphans, broken wiring, stale docs, and
 undocumented scripts. Runs fast (seconds), emits a health score + action list.
@@ -39,38 +39,16 @@ SKIP_DIRS = {"ARCHIVES", "node_modules", ".git", "worktrees", "tmp",
 ARCHIVE_PATH_PARTS = {"outreach_archive", "daily", "research", "content"}
 
 # Files that are allowed to be "orphans" because they're entry points,
-# IDE-loaded at boot, frontmatter-discovered (agents), or reachable via
-# @import rather than [[wiki-link]].
+# IDE-loaded at boot, or reachable via @import rather than [[wiki-link]].
 ORPHAN_ALLOWLIST = {
-    # Brain entry points
     "brain/SOUL.md", "brain/USER.md", "brain/STATE.md",
     "brain/DASHBOARD.md", "brain/CAPABILITIES.md", "brain/QUICK_REFERENCE.md",
     "brain/AGENTS.md", "brain/APP_REGISTRY.md", "brain/BRAIN_LOOP.md",
     "brain/INTERACTION_PROTOCOL.md", "brain/HEARTBEAT.md", "brain/GROWTH.md",
     "brain/CHANGELOG.md", "brain/ORCHESTRATION.md", "brain/PERSONALITY.md",
-    "brain/CLIENT.md", "brain/DAILY_SCHEDULE.md", "brain/ENV_STRUCTURE.md",
-    "brain/PRODUCT_VERTICALS.md", "brain/OKRs.md", "brain/BENCHMARK.md",
-    "brain/RISK_REGISTER.md", "brain/INDEX.md", "brain/RESPONSIBILITY_BOUNDARIES.md",
-    "brain/MARKETING_CANON.md", "brain/WRITING.md", "brain/SHARED_DB.md",
-    "brain/ATTRIBUTION_MODEL.md", "brain/CFO_GATE_CONTRACT.md",
-    # Memory
     "memory/ACTIVE_TASKS.md", "memory/SESSION_LOG.md",
     "memory/MISTAKES.md", "memory/PATTERNS.md", "memory/DECISIONS.md",
     "memory/MEMORY_INDEX.md", "memory/content-strategy.md",
-}
-
-# Whole directories whose files are allowed to be orphans:
-# - agents/ : discovered by frontmatter, not wiki-links
-# - skills/ : discovered by frontmatter, not wiki-links
-# - brain/canon/ : referenced via [[canon/x]] links, indirect
-# - brain/clients/ : referenced via brand profile pages
-# - brain/verticals/ : referenced via vertical pack indirection
-# - _templates/ : reference docs, not wiki-linked
-ORPHAN_ALLOWLIST_DIRS = {
-    "agents/", "skills/", "brain/canon/", "brain/clients/",
-    "brain/verticals/", "_templates/", "brain/intel/", "brain/retros/",
-    ".agents/workflows/", ".agents/commands/", ".agents/plans/",
-    "proposals/",
 }
 
 # ---------------------------------------------------------------------------
@@ -80,20 +58,15 @@ ORPHAN_ALLOWLIST_DIRS = {
 class AuditResult:
     total_md_files: int = 0
     orphans: list[str] = field(default_factory=list)
+    leaves: list[str] = field(default_factory=list)
     broken_links: list[tuple[str, str]] = field(default_factory=list)
     skills_total: int = 0
     skills_missing_skill_md: list[str] = field(default_factory=list)
     skills_missing_frontmatter: list[str] = field(default_factory=list)
-    agents_total: int = 0
-    agents_missing_frontmatter: list[str] = field(default_factory=list)
     scripts_total: int = 0
     scripts_undocumented: list[str] = field(default_factory=list)
     mcp_configs_in_sync: bool = True
     mcp_servers: list[str] = field(default_factory=list)
-    send_gateway_tests_pass: bool = False
-    send_gateway_test_summary: str = "not run"
-    cmo_pulse_fresh: bool = False
-    cmo_pulse_age_hours: float = -1.0
     health_score: int = 0
     warnings: list[str] = field(default_factory=list)
 
@@ -113,6 +86,46 @@ def collect_markdown_files() -> list[Path]:
 
 WIKI_LINK_RE = re.compile(r"\[\[([^\]|#]+)(?:\|[^\]]+)?\]\]")
 AT_IMPORT_RE = re.compile(r"@([a-zA-Z0-9_\-/.]+\.md)")
+
+
+def _find_leaves(md_files: list[Path], inbound: dict[str, set[str]]) -> list[str]:
+    """Files with degree <= 1 (1 inbound + 0 outbound, OR 0 inbound + 1 outbound).
+
+    Same allowlist as orphan detection — entry points and historical
+    archives are exempt. These show up as perimeter dots in Obsidian's
+    force-directed graph, indistinguishable from orphans visually. Flag
+    them so future drift surfaces in self_audit before the user notices.
+    """
+    leaves: list[str] = []
+    for f in md_files:
+        rel = str(f.relative_to(REPO_ROOT)).replace("\\", "/")
+        if rel in ORPHAN_ALLOWLIST:
+            continue
+        if any(part in ARCHIVE_PATH_PARTS for part in rel.split("/")):
+            continue
+        filename = rel.split("/")[-1]
+        # Inbound count (any of the three forms self_audit indexes)
+        in_count = (
+            len(inbound.get(rel, set()))
+            + len(inbound.get(filename, set()))
+            + len(inbound.get(rel.removesuffix(".md"), set()))
+        )
+        # Outbound count: count wiki-links that resolve to other md files
+        try:
+            text = f.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
+        out_count = 0
+        for m in WIKI_LINK_RE.findall(text):
+            target = m.strip()
+            if not target.endswith(".md"):
+                target = target + ".md"
+            # Only count if target is an indexed file (avoid phantom links)
+            if target in inbound or target.split("/")[-1] in inbound:
+                out_count += 1
+        if (in_count + out_count) <= 1:
+            leaves.append(rel)
+    return leaves
 
 
 def build_link_index(md_files: list[Path]) -> dict[str, set[str]]:
@@ -144,54 +157,6 @@ def build_link_index(md_files: list[Path]) -> dict[str, set[str]]:
             inbound.setdefault(m.strip(), set()).add(source)
             inbound.setdefault(m.strip().split("/")[-1], set()).add(source)
     return inbound
-
-
-def check_agents(result: AuditResult) -> None:
-    """Maven addition — verify every agent in agents/*.md has valid YAML
-    frontmatter so Claude Code's auto-discovery can see it."""
-    agents_dir = REPO_ROOT / "agents"
-    if not agents_dir.exists():
-        return
-    for f in agents_dir.glob("*.md"):
-        result.agents_total += 1
-        head = f.read_text(encoding="utf-8", errors="ignore")[:600]
-        if not (head.startswith("---") and "name:" in head and "description:" in head):
-            result.agents_missing_frontmatter.append(str(f.relative_to(REPO_ROOT)))
-
-
-def check_send_gateway(result: AuditResult) -> None:
-    """Maven addition — run the send_gateway test suite and capture pass/fail."""
-    import subprocess
-    test_path = REPO_ROOT / "scripts" / "test_send_gateway.py"
-    if not test_path.exists():
-        result.warnings.append("send_gateway test file missing")
-        return
-    try:
-        proc = subprocess.run(
-            [sys.executable, str(test_path)],
-            cwd=str(REPO_ROOT),
-            capture_output=True, text=True, timeout=60,
-        )
-        result.send_gateway_tests_pass = proc.returncode == 0
-        # Last 5 lines of stderr (unittest writes there)
-        tail = (proc.stderr or proc.stdout or "").strip().splitlines()[-5:]
-        result.send_gateway_test_summary = " | ".join(tail)
-    except Exception as e:
-        result.warnings.append(f"send_gateway test invocation failed: {e}")
-
-
-def check_cmo_pulse(result: AuditResult) -> None:
-    """Maven addition — pulse must be < 24h old or the C-suite is operating
-    on stale data."""
-    import time
-    pulse = REPO_ROOT / "data" / "pulse" / "cmo_pulse.json"
-    if not pulse.exists():
-        result.warnings.append("cmo_pulse.json does not exist — run state_sync")
-        return
-    age_seconds = time.time() - pulse.stat().st_mtime
-    age_hours = age_seconds / 3600.0
-    result.cmo_pulse_age_hours = round(age_hours, 1)
-    result.cmo_pulse_fresh = age_hours < 24
 
 
 def check_skills(result: AuditResult) -> None:
@@ -236,14 +201,19 @@ def check_scripts(result: AuditResult) -> None:
 
 
 def check_mcp_sync(result: AuditResult) -> None:
-    # Maven only checks repo-local MCP configs. ~/.gemini is a Bravo-specific
-    # cross-IDE concern; Maven's MCP envelope is set at the project level.
-    configs = {
+    """Sync rule: project-level configs (.claude/mcp.json + .vscode/mcp.json)
+    must agree exactly. The user-level ~/.gemini/settings.json is shared
+    across every project on the machine, so it's allowed to be a SUPERSET
+    of the project's required servers — extras don't count as drift."""
+    project_configs = {
         ".claude/mcp.json": REPO_ROOT / ".claude" / "mcp.json",
         ".vscode/mcp.json": REPO_ROOT / ".vscode" / "mcp.json",
     }
-    server_sets: dict[str, set[str]] = {}
-    for label, path in configs.items():
+    user_config_label = "~/.gemini/settings.json"
+    user_config_path = Path.home() / ".gemini" / "settings.json"
+
+    project_sets: dict[str, set[str]] = {}
+    for label, path in project_configs.items():
         if not path.exists():
             result.warnings.append(f"MCP config missing: {label}")
             result.mcp_configs_in_sync = False
@@ -254,11 +224,11 @@ def check_mcp_sync(result: AuditResult) -> None:
             result.warnings.append(f"MCP config unreadable: {label} ({e})")
             result.mcp_configs_in_sync = False
             continue
-        servers = data.get("mcpServers") or data.get("servers") or {}
-        server_sets[label] = set(servers.keys())
-    if server_sets:
-        ref = next(iter(server_sets.values()))
-        for label, s in server_sets.items():
+        project_sets[label] = set((data.get("mcpServers") or data.get("servers") or {}).keys())
+
+    if project_sets:
+        ref = next(iter(project_sets.values()))
+        for label, s in project_sets.items():
             if s != ref:
                 result.mcp_configs_in_sync = False
                 missing = ref - s
@@ -268,24 +238,31 @@ def check_mcp_sync(result: AuditResult) -> None:
                 )
         result.mcp_servers = sorted(ref)
 
+        # User-level gemini settings: must be SUPERSET, not exact match.
+        # Extras don't count as drift — they're for other projects on the machine.
+        if user_config_path.exists():
+            try:
+                udata = json.loads(user_config_path.read_text(encoding="utf-8"))
+                user_servers = set((udata.get("mcpServers") or udata.get("servers") or {}).keys())
+                missing_in_user = ref - user_servers
+                if missing_in_user:
+                    result.mcp_configs_in_sync = False
+                    result.warnings.append(
+                        f"MCP missing from {user_config_label}: {sorted(missing_in_user)}"
+                    )
+            except Exception as e:
+                result.warnings.append(f"MCP config unreadable: {user_config_label} ({e})")
+
 
 def compute_health_score(r: AuditResult) -> int:
     score = 100
-    score -= min(len(r.orphans) * 2, 20)
+    score -= min(len(r.orphans) * 2, 20)          # cap orphan penalty at 20
     score -= len(r.broken_links) * 3
     score -= len(r.skills_missing_skill_md) * 5
     score -= len(r.skills_missing_frontmatter) * 2
-    score -= len(r.agents_missing_frontmatter) * 3
-    # Undocumented scripts are an aspirational target — keep the penalty
-    # small. Marketing-engine scripts auto-document themselves via skill
-    # references, but per-task helpers don't always need a CAPABILITIES entry.
-    score -= min(len(r.scripts_undocumented), 5)
+    score -= min(len(r.scripts_undocumented), 10)  # cap undocumented at 10
     if not r.mcp_configs_in_sync:
-        score -= 5
-    if not r.send_gateway_tests_pass:
-        score -= 15  # send_gateway is the highest-blast-radius surface
-    if not r.cmo_pulse_fresh:
-        score -= 5
+        score -= 10
     return max(0, score)
 
 
@@ -299,8 +276,6 @@ def run_audit() -> AuditResult:
         rel = str(f.relative_to(REPO_ROOT)).replace("\\", "/")
         if rel in ORPHAN_ALLOWLIST:
             continue
-        if any(rel.startswith(d) for d in ORPHAN_ALLOWLIST_DIRS):
-            continue
         # Historical archive directories don't need inbound links
         if any(part in ARCHIVE_PATH_PARTS for part in rel.split("/")):
             continue
@@ -309,30 +284,49 @@ def run_audit() -> AuditResult:
         if not inbound.get(rel) and not inbound.get(filename) and not inbound.get(rel.removesuffix(".md")):
             result.orphans.append(rel)
 
+    # Leaf detection: files with degree <= 1 (one inbound, zero outbound)
+    # cluster on the perimeter of the Obsidian force-directed graph and
+    # look like orphans visually even though they have a link. Flag them
+    # so future drift gets caught early. Counted SEPARATELY from orphans
+    # — leaves don't reduce the health score (they're well-formed
+    # technically), they're just a UI quality signal.
+    result.leaves = _find_leaves(md_files, inbound)
+
     check_skills(result)
-    check_agents(result)
     check_scripts(result)
     check_mcp_sync(result)
-    check_send_gateway(result)
-    check_cmo_pulse(result)
+    check_personalization(result)
     result.health_score = compute_health_score(result)
     return result
+
+
+def check_personalization(r: AuditResult) -> None:
+    """Warn (don't fail) when operator.profile.json is missing.
+
+    A fresh clone hasn't run the wizard yet. The agent works without a
+    profile but can't be personalized — surface that as a warning so the
+    operator knows to run `python scripts/setup_wizard.py`.
+    """
+    profile_path = REPO_ROOT / "brain" / "operator.profile.json"
+    if not profile_path.exists():
+        r.warnings.append(
+            "operator.profile.json missing — run `python scripts/setup_wizard.py` "
+            "to personalize this clone (or `python scripts/personalize.py seed` "
+            "to seed a manual profile)."
+        )
 
 
 def render_human(r: AuditResult) -> str:
     lines = [
         "",
         "=" * 64,
-        f" MAVEN SELF-AUDIT   |   health score: {r.health_score}/100",
+        f" BRAVO SELF-AUDIT   |   health score: {r.health_score}/100",
         "=" * 64,
         f"  Markdown files scanned : {r.total_md_files}",
         f"  Skills registered      : {r.skills_total}",
         f"  Scripts (non-internal) : {r.scripts_total}",
         f"  MCP servers in sync    : {'YES' if r.mcp_configs_in_sync else 'NO — drift detected'}",
         f"  MCP servers registered : {len(r.mcp_servers)} ({', '.join(r.mcp_servers)})",
-        f"  Agents (frontmatter)   : {r.agents_total - len(r.agents_missing_frontmatter)}/{r.agents_total} valid",
-        f"  send_gateway tests     : {'PASS' if r.send_gateway_tests_pass else 'FAIL'}",
-        f"  cmo_pulse.json fresh   : {'YES' if r.cmo_pulse_fresh else 'NO'} (age {r.cmo_pulse_age_hours}h)",
         "",
     ]
     if r.orphans:
@@ -341,6 +335,14 @@ def render_human(r: AuditResult) -> str:
             lines.append(f"    - {o}")
     else:
         lines.append("  ORPHANS: none OK")
+    if r.leaves:
+        lines.append(f"  LEAVES ({len(r.leaves)}) — degree <= 1, cluster on graph perimeter (not penalized, UI signal):")
+        for o in sorted(r.leaves)[:15]:
+            lines.append(f"    - {o}")
+        if len(r.leaves) > 15:
+            lines.append(f"    ... +{len(r.leaves) - 15} more")
+    else:
+        lines.append("  LEAVES: none OK (graph is dense)")
     lines.append("")
     if r.skills_missing_skill_md:
         lines.append(f"  SKILLS missing SKILL.md ({len(r.skills_missing_skill_md)}):")
@@ -374,7 +376,7 @@ def render_human(r: AuditResult) -> str:
 
 
 def main() -> int:
-    p = argparse.ArgumentParser(description="Maven self-audit")
+    p = argparse.ArgumentParser(description="Bravo self-audit")
     p.add_argument("--json", action="store_true", help="emit JSON instead of text")
     args = p.parse_args()
 

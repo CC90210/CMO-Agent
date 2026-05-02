@@ -94,6 +94,7 @@ class AuditResult:
     send_gateway_test_summary: str = "not run"
     cmo_pulse_fresh: bool = False
     cmo_pulse_age_hours: float = -1.0
+    capability_drift_count: int = 0
     health_score: int = 0
     warnings: list[str] = field(default_factory=list)
 
@@ -286,7 +287,31 @@ def compute_health_score(r: AuditResult) -> int:
         score -= 15  # send_gateway is the highest-blast-radius surface
     if not r.cmo_pulse_fresh:
         score -= 5
+    # Capability graph drift: capped penalty so it surfaces but doesn't crush.
+    score -= min(int(r.capability_drift_count * 0.05), 5)
     return max(0, score)
+
+
+def check_capability_graph(r: AuditResult) -> None:
+    """Warn when CAPABILITY_GRAPH.json shows drift; cap penalty so audit ships."""
+    graph_path = REPO_ROOT / "brain" / "CAPABILITY_GRAPH.json"
+    if not graph_path.exists():
+        r.warnings.append(
+            "brain/CAPABILITY_GRAPH.json missing - run scripts/build_capability_graph.py"
+        )
+        return
+    try:
+        graph = json.loads(graph_path.read_text(encoding="utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        r.warnings.append(f"CAPABILITY_GRAPH.json unreadable: {exc}")
+        return
+    drift = graph.get("drift") or []
+    if drift:
+        r.capability_drift_count = len(drift)
+        r.warnings.append(
+            f"capability graph: {len(drift)} drift item(s). "
+            "Run 'python scripts/capability_query.py drift' to see them."
+        )
 
 
 def run_audit() -> AuditResult:
@@ -315,6 +340,7 @@ def run_audit() -> AuditResult:
     check_mcp_sync(result)
     check_send_gateway(result)
     check_cmo_pulse(result)
+    check_capability_graph(result)
     result.health_score = compute_health_score(result)
     return result
 

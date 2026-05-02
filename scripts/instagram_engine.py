@@ -1409,6 +1409,236 @@ def process_comment_triggers(env_vars, page) -> dict:
     return result
 
 
+# ─── Activity page: new follower welcome system ─────────────────────────────
+
+FOLLOWERS_SEEN_PATH = PROJECT_ROOT / "tmp" / "ig_followers_seen.json"
+WELCOME_DM_DAILY_CAP = 8  # safe cap — Meta penalises bursts of unsolicited DMs
+
+
+def _load_followers_seen() -> dict:
+    if not FOLLOWERS_SEEN_PATH.exists():
+        return {"initialized": False, "usernames": [], "welcomed": []}
+    try:
+        with open(FOLLOWERS_SEEN_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f) or {}
+    except (json.JSONDecodeError, OSError):
+        return {"initialized": False, "usernames": [], "welcomed": []}
+    data.setdefault("initialized", False)
+    data.setdefault("usernames", [])
+    data.setdefault("welcomed", [])
+    return data
+
+
+def _save_followers_seen(state: dict) -> None:
+    try:
+        FOLLOWERS_SEEN_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(FOLLOWERS_SEEN_PATH, "w", encoding="utf-8") as f:
+            json.dump(state, f, indent=2)
+    except OSError as exc:
+        log_exception("Failed saving followers state", exc)
+
+
+def _fetch_welcome_message(env_vars: dict) -> dict | None:
+    """POST /api/welcome-message/trigger — returns active welcome or None.
+    Increments times_sent server-side."""
+    try:
+        import requests
+    except ImportError:
+        return None
+
+    secret = get_pulse_secret(env_vars)
+    account_id = get_env_value(env_vars, "PULSE_ACCOUNT_ID", "IG_SETTER_PRO_ACCOUNT_ID")
+    if not secret or not account_id:
+        return None
+
+    try:
+        resp = requests.post(
+            f"{get_pulse_api_base(env_vars)}/api/welcome-message/trigger",
+            json={"account_id": account_id},
+            headers={"x-webhook-secret": secret, "Content-Type": "application/json"},
+            timeout=10,
+        )
+        if resp.status_code == 404:
+            return None  # no active welcome configured
+        if resp.status_code != 200:
+            safe_print(f"[ig-followers] welcome fetch error: {resp.status_code}")
+            return None
+        return resp.json().get("welcome_message")
+    except Exception as exc:
+        log_exception("[ig-followers] welcome fetch failed", exc)
+        return None
+
+
+def _scrape_recent_followers(page, ig_username: str, limit: int = 30) -> list[str]:
+    """Open the followers modal and scrape the top N usernames (newest-first by IG default)."""
+    try:
+        page.goto(
+            f"https://www.instagram.com/{ig_username}/",
+            wait_until="domcontentloaded",
+            timeout=PAGE_TIMEOUT_MS,
+        )
+        _sleep(5)
+    except Exception as exc:
+        log_exception(f"[ig-followers] profile navigation failed", exc)
+        return []
+
+    # Click the followers link to open the modal
+    try:
+        clicked = page.evaluate(f"""() => {{
+            const links = document.querySelectorAll('a[href*="/{ig_username}/followers"]');
+            for (const link of links) {{
+                link.click();
+                return true;
+            }}
+            // Fallback: any link containing /followers
+            const fallback = document.querySelectorAll('a[href$="/followers/"]');
+            for (const link of fallback) {{
+                link.click();
+                return true;
+            }}
+            return false;
+        }}""")
+        if not clicked:
+            safe_print("[ig-followers] Could not open followers modal.")
+            return []
+        _sleep(5)
+    except Exception as exc:
+        log_exception("[ig-followers] modal open failed", exc)
+        return []
+
+    script = """() => {
+        const results = [];
+        const seen = new Set();
+        // Followers modal lives inside a [role="dialog"] container on web
+        const dialog = document.querySelector('div[role="dialog"]');
+        const root = dialog || document.body;
+        const links = root.querySelectorAll('a[role="link"][href^="/"]');
+        for (const link of links) {
+            const href = link.getAttribute('href') || '';
+            // Username paths look like /<name>/  with no extra segments
+            if (!/^\\/[A-Za-z0-9._]+\\/?$/.test(href)) continue;
+            const username = href.replace(/\\//g, '').trim();
+            if (!username || seen.has(username)) continue;
+            // Reject reserved IG paths
+            if (['p','reel','reels','explore','direct','accounts','stories','tv'].includes(username)) continue;
+            seen.add(username);
+            results.push(username);
+        }
+        return JSON.stringify(results);
+    }"""
+    try:
+        raw = page.evaluate(script)
+        rows = json.loads(raw or "[]")
+    except Exception as exc:
+        log_exception("[ig-followers] scrape evaluate failed", exc)
+        return []
+
+    # Drop self
+    rows = [u for u in rows if u and u.lower() != ig_username.lower()]
+    return rows[:limit]
+
+
+def process_new_follower_welcomes(env_vars, page) -> dict:
+    """Detect new followers via the followers modal and DM them the welcome message.
+
+    First run: snapshot existing followers, send NO welcomes (avoids spamming
+    everyone who already followed).
+    Subsequent runs: anyone in the top of the followers list who isn't in
+    state.usernames is treated as a new follow.
+    """
+    ig_username = get_env_value(env_vars, "INSTAGRAM_USERNAME").lstrip("@")
+    if not ig_username:
+        return {"status": "skipped", "reason": "INSTAGRAM_USERNAME not set"}
+
+    if not ensure_logged_in(page, env_vars):
+        return {"status": "skipped", "reason": "session not logged in"}
+
+    state = _load_followers_seen()
+    is_first_run = not state.get("initialized")
+
+    scraped = _scrape_recent_followers(page, ig_username)
+    if not scraped:
+        return {"status": "ok", "new_follows": 0, "scraped": 0}
+
+    seen_set = set(state.get("usernames", []))
+    welcomed_set = set(state.get("welcomed", []))
+
+    # First run: snapshot only
+    if is_first_run:
+        state["initialized"] = True
+        state["usernames"] = sorted(seen_set | set(scraped))
+        _save_followers_seen(state)
+        safe_print(
+            f"[ig-followers] First-run snapshot: {len(scraped)} followers recorded; "
+            "no welcomes sent."
+        )
+        _return_to_inbox(page, env_vars)
+        return {"status": "snapshot", "snapshot_size": len(scraped)}
+
+    new_followers = [u for u in scraped if u not in seen_set]
+    result = {"status": "ok", "new_follows": len(new_followers), "sent": 0, "skipped": 0}
+
+    if not new_followers:
+        _return_to_inbox(page, env_vars)
+        return result
+
+    safe_print(f"[ig-followers] Detected {len(new_followers)} new follower(s): {', '.join(new_followers)}")
+
+    welcome = _fetch_welcome_message(env_vars)
+    if not welcome:
+        # Record as seen so we don't pile up — but don't send anything.
+        state["usernames"] = sorted(seen_set | set(scraped))
+        _save_followers_seen(state)
+        result["skipped"] = len(new_followers)
+        result["reason"] = "no welcome configured"
+        _return_to_inbox(page, env_vars)
+        return result
+
+    # Build the welcome text once — Settings determines the body + optional CTA.
+    body_lines = [welcome["message"].strip()]
+    if welcome.get("button_url"):
+        body_lines.append("")
+        body_lines.append(welcome["button_url"].strip())
+    welcome_body = "\n".join(body_lines)
+
+    # Per-cycle cap so a sudden surge in followers doesn't burn the account.
+    todo = [u for u in new_followers if u not in welcomed_set][:WELCOME_DM_DAILY_CAP]
+
+    for username in todo:
+        try:
+            sent_ok = _send_dm_via_search(page, username, welcome_body)
+            if sent_ok:
+                send_to_ig_setter_pro(
+                    env_vars,
+                    username,
+                    welcome_body,
+                    direction="outbound",
+                    is_ai=True,
+                    intent="welcome",
+                    ig_message_id=f"welcome_{username}_{int(time.time())}",
+                )
+                welcomed_set.add(username)
+                result["sent"] += 1
+                notify(
+                    f"\U0001f44b Welcome DM sent to new follower @{username}",
+                    category="campaign",
+                )
+            else:
+                result["skipped"] += 1
+        except Exception as exc:
+            log_exception(f"[ig-followers] welcome DM failed for @{username}", exc)
+            result["skipped"] += 1
+
+    # Persist: usernames is the snapshot; welcomed prevents re-sending if
+    # IG re-orders the followers list later.
+    state["usernames"] = sorted(seen_set | set(scraped))
+    state["welcomed"] = sorted(welcomed_set)
+    _save_followers_seen(state)
+
+    _return_to_inbox(page, env_vars)
+    return result
+
+
 def _send_dm_via_search(page, username: str, message: str) -> bool:
     """Send a DM by navigating to the user's profile and clicking 'Message'.
     Falls back to the inbox flow if the profile path fails. Returns True on success.
@@ -1495,6 +1725,25 @@ def cmd_monitor_dms(env_vars, args):
                             f"{triggers_result['sent']} DM'd, "
                             f"{triggers_result['failed']} failed"
                         )
+
+                    # Activity page (new follower welcomes) — checked every
+                    # 5th poll (~5-10 min) to look organic and avoid hammering
+                    # the followers modal.
+                    if pass_count % 5 == 1:
+                        followers_result = process_new_follower_welcomes(env_vars, page)
+                        status = followers_result.get("status")
+                        if status == "snapshot":
+                            safe_print(
+                                "[ig-daemon] First-run follower snapshot: "
+                                f"{followers_result.get('snapshot_size', 0)} recorded."
+                            )
+                        elif status == "ok" and followers_result.get("new_follows", 0) > 0:
+                            safe_print(
+                                "[ig-daemon] New followers: "
+                                f"{followers_result['new_follows']} detected, "
+                                f"{followers_result.get('sent', 0)} welcomed, "
+                                f"{followers_result.get('skipped', 0)} skipped"
+                            )
                 except KeyboardInterrupt:
                     raise
                 except Exception as exc:

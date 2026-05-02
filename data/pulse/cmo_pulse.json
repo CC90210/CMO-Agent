@@ -1,9 +1,9 @@
 {
   "agent": "maven",
   "version": "1.1",
-  "updated_at": "2026-04-27T08:23:42.379503+00:00",
+  "updated_at": "2026-04-28T03:35:08.756305Z",
   "status": "OPERATIONAL",
-  "session_note": "2026-04-21 graph-wiring pass. Built brain/INDEX.md (vault hub), brain/WRITING.md (voice/hook/anti-slop communication hub), brain/research/content_registry.md (attribution dependency). Relocated stale brain/LENDING_AD_RESEARCH.md to brain/clients/sunbiz-funding-ad-research.md. Wired [[wikilinks]] through SOUL/STATE/CAPABILITIES/SHARED_DB/MARKETING_CANON/ATTRIBUTION_MODEL, all 5 client files, all 8 vertical-pack files (agency + creator), PATTERNS/MISTAKES/ACTIVE_TASKS, marketing-research+lead-management+self-improvement-protocol skills, and START_HERE. Obsidian graph now properly connected \u2014 244 wikilinks total (was 13).",
+  "session_note": "2026-04-21 graph-wiring pass. Built brain/INDEX.md (vault hub), brain/WRITING.md (voice/hook/anti-slop communication hub), brain/research/content_registry.md (attribution dependency). Relocated stale brain/LENDING_AD_RESEARCH.md to brain/clients/sunbiz-funding-ad-research.md. Wired [[wikilinks]] through SOUL/STATE/CAPABILITIES/SHARED_DB/MARKETING_CANON/ATTRIBUTION_MODEL, all 5 client files, all 8 vertical-pack files (agency + creator), PATTERNS/MISTAKES/ACTIVE_TASKS, marketing-research+lead-management+self-improvement-protocol skills, and START_HERE. Obsidian graph now properly connected — 244 wikilinks total (was 13).",
   "content_pipeline": {
     "drafts": 0,
     "scheduled": 0,
@@ -80,31 +80,31 @@
       "sunbiz_hardcoding": "confirmed isolated to brain/clients/sunbiz-funding.md + MAXIMIZATION_GUIDE.md (scoped as SunBiz playbook)"
     },
     "optimize": {
-      "traces_query_status": "deferred \u2014 scripts/supabase_tool.py missing in this repo; Supabase MCP available but pre-operations means no 7d Maven traces yet to analyze",
-      "skill_probation_flags": "none yet \u2014 first OPERATIONAL session"
+      "traces_query_status": "deferred — scripts/supabase_tool.py missing in this repo; Supabase MCP available but pre-operations means no 7d Maven traces yet to analyze",
+      "skill_probation_flags": "none yet — first OPERATIONAL session"
     },
     "develop": {
       "gap_A_canon_references": "added to all skills (frontmatter canon_references: [pillar-name])",
       "gap_B_marketing_research": "skills/marketing-research/SKILL.md created (Fitzpatrick + Fishkin + Ritson + Dunford)",
-      "gap_C_attribution": "brain/ATTRIBUTION_MODEL.md written \u2014 Supabase schema extension proposed (source_content_ids JSONB + attribution_touches JSONB on leads)",
+      "gap_C_attribution": "brain/ATTRIBUTION_MODEL.md written — Supabase schema extension proposed (source_content_ids JSONB + attribution_touches JSONB on leads)",
       "gap_D_vertical_packs": "agency/ and creator/ populated (lead-channels, pricing-playbook, objection-handlers, sources)"
     },
     "improve": {
       "mistakes_logged": "AdVantage-era single-client hardcoding risk; skill frontmatter drift; paid launch without Atlas gate",
-      "patterns_promoted": "Atlas-spend-gate-before-campaign \u2192 [VALIDATED]"
+      "patterns_promoted": "Atlas-spend-gate-before-campaign → [VALIDATED]"
     }
   },
   "canon_pillars_now_binding": [
-    "April Dunford \u2014 Positioning before copy",
-    "Byron Sharp \u2014 Reach + light-buyer acquisition > retention below $1M ARR",
-    "Mark Ritson \u2014 Diagnosis before prescription",
-    "Alex Hormozi \u2014 Value Equation + 4 lead flows",
-    "Chet Holmes \u2014 Buyer Pyramid (60% educational content)",
-    "Jeremy Miner \u2014 NEPQ objection handling",
-    "Russell Brunson \u2014 Funnel type chosen before copy",
-    "Seth Godin \u2014 Smallest Viable Audience",
-    "Rory Sutherland \u2014 Signalling > functionality",
-    "Blair Enns \u2014 Agency pricing + value-based"
+    "April Dunford — Positioning before copy",
+    "Byron Sharp — Reach + light-buyer acquisition > retention below $1M ARR",
+    "Mark Ritson — Diagnosis before prescription",
+    "Alex Hormozi — Value Equation + 4 lead flows",
+    "Chet Holmes — Buyer Pyramid (60% educational content)",
+    "Jeremy Miner — NEPQ objection handling",
+    "Russell Brunson — Funnel type chosen before copy",
+    "Seth Godin — Smallest Viable Audience",
+    "Rory Sutherland — Signalling > functionality",
+    "Blair Enns — Agency pricing + value-based"
   ],
   "graph_wiring_2026_04_21": {
     "new_hubs_created": [

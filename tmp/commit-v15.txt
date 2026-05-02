@@ -1,0 +1,58 @@
+maven: V1.5 Telegram bridge (Bravo parity) + hard CFO spend gate + PM2
+
+Replaced V1.3 thin bridge with full Bravo-parity V1.0 mirror (~1100 lines).
+Distinct bot from Bravo and Atlas — three tokens, three PM2 processes, no
+polling conflict.
+
+Architecture mirrored from Bravo V15.7:
+  - scripts/c_suite_context.js copied verbatim (byte-identical to Bravo).
+    38/38 tests PASS via test_c_suite_context.js.
+  - SIBLING_REPOS resolution (env var > candidates > fallback) so the same
+    module works on Mac AND Windows without code edits.
+  - Tier classifier with marketing-tuned T0 keywords (post, tweet, campaign,
+    ROAS, image, video, caption, hook, pillar) and coding-task exclusions.
+  - Maven-perspective sibling pulses: iterates [bravo, atlas, aura] via
+    wrapper around the shared module (which is Bravo-perspective by default).
+  - Single-instance lock at tmp/maven_telegram.lock.json.
+  - Conversation history (last 15 msgs/chat, persisted).
+  - Rate limiting (5/10s).
+  - Auto-register first user as owner.
+  - Approval gate: confirm pattern + inline buttons.
+  - state_sync after every successful T1+ Claude run.
+  - Startup health check: Telegram getMe + Anthropic ping; on failure,
+    alert ALLOWED_USERS[0] directly.
+
+Maven-specific deltas:
+  - HARD CFO spend gate BEFORE Claude spawn. Bridge intercepts paid-launch
+    string match, reads cfo_pulse.json via readSiblingRepo. On stale (>24h)
+    / missing / status not open: REFUSED + posts high-priority cross-repo
+    inbox to Atlas. On approved: shows status/age/approvals to CC with
+    inline yes/no buttons. yes routes through agent_inbox to Bravo + Atlas,
+    then spawns Claude with cleared context.
+  - Marketing tool routing: content/creative, paid (hard-gated), organic,
+    reporting, cross-agent.
+  - MAVEN_FORCE_DRY_RUN enforced at bridge level too.
+  - Slash commands: status, spend, campaigns, killswitch, unleash, pulse,
+    sync, audit, tests, inbox, post.
+  - T2+ context loads MARKETING_CANON + RESPONSIBILITY_BOUNDARIES.
+  - T3 context adds CONTENT_BIBLE + VIDEO_PRODUCTION_BIBLE.
+
+PM2 wiring:
+  - ecosystem.config.js: process name maven-telegram, autorestart, max 10
+    restarts, 512M limit, logs to tmp/pm2-maven-telegram-{out,error}.log.
+  - package.json scripts: telegram:start, telegram:restart, telegram:logs,
+    telegram:status.
+  - npm install completes (dotenv + node-telegram-bot-api).
+  - Bridge boots clean and exits 1 with BotFather setup instructions when
+    MAVEN_TELEGRAM_BOT_TOKEN missing.
+  - npm test extended to 8 suites: + script_ideation + c_suite_context.
+
+Docs:
+  - docs/TELEGRAM_BRIDGE_SETUP.md: full setup, 4-prompt smoke checklist,
+    Mac path overrides, slash command table, troubleshooting.
+
+self_audit health 100/100, 0 orphans.
+
+Pending CC: paste BotFather token into .env.agents, npm run telegram:start.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>

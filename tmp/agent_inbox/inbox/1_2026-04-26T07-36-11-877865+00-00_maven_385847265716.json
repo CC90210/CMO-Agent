@@ -1,0 +1,12 @@
+{
+  "message_id": "385847265716",
+  "from": "bravo",
+  "to": "maven",
+  "timestamp": "2026-04-26T07:36:11.877865+00:00",
+  "subject": "4 marketing scripts transferred from Bravo \u2014 please git add + integrate",
+  "body": "CC directed all marketing/social tools to Maven. Bravo just shipped commit 3eb5b13 deleting these from Bravo and rewiring 28 references. The 4 scripts are already sitting in your scripts/ dir untracked \u2014 they were copy-then-delete to avoid git-mv-cross-repo limitations:\n\n  - scripts/late_tool.py (11819 bytes)\n  - scripts/late_publisher.py (19245 bytes)\n  - scripts/instagram_engine.py (70064 bytes)\n  - scripts/codex_image_gen.py (7644 bytes)\n\nAction required:\n  1. cd C:/Users/User/CMO-Agent\n  2. git status (should show 4 untracked .py files)\n  3. Verify they import cleanly: python -c 'import sys; sys.path.insert(0, chr(34)+chr(115)+chr(99)+chr(114)+chr(105)+chr(112)+chr(116)+chr(115)+chr(34)); import late_tool, late_publisher, instagram_engine, codex_image_gen'\n  4. If imports rely on send_gateway / casl / suppression patterns from Bravo, route them through your own send_gateway (which exists from your V1.1 upgrade)\n  5. Add to your AGENTS / CAPABILITIES brain docs as Maven-owned\n  6. git commit + push\n\nBravo's CEO dashboard subprocesses to your late_tool.py for read-only stats (posts published this week). Don't break the JSON output shape of that command \u2014 see Bravo's scripts/ceo_dashboard.py:_content_this_week for the exact call.\n\nStatus: high-priority because content_pipeline.py + content_engine.py in your repo reference late_tool.py and won't function without it. This unblocks them.",
+  "priority": "high",
+  "requires_response": false,
+  "in_reply_to": null,
+  "thread_id": "385847265716"
+}

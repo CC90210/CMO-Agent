@@ -1,0 +1,2204 @@
+{
+  "schema_version": "1.0",
+  "agent": "maven",
+  "generated_at": "2026-05-02T05:37:29.862806+00:00",
+  "totals": {
+    "skills": 55,
+    "scripts": 61,
+    "agents": 19,
+    "mcp_servers": 6,
+    "workflows": 11,
+    "nodes_total": 152,
+    "edges_total": 9,
+    "drift_count": 38
+  },
+  "nodes": [
+    {
+      "id": "skill:a-b-testing",
+      "kind": "skill",
+      "name": "a-b-testing",
+      "path": "skills/a-b-testing/SKILL.md",
+      "description": "Systematic split-testing protocol for ads, audiences, and landing pages \u2014 test design, sample sizing, significance thresholds.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:ad-copywriting",
+      "kind": "skill",
+      "name": "ad-copywriting",
+      "path": "skills/ad-copywriting/SKILL.md",
+      "description": "Direct-response ad copywriting for headlines, descriptions, CTAs, and hooks across Meta and Google Ads. Avoids AI slop; cites canon.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:agent-inbox",
+      "kind": "skill",
+      "name": "agent-inbox",
+      "path": "skills/agent-inbox/SKILL.md",
+      "description": "Async agent-to-agent messaging protocol. Use when Bravo, Atlas, Maven, Aura, or Codex needs to pass a structured message to another agent without blocking the orchestrator. Replaces synchronous-only delegation with a checkpoint-based pickup pattern. CLI backed by scripts/agent_in",
+      "tier": "standard",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "agent inbox",
+        "inter-agent message",
+        "async delegation",
+        "agent notification",
+        "cross-agent handoff"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:anti-drift",
+      "kind": "skill",
+      "name": "anti-drift",
+      "path": "skills/anti-drift/SKILL.md",
+      "description": ">",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [
+        "orchestration",
+        "quality",
+        "agents"
+      ],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:audience-targeting",
+      "kind": "skill",
+      "name": "audience-targeting",
+      "path": "skills/audience-targeting/SKILL.md",
+      "description": "Audience-strategy playbook \u2014 behavioral targeting, custom audiences, lookalikes, exclusions, keyword segmentation.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:auto-generated",
+      "kind": "skill",
+      "name": "auto-generated",
+      "path": "skills/auto-generated/SKILL.md",
+      "description": "Container for skills synthesized at runtime by skill_synthesizer.py. Each child directory is a [NEW] skill with its own SKILL.md + metrics.json. Promoted to skills/<slug>/ after 3 successful uses (skill_metrics.py promote).",
+      "tier": "meta",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:brand-guidelines",
+      "kind": "skill",
+      "name": "brand-guidelines",
+      "path": "skills/brand-guidelines/SKILL.md",
+      "description": "Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use it when brand colors or style guidelines, visual formatting, or company design standards apply.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "brand",
+        "colors",
+        "typography",
+        "style guide",
+        "design system",
+        "Anthropic brand"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:browser-automation",
+      "kind": "skill",
+      "name": "browser-automation",
+      "path": "skills/browser-automation/SKILL.md",
+      "description": "Playwright-driven browser automation for ad-library scraping, competitor research, and UI flow verification.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:budget-optimization",
+      "kind": "skill",
+      "name": "budget-optimization",
+      "path": "skills/budget-optimization/SKILL.md",
+      "description": "Budget reallocation and pacing rules across ad sets and channels. Drives spend toward winning creative under CFO caps.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:campaign-creation",
+      "kind": "skill",
+      "name": "campaign-creation",
+      "path": "skills/campaign-creation/SKILL.md",
+      "description": "End-to-end campaign-creation workflow: objective, structure, audience, creative, budget, launch verification.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:codex-delegation",
+      "kind": "skill",
+      "name": "codex-delegation",
+      "path": "skills/codex-delegation/SKILL.md",
+      "description": "Intelligent routing between Bravo and Codex \u2014 decides when to delegate tasks to Codex vs handle internally",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [
+        "skill"
+      ],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:competitive-intelligence",
+      "kind": "skill",
+      "name": "competitive-intelligence",
+      "path": "skills/competitive-intelligence/SKILL.md",
+      "description": "Systematic competitor tracking, battlecard generation, market monitoring, and competitive response playbook for OASIS AI, PropFlow, and Nostalgic Requests",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [
+        "skill",
+        "competitive-intelligence",
+        "market-research",
+        "strategy"
+      ],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:content-engine",
+      "kind": "skill",
+      "name": "content-engine",
+      "path": "skills/content-engine/SKILL.md",
+      "description": "Use this skill whenever the user asks about generating content, writing posts, creating marketing copy, running the content engine, or organizing content creation. Includes formats, tones, and strategies.",
+      "tier": "standard",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "content",
+        "post",
+        "copy",
+        "brand voice",
+        "pillar",
+        "marketing",
+        "content engine"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:elite-video-production",
+      "kind": "skill",
+      "name": "elite-video-production",
+      "path": "skills/elite-video-production/SKILL.md",
+      "description": "Complete automated video production system for CC's content pipeline. Use whenever CC provides raw video footage and says \"make this a post\", \"edit this\", or asks for a cinematic output. Replaces a human video editor entirely. Covers hook engineering, pacing, caption styling, col",
+      "tier": "full",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "video",
+        "edit",
+        "post",
+        "caption",
+        "hook",
+        "grade",
+        "audio",
+        "export",
+        "reel",
+        "short",
+        "tiktok",
+        "b-roll",
+        "lower third",
+        "film grain",
+        "remotion",
+        "ffmpeg",
+        "whisper",
+        "cinematic"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:email-marketing",
+      "kind": "skill",
+      "name": "email-marketing",
+      "path": "skills/email-marketing/SKILL.md",
+      "description": "Send individual emails, run nurture sequences, and manage templates using email_engine.py and free Gmail SMTP. Zero paid ESP. All sends tracked in Supabase.",
+      "tier": "standard",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "email",
+        "nurture",
+        "sequence",
+        "campaign",
+        "gmail",
+        "smtp",
+        "template",
+        "drip"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:email-outbound",
+      "kind": "skill",
+      "name": "email-outbound",
+      "path": "skills/email-outbound/SKILL.md",
+      "description": "Marketing email blast operations \u2014 HTML templates, bulk send, deliverability, list hygiene, CASL/CAN-SPAM compliance.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:email-safety",
+      "kind": "skill",
+      "name": "email-safety",
+      "path": "skills/email-safety/SKILL.md",
+      "description": "Mandatory contract for sending email/outreach from any AI (Claude, Gemini, Antigravity, Codex). Read this before invoking any send command. Disable-model-invocation false \u2014 ANY model that sends mail must read this first.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:executing-plans",
+      "kind": "skill",
+      "name": "executing-plans",
+      "path": "skills/executing-plans/SKILL.md",
+      "description": "Use when you have a written implementation plan to execute in a separate session with review checkpoints",
+      "tier": "standard",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "execute plan",
+        "run plan",
+        "implement plan",
+        "batch execution"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:funnel-management",
+      "kind": "skill",
+      "name": "funnel-management",
+      "path": "skills/funnel-management/SKILL.md",
+      "description": "Track leads through conversion funnels, measure stage-to-stage conversion rates, and identify where prospects are dropping off using lead_engine.py and direct Supabase queries.",
+      "tier": "standard",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "funnel",
+        "conversion",
+        "drop-off",
+        "stage",
+        "pipeline metrics",
+        "awareness",
+        "consideration"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:google-ads-management",
+      "kind": "skill",
+      "name": "google-ads-management",
+      "path": "skills/google-ads-management/SKILL.md",
+      "description": "Google Ads operational playbook \u2014 campaigns, ad groups, keywords, bidding, negative-keyword discipline, quality score.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:growth-engine",
+      "kind": "skill",
+      "name": "growth-engine",
+      "path": "skills/growth-engine/SKILL.md",
+      "description": "Self-learning and evolution system. Tracks capability expansion, extracts patterns from experience, promotes patterns to SOPs, identifies skill gaps, and produces evolution reports. Triggers after complex tasks, failures, and monthly audits.",
+      "tier": "core",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "MRR",
+        "revenue",
+        "growth",
+        "evolution",
+        "capability",
+        "skill gap",
+        "pattern promotion"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:hyperthink",
+      "kind": "skill",
+      "name": "hyperthink",
+      "path": "skills/hyperthink/SKILL.md",
+      "description": "Maximum-depth reasoning protocol. Wraps Claude Code's native ultrathink (31,999 thinking tokens) with a structured multi-hypothesis framework. Fires on architectural decisions, multi-root-cause debugging, or expensive-to-reverse choices.",
+      "tier": "strategic",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "hyperthink",
+        "ultrathink",
+        "think harder",
+        "think super hard",
+        "think intensely",
+        "think really hard",
+        "architectural decision",
+        "irreversible choice"
+      ],
+      "tags": [
+        "reasoning",
+        "protocol",
+        "top-tier"
+      ],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:image-generation",
+      "kind": "skill",
+      "name": "image-generation",
+      "path": "skills/image-generation/SKILL.md",
+      "description": "Production-grade AI ad imagery \u2014 prompt patterns, brand compositing, human-centered psychology, anti-slop standards.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:knowledge-management",
+      "kind": "skill",
+      "name": "knowledge-management",
+      "path": "skills/knowledge-management/SKILL.md",
+      "description": "Use this skill whenever the user wants to capture, organize, retrieve, or maintain business intelligence. Covers PARA implementation, information capture protocols, progressive summarization, retrieval frameworks, freshness scoring, template library management, and weekly mainten",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "knowledge management",
+        "second brain",
+        "PARA",
+        "capture notes",
+        "organize information",
+        "template library",
+        "information retrieval",
+        "knowledge base",
+        "weekly maintenance"
+      ],
+      "tags": [
+        "skill",
+        "knowledge",
+        "management"
+      ],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:lead-generation",
+      "kind": "skill",
+      "name": "lead-generation",
+      "path": "skills/lead-generation/SKILL.md",
+      "description": "Lead-generation funnel construction \u2014 lead magnets, tripwires, gated content, qualified-lead routing into CRM.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:lead-management",
+      "kind": "skill",
+      "name": "lead-management",
+      "path": "skills/lead-management/SKILL.md",
+      "description": "End-to-end lead lifecycle: capture -> qualify -> nurture -> handoff. Lead scoring, CRM architecture, automation rules, re-engagement, SLA windows, multi-touch attribution. Industry-standard methodology (Ross, Holmes, Hormozi, Sandler, Miner) + vertical pack extensions.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "lead",
+        "leads",
+        "pipeline",
+        "crm",
+        "funnel",
+        "qualify",
+        "nurture",
+        "mql",
+        "sql",
+        "cpl",
+        "cpql",
+        "cac",
+        "attribution",
+        "handoff"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:lending-industry",
+      "kind": "skill",
+      "name": "lending-industry",
+      "path": "skills/lending-industry/SKILL.md",
+      "description": "MCA/business-funding compliance and vocabulary rules. Use when working SunBiz or any regulated lending vertical.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:linkedin-outreach",
+      "kind": "skill",
+      "name": "linkedin-outreach",
+      "path": "skills/linkedin-outreach/SKILL.md",
+      "description": "Use the CLI-Anything wrapper to send connection requests and messages on LinkedIn, completely bypassing UI/browser restrictions.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "LinkedIn",
+        "outreach",
+        "lead",
+        "prospect",
+        "DM",
+        "connection request"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:marketing-research",
+      "kind": "skill",
+      "name": "marketing-research",
+      "path": "skills/marketing-research/SKILL.md",
+      "description": "Systematic market, audience, competitor, and trend research. Diagnosis-before-prescription (Ritson). Non-leading customer interviews (Fitzpatrick). Audience discovery without survey bias (Fishkin). Positioning research before copy (Dunford).",
+      "tier": "full",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "research",
+        "audience",
+        "icp",
+        "interview",
+        "mom test",
+        "sparktoro",
+        "reddit",
+        "competitive audit",
+        "trend",
+        "keyword research",
+        "seo research",
+        "aeo research",
+        "voc",
+        "voice of customer",
+        "content gap"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:mcp-operations",
+      "kind": "skill",
+      "name": "mcp-operations",
+      "path": "skills/mcp-operations/SKILL.md",
+      "description": "Tool routing guide \u2014 CLI-first for credential services, MCP for stateless tools. Single source of truth for all agents.",
+      "tier": "core",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "tool routing",
+        "Zernio",
+        "Late",
+        "n8n",
+        "Supabase",
+        "Stripe",
+        "MCP",
+        "tool failure"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:media-upload",
+      "kind": "skill",
+      "name": "media-upload",
+      "path": "skills/media-upload/SKILL.md",
+      "description": "Media upload pipeline for Meta, Google, Late, and Shopify. Format conversion, codec, aspect-ratio handling.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:memory-compression",
+      "kind": "skill",
+      "name": "memory-compression",
+      "path": "skills/memory-compression/SKILL.md",
+      "description": "claude-mem plugin \u2014 automatic cross-session memory compression and injection via SQLite + semantic search. Captures tool usage, compresses observations, and injects relevant context at session start.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [
+        "skill",
+        "memory",
+        "plugin",
+        "claude-mem"
+      ],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:memory-management",
+      "kind": "skill",
+      "name": "memory-management",
+      "path": "skills/memory-management/SKILL.md",
+      "description": "MemoryBox system for preventing bloat, scoring confidence, compressing archives, and maintaining memory hygiene. Ensures cross-session intelligence without context window overflow.",
+      "tier": "core",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "memory",
+        "bloat",
+        "archive",
+        "compress",
+        "session log",
+        "confidence",
+        "MemoryBox"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:meta-ads-management",
+      "kind": "skill",
+      "name": "meta-ads-management",
+      "path": "skills/meta-ads-management/SKILL.md",
+      "description": "Meta Ads operational playbook \u2014 Special Ad Categories, Andromeda creative diversity, ad-set structure, audience overlap.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:performance-optimization",
+      "kind": "skill",
+      "name": "performance-optimization",
+      "path": "skills/performance-optimization/SKILL.md",
+      "description": "Campaign optimization protocol \u2014 winner promotion, killer thresholds, fatigue detection, statistical confidence.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:persona-content-creator",
+      "kind": "skill",
+      "name": "persona-content-creator",
+      "path": "skills/persona-content-creator/SKILL.md",
+      "description": "Create, organize, and distribute content across Workspace.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:python-daemon-automation",
+      "kind": "skill",
+      "name": "python-daemon-automation",
+      "path": "skills/python-daemon-automation/SKILL.md",
+      "description": "Build, deploy, and manage Python background daemons on Windows \u2014 includes 5-step redeploy protocol, watchdog patterns, zombie process detection, and kill switches",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [
+        "skill",
+        "automation",
+        "python",
+        "daemon",
+        "windows"
+      ],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:reporting-analytics",
+      "kind": "skill",
+      "name": "reporting-analytics",
+      "path": "skills/reporting-analytics/SKILL.md",
+      "description": "Cross-platform performance reporting \u2014 metric reconciliation, ROAS modeling, dashboard generation, narrative writing.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:retro",
+      "kind": "skill",
+      "name": "retro",
+      "path": "skills/retro/SKILL.md",
+      "description": "Weekly retrospective analysis. Use when CC says \"/retro\", \"weekly retro\", \"how did we do this week\", or \"what shipped this week\". Analyzes all agent activity, rates 4 operational dimensions, and generates specific improvement actions.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "retro",
+        "retrospective",
+        "weekly retro",
+        "what shipped",
+        "how did we do"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:security-protocol",
+      "kind": "skill",
+      "name": "security-protocol",
+      "path": "skills/security-protocol/SKILL.md",
+      "description": "Secrets and authentication management. Ensures API keys, tokens, and credentials are NEVER exposed in plain text. Use when handling any credential, API key, or sensitive configuration.",
+      "tier": "core",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "secret",
+        "credential",
+        "API key",
+        "exposed",
+        "rotation",
+        "security",
+        "token",
+        "password",
+        "leak",
+        "gitguardian"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:self-healing",
+      "kind": "skill",
+      "name": "self-healing",
+      "path": "skills/self-healing/SKILL.md",
+      "description": "Auto-recovery patterns for marketing automations \u2014 token refresh, retry policies, fallback channels, dead-letter queues.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:self-improvement-protocol",
+      "kind": "skill",
+      "name": "self-improvement-protocol",
+      "path": "skills/self-improvement-protocol/SKILL.md",
+      "description": "The 4-protocol loop every C-Suite agent runs to stay sharp: self-heal (detect+fix broken state), self-optimize (track+tune own performance), self-develop (fill capability gaps), self-improve (learn from outcomes). Installs in Bravo / Atlas / Maven / Aura with per-agent scoping.",
+      "tier": "full",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "self-heal",
+        "self-optimize",
+        "self-develop",
+        "self-improve",
+        "retrospective",
+        "reflexion",
+        "review-self",
+        "heal",
+        "optimize",
+        "evolve"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:send-gateway",
+      "kind": "skill",
+      "name": "send-gateway",
+      "path": "skills/send-gateway/SKILL.md",
+      "description": "The single outbound chokepoint for every autonomous action Bravo performs on behalf of CC. Enforces CASL compliance, cooldown windows, daily caps, and cross-engine idempotency architecturally \u2014 callers cannot bypass it.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:seo-aeo",
+      "kind": "skill",
+      "name": "seo-aeo",
+      "path": "skills/seo-aeo/SKILL.md",
+      "description": "Search Engine + Answer Engine Optimization \u2014 keyword research, schema, AI-citable content structure, on-page tuning.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:ship",
+      "kind": "skill",
+      "name": "ship",
+      "path": "skills/ship/SKILL.md",
+      "description": "Full deployment pipeline for any app in the registry. Use when CC says \"ship it\", \"deploy\", \"push this live\", or \"/ship\". Handles sync, tests, code review, changelog, PR, and post-ship verification in sequence.",
+      "tier": "standard",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "ship",
+        "deploy",
+        "push live",
+        "release",
+        "go live",
+        "ship it"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:sop-breakdown",
+      "kind": "skill",
+      "name": "sop-breakdown",
+      "path": "skills/sop-breakdown/SKILL.md",
+      "description": "Automatically creates, refines, and executes Standard Operating Procedures. Triggers when a process is repeated 3+ times or when CC requests an SOP. Extracts steps from observed behavior, tracks success rates, and evolves SOPs over time.",
+      "tier": "standard",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "SOP",
+        "standard operating procedure",
+        "process",
+        "repeated task",
+        "workflow template"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:subagent-driven-development",
+      "kind": "skill",
+      "name": "subagent-driven-development",
+      "path": "skills/subagent-driven-development/SKILL.md",
+      "description": "Use when executing implementation plans with independent tasks in the current session",
+      "tier": "standard",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "subagent",
+        "sub-agent",
+        "fresh subagent",
+        "task delegation",
+        "subagent execution"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:systematic-debugging",
+      "kind": "skill",
+      "name": "systematic-debugging",
+      "path": "skills/systematic-debugging/SKILL.md",
+      "description": "Marketing-pipeline debugging protocol \u2014 hypothesis ladder, isolation, instrumentation, post-mortem capture.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:task-routing",
+      "kind": "skill",
+      "name": "task-routing",
+      "path": "skills/task-routing/SKILL.md",
+      "description": ">",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [
+        "orchestration",
+        "routing",
+        "agents"
+      ],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:using-git-worktrees",
+      "kind": "skill",
+      "name": "using-git-worktrees",
+      "path": "skills/using-git-worktrees/SKILL.md",
+      "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification",
+      "tier": "standard",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "worktree",
+        "git worktree",
+        "isolation",
+        "feature branch",
+        "workspace"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:verification-before-completion",
+      "kind": "skill",
+      "name": "verification-before-completion",
+      "path": "skills/verification-before-completion/SKILL.md",
+      "description": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always",
+      "tier": "standard",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "verify",
+        "complete",
+        "done",
+        "passing",
+        "evidence",
+        "before commit",
+        "before PR"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:verticals",
+      "kind": "skill",
+      "name": "verticals",
+      "path": "skills/verticals/SKILL.md",
+      "description": "Vertical-pack registry for Maven. Routes a brand to its industry-specific marketing playbook (SaaS, agency, coaching, e-commerce, local-service, creator).",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:video-editing",
+      "kind": "skill",
+      "name": "video-editing",
+      "path": "skills/video-editing/SKILL.md",
+      "description": "Automated video editing pipeline for CC's personal brand content. Use whenever CC drops raw footage and needs it edited, captioned, graded, and sent for review. The primary tool is video_editor.py which handles the full 8-step pipeline.",
+      "tier": "standard",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "video",
+        "edit",
+        "raw footage",
+        "silence",
+        "filler",
+        "caption",
+        "grade",
+        "master",
+        "review",
+        "content day",
+        "batch"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:web-scraping",
+      "kind": "skill",
+      "name": "web-scraping",
+      "path": "skills/web-scraping/SKILL.md",
+      "description": "Web scraping and structured data extraction. Activate when CC needs to pull content from competitor sites, extract pricing/contacts/listings, harvest data for research, scrape pages that don't have an API, or operate a site under CC's logged-in account.",
+      "tier": "specialized",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [],
+      "tags": [
+        "skill",
+        "scraping",
+        "data-extraction",
+        "research",
+        "browser-harness"
+      ],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "skill:writing-plans",
+      "kind": "skill",
+      "name": "writing-plans",
+      "path": "skills/writing-plans/SKILL.md",
+      "description": "Use when you have a spec or requirements for a multi-step task, before touching code",
+      "tier": "standard",
+      "owner": "maven",
+      "risk": "low",
+      "triggers": [
+        "plan",
+        "implementation plan",
+        "feature plan",
+        "spec",
+        "requirements"
+      ],
+      "tags": [],
+      "status": "[VALIDATED]",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "script:ab_testing_engine",
+      "kind": "script",
+      "name": "ab_testing_engine",
+      "path": "scripts/ab_testing_engine.py",
+      "description": "(no docstring)",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-filename"
+    },
+    {
+      "id": "script:ad_copy_generator",
+      "kind": "script",
+      "name": "ad_copy_generator",
+      "path": "scripts/ad_copy_generator.py",
+      "description": "(no docstring)",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-filename"
+    },
+    {
+      "id": "script:agent_inbox",
+      "kind": "script",
+      "name": "agent_inbox",
+      "path": "scripts/agent_inbox.py",
+      "description": "(no docstring)",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-filename"
+    },
+    {
+      "id": "script:audit_logger",
+      "kind": "script",
+      "name": "audit_logger",
+      "path": "scripts/audit_logger.py",
+      "description": "Campaign audit logging \u2014 tracks every change made via the API. ============================================================== Appends structured JSON Lines records to data/audit/audit_log.jsonl. Each line is one self-contained AuditEntry serialised as JSON.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:batch_content_day",
+      "kind": "script",
+      "name": "batch_content_day",
+      "path": "scripts/batch_content_day.py",
+      "description": "Batch Content Day Scheduler \u2014 Schedule 7 content pieces for the week ahead.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:bridge_lock",
+      "kind": "script",
+      "name": "bridge_lock",
+      "path": "scripts/bridge_lock.py",
+      "description": "Bridge Lock \u2014 multi-machine arbitration for Telegram (and future Discord/Slack) bridges.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:build_capability_graph",
+      "kind": "script",
+      "name": "build_capability_graph",
+      "path": "scripts/build_capability_graph.py",
+      "description": "Build Capability Graph \u2014 auto-discover every skill, script, agent, MCP server, workflow, and integration in this repo and emit a single machine-readable graph at brain/CAPABILITY_GRAPH.json.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:cache_layer",
+      "kind": "script",
+      "name": "cache_layer",
+      "path": "scripts/cache_layer.py",
+      "description": "TTL-based caching layer for Meta and Google Ads API responses. ============================================================== File-based cache stored as JSON in data/cache/. Each cache entry is a separate .json file containing the value and an expiry timestamp.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:campaign_templates",
+      "kind": "script",
+      "name": "campaign_templates",
+      "path": "scripts/campaign_templates.py",
+      "description": "SunBiz Funding \u2014 Campaign Templates ===================================== Pre-built, MCA-compliant Meta Ads campaign templates for SunBiz Funding. Import this module to launch full campaigns in one function call.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:capability_query",
+      "kind": "script",
+      "name": "capability_query",
+      "path": "scripts/capability_query.py",
+      "description": "Capability Query \u2014 runtime tool-tree resolver for agents.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:casl_compliance",
+      "kind": "script",
+      "name": "casl_compliance",
+      "path": "scripts/casl_compliance.py",
+      "description": "CASL compliance helpers for all outgoing cold email.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:codex_delegate",
+      "kind": "script",
+      "name": "codex_delegate",
+      "path": "scripts/codex_delegate.py",
+      "description": "(no docstring)",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-filename"
+    },
+    {
+      "id": "script:codex_image_gen",
+      "kind": "script",
+      "name": "codex_image_gen",
+      "path": "scripts/codex_image_gen.py",
+      "description": "(no docstring)",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-filename"
+    },
+    {
+      "id": "script:computer_control",
+      "kind": "script",
+      "name": "computer_control",
+      "path": "scripts/computer_control.py",
+      "description": "Computer Control \u2014 unified dispatcher for full-machine automation.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:content_engine",
+      "kind": "script",
+      "name": "content_engine",
+      "path": "scripts/content_engine.py",
+      "description": "Content Calendar & Template Engine - CC's content operations hub. Supabase-backed. Designed to feed Late MCP for publishing. All credentials loaded from .env.agents (never hardcoded).",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:content_generator",
+      "kind": "script",
+      "name": "content_generator",
+      "path": "scripts/content_generator.py",
+      "description": "Viral Content Generation Engine - Transforms draft placeholders into real posts. Uses Anthropic Claude API to generate platform-appropriate content for CC's brand. All credentials loaded from .env.agents (never hardcoded).",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:content_pipeline",
+      "kind": "script",
+      "name": "content_pipeline",
+      "path": "scripts/content_pipeline.py",
+      "description": "(no docstring)",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-filename"
+    },
+    {
+      "id": "script:content_repurposer",
+      "kind": "script",
+      "name": "content_repurposer",
+      "path": "scripts/content_repurposer.py",
+      "description": "Content Repurposing Engine \u2014 Adapts posts from X to other platforms via Claude API. All credentials loaded from .env.agents (never hardcoded).",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:draft_critic",
+      "kind": "script",
+      "name": "draft_critic",
+      "path": "scripts/draft_critic.py",
+      "description": "Draft Critic \u2014 the adversarial second-opinion reviewer that runs on every Claude-drafted outbound before it reaches send_gateway.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:edit_content_v2",
+      "kind": "script",
+      "name": "edit_content_v2",
+      "path": "scripts/edit_content_v2.py",
+      "description": "OASIS AI Video Pipeline -- V3 (Elite Production)",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:email_blast",
+      "kind": "script",
+      "name": "email_blast",
+      "path": "scripts/email_blast.py",
+      "description": "SunBiz Funding \u2014 Production-Grade Gmail Email Blast Engine =========================================================== Thread-safe, rate-limited bulk email sender with CAN-SPAM compliance, unsubscribe management, campaign tracking, and exponential-backoff retries.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:full_diagnostic",
+      "kind": "script",
+      "name": "full_diagnostic",
+      "path": "scripts/full_diagnostic.py",
+      "description": "Full diagnostic \u2014 SunBiz Meta Ads health check.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:generate_google_ads_token",
+      "kind": "script",
+      "name": "generate_google_ads_token",
+      "path": "scripts/generate_google_ads_token.py",
+      "description": "Generate Google Ads OAuth token JSON for the cohnen/mcp-google-ads server.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:generate_logo",
+      "kind": "script",
+      "name": "generate_logo",
+      "path": "scripts/generate_logo.py",
+      "description": "Generate a clean SunBiz Funding logo with transparent background using Gemini.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:generate_page_assets",
+      "kind": "script",
+      "name": "generate_page_assets",
+      "path": "scripts/generate_page_assets.py",
+      "description": "Generate Facebook page profile picture and cover photo using Gemini.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:gnn_skill_router",
+      "kind": "script",
+      "name": "gnn_skill_router",
+      "path": "scripts/gnn_skill_router.py",
+      "description": "GNN Skill Router -- graph-based next-skill prediction over the Obsidian vault.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:google_ads_engine",
+      "kind": "script",
+      "name": "google_ads_engine",
+      "path": "scripts/google_ads_engine.py",
+      "description": "SunBiz Funding \u2014 Production Google Ads Engine ============================================= Reusable Google Ads API client (google-ads SDK v29+) that mirrors the structure and quality of meta_ads_engine.py. Designed to be imported by other scripts or run standalone for quick diag",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:imagen_generate",
+      "kind": "script",
+      "name": "imagen_generate",
+      "path": "scripts/imagen_generate.py",
+      "description": "SunBiz Funding \u2014 Production-Grade AI Ad Creative Generator =========================================================== Gemini Imagen (Nano Banana) + Pillow Logo Compositing",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:instagram_engine",
+      "kind": "script",
+      "name": "instagram_engine",
+      "path": "scripts/instagram_engine.py",
+      "description": "Instagram Engine - ManyChat replacement via Playwright browser automation.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:jotform_tracker",
+      "kind": "script",
+      "name": "jotform_tracker",
+      "path": "scripts/jotform_tracker.py",
+      "description": "SunBiz Funding \u2014 JotForm Lead Tracker ====================================== Production lead tracking via the JotForm REST API (https://api.jotform.com/). Fetches submissions from the SunBiz Funding lead capture form, parses field values, detects duplicates, and generates formatt",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:late_publisher",
+      "kind": "script",
+      "name": "late_publisher",
+      "path": "scripts/late_publisher.py",
+      "description": "Late Publisher \u2014 Automated Social Media Publishing from Content Calendar Reads due content from Supabase `content_calendar` and publishes via late_tool.py. All credentials loaded from .env.agents (never hardcoded).",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:late_tool",
+      "kind": "script",
+      "name": "late_tool",
+      "path": "scripts/late_tool.py",
+      "description": "Late SDK CLI \u2014 Social Media Publishing Tool Uses Late SDK via inline Python (subprocess with uvx environment). All credentials loaded from .env.agents (never hardcoded).",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:maml_onboard",
+      "kind": "script",
+      "name": "maml_onboard",
+      "path": "scripts/maml_onboard.py",
+      "description": "MAML Onboard \u2014 Model-Agnostic Meta-Learning for rapid client onboarding.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:memory_consolidation",
+      "kind": "script",
+      "name": "memory_consolidation",
+      "path": "scripts/memory_consolidation.py",
+      "description": "Memory Consolidation \u2014 3-layer memory pipeline.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:meta_ads_engine",
+      "kind": "script",
+      "name": "meta_ads_engine",
+      "path": "scripts/meta_ads_engine.py",
+      "description": "SunBiz Funding \u2014 Production Meta Ads Engine ============================================ Reusable Meta Marketing API client (Graph API v21.0) built on the requests library. Designed to be imported by other scripts or run standalone for quick diagnostics.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:meta_campaign_builder",
+      "kind": "script",
+      "name": "meta_campaign_builder",
+      "path": "scripts/meta_campaign_builder.py",
+      "description": "SunBiz Funding \u2014 Meta Ads Campaign Builder =========================================== Completes setup of 5 existing Meta ad campaigns by creating ad sets, ad creatives, and ads for each. Campaigns already exist and are ACTIVE.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:model_router",
+      "kind": "script",
+      "name": "model_router",
+      "path": "scripts/model_router.py",
+      "description": "Model Router -- unified provider registry, routing, and call surface.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:monitoring",
+      "kind": "script",
+      "name": "monitoring",
+      "path": "scripts/monitoring.py",
+      "description": "Real-time campaign monitoring, anomaly detection, and alerting system. ======================================================================= Wraps a MetaAdsEngine instance to provide scheduled health checks, anomaly detection, budget pacing alerts, CTR/CPC deviation alerts, dis",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:name_utils",
+      "kind": "script",
+      "name": "name_utils",
+      "path": "scripts/name_utils.py",
+      "description": "Shared name-sanitization for any path that interpolates a lead's first or full name into outbound copy (email body, calendar invite, DM, SMS).",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:neural_memory",
+      "kind": "script",
+      "name": "neural_memory",
+      "path": "scripts/neural_memory.py",
+      "description": "Neural Memory \u2014 differentiable memory store backed by a Neural Turing Machine.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:neuro_symbolic_gate",
+      "kind": "script",
+      "name": "neuro_symbolic_gate",
+      "path": "scripts/neuro_symbolic_gate.py",
+      "description": "Neuro-Symbolic Compliance Gate \u2014 rule-based + neural content verifier.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:notify",
+      "kind": "script",
+      "name": "notify",
+      "path": "scripts/notify.py",
+      "description": "Maven Notification System \u2014 Telegram alerts for CC's marketing surface.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:performance_reporter",
+      "kind": "script",
+      "name": "performance_reporter",
+      "path": "scripts/performance_reporter.py",
+      "description": "SunBiz Funding \u2014 Performance Reporter ======================================== Pulls Meta Ads performance data and formats it into clean human-readable reports. Uses MetaAdsEngine for all API calls \u2014 no direct HTTP calls here.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:personalize",
+      "kind": "script",
+      "name": "personalize",
+      "path": "scripts/personalize.py",
+      "description": "Personalize \u2014 render operator-specific files from the wizard's answers.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:pulse_client",
+      "kind": "script",
+      "name": "pulse_client",
+      "path": "scripts/pulse_client.py",
+      "description": "(no docstring)",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-filename"
+    },
+    {
+      "id": "script:register",
+      "kind": "script",
+      "name": "register",
+      "path": "scripts/register.py",
+      "description": "Register \u2014 one-command \"add a new skill or tool\" wizard.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:render_video",
+      "kind": "script",
+      "name": "render_video",
+      "path": "scripts/render_video.py",
+      "description": "Remotion Video Render Script \u2014 Bravo V5.5",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:rlhf_outreach",
+      "kind": "script",
+      "name": "rlhf_outreach",
+      "path": "scripts/rlhf_outreach.py",
+      "description": "RLHF Outreach -- dataset builder, DPO training skeleton, and fast draft scorer.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:save_logo",
+      "kind": "script",
+      "name": "save_logo",
+      "path": "scripts/save_logo.py",
+      "description": "Save the SunBiz Funding logo to media/brand/sunbiz_logo.png",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:scaffold",
+      "kind": "script",
+      "name": "scaffold",
+      "path": "scripts/scaffold.py",
+      "description": "Scaffold \u2014 turn a fresh clone of CMO-Agent into a new operator's personal Maven agent by token-replacing CC's identifiers across non-gitignored files.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:script_ideation",
+      "kind": "script",
+      "name": "script_ideation",
+      "path": "scripts/script_ideation.py",
+      "description": "Script Ideation Engine \u2014 generates creative video/post ideas for CC.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:self_audit",
+      "kind": "script",
+      "name": "self_audit",
+      "path": "scripts/self_audit.py",
+      "description": "(no docstring)",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-filename"
+    },
+    {
+      "id": "script:send_gateway",
+      "kind": "script",
+      "name": "send_gateway",
+      "path": "scripts/send_gateway.py",
+      "description": "Send Gateway \u2014 the single outbound chokepoint for every marketing action Maven (CMO Agent) performs on behalf of CC's empire.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:setup",
+      "kind": "script",
+      "name": "setup",
+      "path": "scripts/setup.py",
+      "description": "Marketing Agent Setup Script Installs all required Python packages and validates environment.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:skill_metrics",
+      "kind": "script",
+      "name": "skill_metrics",
+      "path": "scripts/skill_metrics.py",
+      "description": "Skill Metrics \u2014 usage tracking and promotion for auto-generated skills.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:skill_synthesizer",
+      "kind": "script",
+      "name": "skill_synthesizer",
+      "path": "scripts/skill_synthesizer.py",
+      "description": "Skill Synthesizer \u2014 autonomous skill extraction pipeline.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:state_sync",
+      "kind": "script",
+      "name": "state_sync",
+      "path": "scripts/state_sync.py",
+      "description": "State Sync \u2014 Single-Write Protocol for Fragmented Memory Syncs a key observation/update across all 3 active memory layers simultaneously:   1. brain/STATE.md  \u2014 heartbeat timestamp + last result   2. memory/SESSION_LOG.md \u2014 append session entry   3. scripts/mem0_tool.py  \u2014 semant",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:system_cleanup",
+      "kind": "script",
+      "name": "system_cleanup",
+      "path": "scripts/system_cleanup.py",
+      "description": "System Cleanup \u2014 find and remove redundant artifacts left by repeated installs.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:tft_forecast",
+      "kind": "script",
+      "name": "tft_forecast",
+      "path": "scripts/tft_forecast.py",
+      "description": "TFT Forecast \u2014 Temporal Fusion Transformer for MRR forecasting.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:update_utm_links",
+      "kind": "script",
+      "name": "update_utm_links",
+      "path": "scripts/update_utm_links.py",
+      "description": "Update Meta Ads with UTM-Tagged URLs ===================================== Since Meta ad creatives are immutable, this script: 1. Gets all campaigns and matches them to UTM slugs 2. For each campaign \u2192 ad sets \u2192 ads, reads the current creative 3. Creates a NEW creative with the U",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:video_editor",
+      "kind": "script",
+      "name": "video_editor",
+      "path": "scripts/video_editor.py",
+      "description": "Video Editor -- Automated editing pipeline for CC's Content Day system.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "agent:ad-strategist",
+      "kind": "agent",
+      "name": "ad-strategist",
+      "path": "agents/ad-strategist.md",
+      "description": "Use this agent when CC asks for paid-campaign strategy, A/B test design, budget allocation, or cross-platform funnel planning across Meta and Google Ads.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:analytics-analyst",
+      "kind": "agent",
+      "name": "analytics-analyst",
+      "path": "agents/analytics-analyst.md",
+      "description": "Use this agent when CC asks for performance reporting, CPQL/ROAS analysis, attribution math, or cross-platform metric reconciliation.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:architect",
+      "kind": "agent",
+      "name": "architect",
+      "path": "agents/architect.md",
+      "description": "Use this agent when CC asks for marketing-stack design, infrastructure planning, or major technical decisions inside the CMO repo (data pipelines, integration topology).",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:audience-builder",
+      "kind": "agent",
+      "name": "audience-builder",
+      "path": "agents/audience-builder.md",
+      "description": "Use this agent when CC asks for audience strategy: behavioral targeting, custom/lookalike audiences, exclusion lists, or keyword segmentation.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:content-creator",
+      "kind": "agent",
+      "name": "content-creator",
+      "path": "agents/content-creator.md",
+      "description": "Use this agent when CC asks for ad copy, headlines, descriptions, CTAs, hooks, or any short-form direct-response creative writing.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:debugger",
+      "kind": "agent",
+      "name": "debugger",
+      "path": "agents/debugger.md",
+      "description": "Use this agent when CC asks to debug a marketing-pipeline failure, API error, or systematic troubleshooting of campaign/automation issues.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:documenter",
+      "kind": "agent",
+      "name": "documenter",
+      "path": "agents/documenter.md",
+      "description": "Use this agent when CC asks to update brain/, memory/, SOPs, READMEs, or any marketing-doc maintenance and knowledge organization.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:email-outbound",
+      "kind": "agent",
+      "name": "email-outbound",
+      "path": "agents/email-outbound.md",
+      "description": "Use this agent when CC asks to operate the marketing email blast system \u2014 HTML templates, bulk sending, lead tracking, CASL/CAN-SPAM compliance.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:explorer",
+      "kind": "agent",
+      "name": "explorer",
+      "path": "agents/explorer.md",
+      "description": "Use this agent when CC asks to navigate the codebase, search files, or gather information across the CMO repo without making edits.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:google-ads-specialist",
+      "kind": "agent",
+      "name": "google-ads-specialist",
+      "path": "agents/google-ads-specialist.md",
+      "description": "Use this agent when CC asks for Google Ads work \u2014 campaigns, ad groups, ads, keywords, bidding, or reporting via the Google Ads API.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:image-generator",
+      "kind": "agent",
+      "name": "image-generator",
+      "path": "agents/image-generator.md",
+      "description": "Use this agent when CC asks to generate ad creative imagery \u2014 psychology-based, human-centered, brand-composited static creative.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:media-manager",
+      "kind": "agent",
+      "name": "media-manager",
+      "path": "agents/media-manager.md",
+      "description": "Use this agent when CC asks to upload, organize, or optimize creative assets (images, videos) across platforms.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:meta-ads-specialist",
+      "kind": "agent",
+      "name": "meta-ads-specialist",
+      "path": "agents/meta-ads-specialist.md",
+      "description": "Use this agent when CC asks for Meta Ads work \u2014 campaigns, ad sets, ads, creatives, audiences, or insights via the Meta Marketing API.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:researcher",
+      "kind": "agent",
+      "name": "researcher",
+      "path": "agents/researcher.md",
+      "description": "Use this agent for deep market research, competitor ad-library scrapes, audience trend analysis, and positioning intel. Facts over impressions, sources over summaries.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:reviewer",
+      "kind": "agent",
+      "name": "reviewer",
+      "path": "agents/reviewer.md",
+      "description": "Use this agent before launching any campaign or shipping any creative \u2014 it's the adversarial pre-flight check. Catches CASL violations, slop, brand-voice drift, missing CFO approval, and unverified claims.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:seo-specialist",
+      "kind": "agent",
+      "name": "seo-specialist",
+      "path": "agents/seo-specialist.md",
+      "description": "Use this agent when CC asks for SEO/AEO work \u2014 keyword research, ad-relevance scoring, on-page optimization, or landing-page tuning.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:video-editor",
+      "kind": "agent",
+      "name": "video-editor",
+      "path": "agents/video-editor.md",
+      "description": "Use this agent when CC asks to trim, caption, format, thumbnail, or platform-optimize video assets for ad placement.",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:workflow-builder",
+      "kind": "agent",
+      "name": "workflow-builder",
+      "path": "agents/workflow-builder.md",
+      "description": "Use this agent when CC asks to build n8n workflows, scheduled tasks, or marketing automations (nurture sequences, reporting cron).",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "agent:writer",
+      "kind": "agent",
+      "name": "writer",
+      "path": "agents/writer.md",
+      "description": "Use this agent for non-ad written communications \u2014 campaign briefs to CC, post-mortem reports, RFCs for new marketing capabilities, memos to Bravo via agent_inbox. Distinct from content-creator (which owns ad copy).",
+      "owner": "maven",
+      "tier": "specialized",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "mcp:meta-ads-mcp",
+      "kind": "mcp",
+      "name": "meta-ads-mcp",
+      "path": ".claude/mcp.json",
+      "description": "MCP server registered in mcp.json",
+      "owner": "maven",
+      "discovery": "auto-config"
+    },
+    {
+      "id": "mcp:google-ads-mcp",
+      "kind": "mcp",
+      "name": "google-ads-mcp",
+      "path": ".claude/mcp.json",
+      "description": "MCP server registered in mcp.json",
+      "owner": "maven",
+      "discovery": "auto-config"
+    },
+    {
+      "id": "mcp:playwright",
+      "kind": "mcp",
+      "name": "playwright",
+      "path": ".claude/mcp.json",
+      "description": "MCP server registered in mcp.json",
+      "owner": "maven",
+      "discovery": "auto-config"
+    },
+    {
+      "id": "mcp:context7",
+      "kind": "mcp",
+      "name": "context7",
+      "path": ".claude/mcp.json",
+      "description": "MCP server registered in mcp.json",
+      "owner": "maven",
+      "discovery": "auto-config"
+    },
+    {
+      "id": "mcp:memory",
+      "kind": "mcp",
+      "name": "memory",
+      "path": ".claude/mcp.json",
+      "description": "MCP server registered in mcp.json",
+      "owner": "maven",
+      "discovery": "auto-config"
+    },
+    {
+      "id": "mcp:sequential-thinking",
+      "kind": "mcp",
+      "name": "sequential-thinking",
+      "path": ".claude/mcp.json",
+      "description": "MCP server registered in mcp.json",
+      "owner": "maven",
+      "discovery": "auto-config"
+    },
+    {
+      "id": "workflow:ad-launch",
+      "kind": "workflow",
+      "name": "ad-launch",
+      "path": ".agents/workflows/ad-launch.md",
+      "description": "Create and launch new ads within an existing campaign \u2014 copy, creative, compliance, and activation.",
+      "owner": "maven",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "workflow:audience",
+      "kind": "workflow",
+      "name": "audience",
+      "path": ".agents/workflows/audience.md",
+      "description": "Build or refine targeting audiences \u2014 keywords, custom audiences, lookalikes, and interest-based targeting.",
+      "owner": "maven",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "workflow:campaign-create",
+      "kind": "workflow",
+      "name": "campaign-create",
+      "path": ".agents/workflows/campaign-create.md",
+      "description": "Full campaign creation wizard \u2014 platform selection, strategy, SEO keywords, copy, creative, compliance check, and launch.",
+      "owner": "maven",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "workflow:commit",
+      "kind": "workflow",
+      "name": "commit",
+      "path": ".agents/workflows/commit.md",
+      "description": "Smart git commit with secret scanning, referential integrity checks, and capability count verification.",
+      "owner": "maven",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "workflow:debug",
+      "kind": "workflow",
+      "name": "debug",
+      "path": ".agents/workflows/debug.md",
+      "description": "Systematic 4-phase debugging \u2014 investigate, pattern analysis, hypothesis testing, and documented resolution.",
+      "owner": "maven",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "workflow:health",
+      "kind": "workflow",
+      "name": "health",
+      "path": ".agents/workflows/health.md",
+      "description": "Full system diagnostic \u2014 API connectivity, token validity, campaign health, compliance, and infrastructure checks.",
+      "owner": "maven",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "workflow:optimize",
+      "kind": "workflow",
+      "name": "optimize",
+      "path": ".agents/workflows/optimize.md",
+      "description": "Analyze underperforming campaigns and apply data-driven optimizations to creative, audience, budget, and bidding.",
+      "owner": "maven",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "workflow:performance",
+      "kind": "workflow",
+      "name": "performance",
+      "path": ".agents/workflows/performance.md",
+      "description": "Pull cross-platform ad performance metrics with insights and actionable recommendations.",
+      "owner": "maven",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "workflow:prime",
+      "kind": "workflow",
+      "name": "prime",
+      "path": ".agents/workflows/prime.md",
+      "description": "Load full agent context \u2014 brain, memory, state, and quick health check for session start.",
+      "owner": "maven",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "workflow:report",
+      "kind": "workflow",
+      "name": "report",
+      "path": ".agents/workflows/report.md",
+      "description": "Generate comprehensive performance reports \u2014 daily snapshots, weekly analysis, or monthly executive summaries.",
+      "owner": "maven",
+      "discovery": "auto-frontmatter"
+    },
+    {
+      "id": "workflow:sync",
+      "kind": "workflow",
+      "name": "sync",
+      "path": ".agents/workflows/sync.md",
+      "description": "End-of-session sync \u2014 update state, tasks, session log, capture patterns, and commit to git.",
+      "owner": "maven",
+      "discovery": "auto-frontmatter"
+    }
+  ],
+  "edges": [
+    {
+      "from": "skill:agent-inbox",
+      "to": "script:agent_inbox",
+      "kind": "uses"
+    },
+    {
+      "from": "skill:auto-generated",
+      "to": "script:skill_metrics",
+      "kind": "uses"
+    },
+    {
+      "from": "skill:auto-generated",
+      "to": "script:skill_synthesizer",
+      "kind": "uses"
+    },
+    {
+      "from": "skill:email-outbound",
+      "to": "script:email_blast",
+      "kind": "uses"
+    },
+    {
+      "from": "skill:email-safety",
+      "to": "script:send_gateway",
+      "kind": "uses"
+    },
+    {
+      "from": "skill:mcp-operations",
+      "to": "script:late_tool",
+      "kind": "uses"
+    },
+    {
+      "from": "skill:send-gateway",
+      "to": "script:send_gateway",
+      "kind": "uses"
+    },
+    {
+      "from": "skill:video-editing",
+      "to": "script:content_pipeline",
+      "kind": "uses"
+    },
+    {
+      "from": "skill:video-editing",
+      "to": "script:video_editor",
+      "kind": "uses"
+    }
+  ],
+  "drift": [
+    {
+      "node": "skill:a-b-testing",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:ad-copywriting",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:anti-drift",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:audience-targeting",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:auto-generated",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:browser-automation",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:budget-optimization",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:campaign-creation",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:codex-delegation",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:competitive-intelligence",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:email-outbound",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:email-safety",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:google-ads-management",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:image-generation",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:lead-generation",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:lending-industry",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:media-upload",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:memory-compression",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:meta-ads-management",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:performance-optimization",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:persona-content-creator",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:python-daemon-automation",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:reporting-analytics",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:self-healing",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:send-gateway",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:seo-aeo",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:systematic-debugging",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:task-routing",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:verticals",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "skill:web-scraping",
+      "issue": "skill has no triggers \u2014 agent can't route to it"
+    },
+    {
+      "node": "script:ab_testing_engine",
+      "issue": "script missing module docstring"
+    },
+    {
+      "node": "script:ad_copy_generator",
+      "issue": "script missing module docstring"
+    },
+    {
+      "node": "script:agent_inbox",
+      "issue": "script missing module docstring"
+    },
+    {
+      "node": "script:codex_delegate",
+      "issue": "script missing module docstring"
+    },
+    {
+      "node": "script:codex_image_gen",
+      "issue": "script missing module docstring"
+    },
+    {
+      "node": "script:content_pipeline",
+      "issue": "script missing module docstring"
+    },
+    {
+      "node": "script:pulse_client",
+      "issue": "script missing module docstring"
+    },
+    {
+      "node": "script:self_audit",
+      "issue": "script missing module docstring"
+    }
+  ]
+}

@@ -1247,16 +1247,26 @@ let pollingDormant = false;
 bot.on('polling_error', (e) => {
     pollErrorCount++;
     const msg = e.message || String(e);
+    // 409 Conflict — another bridge owns this token. Same fix as Bravo:
+    // stop polling, wait 30s for the conflicting process to release the token,
+    // then exit non-zero so PM2 autorestarts. Old "dormant until restart"
+    // behavior left bridges silently broken for days because PM2 saw "online".
     if (msg.includes('409') || msg.includes('Conflict')) {
         if (!pollingDormant) {
             pollingDormant = true;
-            log('[POLL] 409 conflict: another Maven bridge owns this token. Dormant until restart.');
+            log('[POLL] 409 conflict: another Maven bridge owns this token. ' +
+                'Stopping polling and exiting in 30s so PM2 can restart cleanly.');
         }
         bot.stopPolling().catch(() => {});
+        setTimeout(() => {
+            log('[POLL] 30s elapsed after 409, exiting with code 1 to trigger PM2 restart.');
+            process.exit(1);
+        }, 30000);
         return;
     }
     if (msg.includes('401')) {
-        log('[POLL] 401 — MAVEN_TELEGRAM_BOT_TOKEN invalid or revoked.');
+        log('[POLL] 401 — MAVEN_TELEGRAM_BOT_TOKEN invalid or revoked. Exiting.');
+        process.exit(1);
         return;
     }
     if (pollErrorCount === 1 || pollErrorCount % 50 === 0) {

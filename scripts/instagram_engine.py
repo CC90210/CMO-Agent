@@ -512,25 +512,62 @@ def get_browser_context(playwright):
     headless_env = (os.environ.get("IG_HEADLESS") or "1").strip().lower()
     headless = headless_env not in ("0", "false", "no")
 
-    context = playwright.chromium.launch_persistent_context(
-        user_data_dir=BROWSER_DIR,
-        headless=headless,
-        viewport={"width": 1440, "height": 900},
-        user_agent=(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/131.0.0.0 Safari/537.36"
-        ),
-        locale="en-US",
-        timezone_id="America/New_York",
-        args=[
+    # CRITICAL: launch the user's installed Chrome (channel="chrome") instead
+    # of Playwright's bundled Chromium. Real Chrome has all the WebGL,
+    # canvas, font, plugin signatures IG fingerprints against, so it sees a
+    # normal user. Playwright Chromium gets silently degraded — conversation
+    # panels never mount.
+    #
+    # Profile is dedicated to the daemon (not CC's normal Chrome profile)
+    # so it doesn't fight CC's everyday browsing. CC logs into IG once in
+    # this profile and the session persists.
+    channel = (os.environ.get("IG_BROWSER_CHANNEL") or "chrome").strip().lower()
+    use_channel = channel if channel in ("chrome", "msedge", "chrome-beta") else None
+
+    launch_kwargs = {
+        "user_data_dir": BROWSER_DIR,
+        "headless": headless,
+        "viewport": {"width": 1440, "height": 900},
+        "locale": "en-US",
+        "timezone_id": "America/New_York",
+        "args": [
             "--disable-blink-features=AutomationControlled",
             "--disable-infobars",
             "--no-default-browser-check",
             "--disable-features=IsolateOrigins,site-per-process",
         ],
-        ignore_default_args=["--enable-automation"],
-    )
+        "ignore_default_args": ["--enable-automation"],
+    }
+    if use_channel:
+        launch_kwargs["channel"] = use_channel
+        safe_print(f"[ig-browser] Launching system {use_channel.upper()} (real browser, defeats IG bot detection)")
+    else:
+        # Bundled Chromium fallback — usually doesn't work with IG long-term
+        launch_kwargs["user_agent"] = (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/131.0.0.0 Safari/537.36"
+        )
+        safe_print(
+            "[ig-browser] WARNING: Falling back to bundled Chromium "
+            "(IG_BROWSER_CHANNEL not set to chrome/msedge). IG may degrade panels."
+        )
+
+    try:
+        context = playwright.chromium.launch_persistent_context(**launch_kwargs)
+    except Exception as exc:
+        safe_print(
+            f"[ig-browser] System {use_channel} launch failed ({exc}); "
+            "falling back to bundled Chromium."
+        )
+        launch_kwargs.pop("channel", None)
+        if "user_agent" not in launch_kwargs:
+            launch_kwargs["user_agent"] = (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/131.0.0.0 Safari/537.36"
+            )
+        context = playwright.chromium.launch_persistent_context(**launch_kwargs)
     # Inject a stealth shim into every new page BEFORE any IG JS runs.
     context.add_init_script(
         """

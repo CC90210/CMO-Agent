@@ -853,25 +853,48 @@ def _send_dm_reply(page, reply_text: str, recipient: str | None = None) -> bool:
 
     msg_input = _locate_message_input(page)
 
-    # IG's React app sometimes navigates to the thread URL but fails to
-    # render the conversation panel — leaves the empty state ("Your messages
-    # — Send a message to start a chat") in the right panel. URL says we're
-    # in the thread, but textbox can't exist because the panel never loaded.
-    # Recovery: reload the thread URL once and retry textbox locate.
-    if not msg_input:
-        current_url = (page.url or "")
-        if "/direct/t/" in current_url:
-            safe_print(
-                f"  [_send_dm_reply] Thread URL loaded but panel empty for "
-                f"@{recipient}; reloading and retrying."
-            )
-            try:
-                page.reload(wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
-                time.sleep(6)
-                _dismiss_ig_prompts(page)
-                msg_input = _locate_message_input(page)
-            except Exception as exc:
-                log_exception(f"[_send_dm_reply] reload retry failed for @{recipient}", exc)
+    # IG's React app frequently unmounts the conversation panel between when
+    # we open the conversation (via read_conversation_text) and when we
+    # actually type (now). The 5-15s gap for webhook + doctrine calls is
+    # enough for the panel to disappear, leaving the empty state. Recovery:
+    # navigate back to inbox, re-click the conversation card, wait for the
+    # panel to render fresh, then locate the textbox.
+    if not msg_input and recipient:
+        safe_print(
+            f"  [_send_dm_reply] Textbox not found for @{recipient}; re-opening "
+            "conversation from inbox."
+        )
+        try:
+            page.goto(INBOX_URL, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+            time.sleep(4)
+            _dismiss_ig_prompts(page)
+            # Re-click the conversation by display name. Same scoring as
+            # read_conversation_text: prefer Unread + exact match.
+            safe_name = recipient.replace("'", "\\'").replace("\\", "\\\\")
+            page.evaluate(f"""() => {{
+                const target = '{safe_name}';
+                const btns = Array.from(document.querySelectorAll('div[role="button"]'));
+                let best = null, bestScore = -1;
+                for (const btn of btns) {{
+                    const text = (btn.innerText || '').trim();
+                    const firstLine = text.split(String.fromCharCode(10))[0].trim();
+                    if (firstLine !== target) continue;
+                    const s = text.includes('Unread') ? 100 : 50;
+                    if (s > bestScore) {{ bestScore = s; best = btn; }}
+                }}
+                if (best) {{ best.click(); return 'exact'; }}
+                for (const btn of btns) {{
+                    const text = (btn.innerText || '').trim();
+                    const firstLine = text.split(String.fromCharCode(10))[0].trim();
+                    if (firstLine.includes(target)) {{ btn.click(); return 'partial'; }}
+                }}
+                return false;
+            }}""")
+            time.sleep(5)
+            _dismiss_ig_prompts(page)
+            msg_input = _locate_message_input(page)
+        except Exception as exc:
+            log_exception(f"[_send_dm_reply] re-open retry failed for @{recipient}", exc)
 
     if not msg_input:
         # Capture state for debugging instead of silently failing

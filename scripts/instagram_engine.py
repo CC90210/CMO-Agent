@@ -853,26 +853,26 @@ def _send_dm_reply(page, reply_text: str, recipient: str | None = None) -> bool:
 
     msg_input = _locate_message_input(page)
 
-    # IG's React app frequently unmounts the conversation panel between when
-    # we open the conversation (via read_conversation_text) and when we
-    # actually type (now). The 5-15s gap for webhook + doctrine calls is
-    # enough for the panel to disappear, leaving the empty state. Recovery:
-    # navigate back to inbox, re-click the conversation card, wait for the
-    # panel to render fresh, then locate the textbox.
+    # IG's React app frequently unmounts the conversation panel between
+    # read_conversation_text and _send_dm_reply (5-15s gap for webhook +
+    # doctrine). Recovery: navigate to inbox, find the conversation card via
+    # Playwright locator (NOT JS evaluate — IG's React doesn't re-render the
+    # panel for synthetic click events, only for real pointer events), then
+    # click via Playwright's mouse API.
     if not msg_input and recipient:
         safe_print(
             f"  [_send_dm_reply] Textbox not found for @{recipient}; re-opening "
-            "conversation from inbox."
+            "conversation via Playwright native click."
         )
         try:
             page.goto(INBOX_URL, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
             time.sleep(4)
             _dismiss_ig_prompts(page)
-            # Re-click the conversation by display name. Same scoring as
-            # read_conversation_text: prefer Unread + exact match.
-            safe_name = recipient.replace("'", "\\'").replace("\\", "\\\\")
-            page.evaluate(f"""() => {{
-                const target = '{safe_name}';
+
+            # Find the conversation card whose first text line is the recipient
+            # display name. Get its bounding box and click via real mouse.
+            card_box = page.evaluate(f"""() => {{
+                const target = {json.dumps(recipient)};
                 const btns = Array.from(document.querySelectorAll('div[role="button"]'));
                 let best = null, bestScore = -1;
                 for (const btn of btns) {{
@@ -882,19 +882,42 @@ def _send_dm_reply(page, reply_text: str, recipient: str | None = None) -> bool:
                     const s = text.includes('Unread') ? 100 : 50;
                     if (s > bestScore) {{ bestScore = s; best = btn; }}
                 }}
-                if (best) {{ best.click(); return 'exact'; }}
-                for (const btn of btns) {{
-                    const text = (btn.innerText || '').trim();
-                    const firstLine = text.split(String.fromCharCode(10))[0].trim();
-                    if (firstLine.includes(target)) {{ btn.click(); return 'partial'; }}
+                if (!best) {{
+                    // fallback: substring
+                    for (const btn of btns) {{
+                        const text = (btn.innerText || '').trim();
+                        const firstLine = text.split(String.fromCharCode(10))[0].trim();
+                        if (firstLine.includes(target)) {{ best = btn; break; }}
+                    }}
                 }}
-                return false;
+                if (!best) return null;
+                best.scrollIntoView({{block: 'center'}});
+                const r = best.getBoundingClientRect();
+                return {{x: r.x + r.width / 2, y: r.y + r.height / 2}};
             }}""")
-            time.sleep(5)
-            _dismiss_ig_prompts(page)
-            msg_input = _locate_message_input(page)
+            if card_box and isinstance(card_box, dict):
+                # Real mouse click → fires pointerdown/pointerup/click in
+                # sequence, which IG's React app handles correctly.
+                page.mouse.click(card_box["x"], card_box["y"])
+                # Then wait for the textbox to appear (up to 8s) — that's
+                # the signal that the panel actually mounted.
+                try:
+                    page.wait_for_selector(
+                        'div[role="textbox"][contenteditable="true"], div[role="textbox"]',
+                        timeout=8000,
+                        state="visible",
+                    )
+                except Exception:
+                    pass
+                _dismiss_ig_prompts(page)
+                msg_input = _locate_message_input(page)
+            else:
+                safe_print(
+                    f"  [_send_dm_reply] Could not locate conversation card "
+                    f"for @{recipient} on inbox after navigation."
+                )
         except Exception as exc:
-            log_exception(f"[_send_dm_reply] re-open retry failed for @{recipient}", exc)
+            log_exception(f"[_send_dm_reply] native-click retry failed for @{recipient}", exc)
 
     if not msg_input:
         # Capture state for debugging instead of silently failing

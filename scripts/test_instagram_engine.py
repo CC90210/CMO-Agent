@@ -23,6 +23,8 @@ if str(SCRIPTS_DIR) not in sys.path:
 class _FakePage:
     """Minimal Playwright page stub: returns a fake textbox + records keystrokes."""
 
+    url = "https://www.instagram.com/direct/t/test/"
+
     def __init__(self, has_textbox: bool = True):
         self._has_textbox = has_textbox
         self.typed: list[str] = []
@@ -36,7 +38,23 @@ class _FakePage:
         class Box:
             def click(self_inner):  # noqa: N805
                 return None
+
+            def is_visible(self_inner):  # noqa: N805
+                return True
+
+            def scroll_into_view_if_needed(self_inner, timeout=3000):  # noqa: N805
+                return None
         return Box()
+
+    def wait_for_selector(self, _selector: str, timeout: int = 4000, state: str = "visible"):
+        return self.query_selector(_selector)
+
+    def evaluate(self, _script: str):
+        # _dismiss_ig_prompts uses evaluate; tests don't care about its result
+        return False
+
+    def screenshot(self, path: str = ""):
+        return None
 
     def type(self, text: str, delay: int = 0):
         self.typed.append(text)

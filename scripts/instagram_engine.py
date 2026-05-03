@@ -1085,7 +1085,15 @@ def _check_dms_on_page(env_vars, args, page):
                     continue
 
                 convo_text = read_conversation_text(page, username)
-                last_msg = extract_last_incoming_message(convo_text) or preview
+                # Pull EVERY inbound message since CC/Maven last replied —
+                # critical for catching up after daemon downtime when 2-5
+                # messages stack from the prospect.
+                inbound_burst = extract_all_inbound_since_last_outbound(convo_text)
+                last_msg = (
+                    inbound_burst[-1]
+                    if inbound_burst
+                    else (extract_last_incoming_message(convo_text) or preview)
+                )
 
                 # Try to upgrade the username from "display name" to the actual
                 # @handle by scraping the conversation header. If that fails,
@@ -1097,17 +1105,31 @@ def _check_dms_on_page(env_vars, args, page):
                     safe_print(f"[ig-daemon] Resolved @{handle} from display name '{username}'")
                 username = handle
 
-                # Push inbound unread message to ig-setter-pro. The backend
-                # dedupes by id and returns whether auto-send is enabled for
-                # this account + a doctrine-generated draft (if configured).
-                webhook_resp = send_to_ig_setter_pro(
-                    env_vars,
-                    username,
-                    last_msg,
-                    direction="inbound",
-                    intent="active",
-                    display_name=display_name,
-                )
+                # Push every stacked inbound to PULSE so dm_messages stays a
+                # truthful transcript. Webhook dedupes by ig_message_id, so
+                # re-sends are safe. Only the FINAL push generates the
+                # doctrine draft (PULSE returns it on the latest webhook
+                # response that has the most context).
+                webhook_resp = None
+                bursts_to_push = inbound_burst if len(inbound_burst) > 1 else [last_msg]
+                if bursts_to_push and len(bursts_to_push) > 1:
+                    safe_print(
+                        f"  [catch-up] @{username} sent {len(bursts_to_push)} "
+                        "messages while daemon was idle — pushing all to PULSE."
+                    )
+                for idx, msg in enumerate(bursts_to_push):
+                    is_last = idx == len(bursts_to_push) - 1
+                    webhook_resp = send_to_ig_setter_pro(
+                        env_vars,
+                        username,
+                        msg,
+                        direction="inbound",
+                        intent="active",
+                        display_name=display_name,
+                    )
+                    # Only the last call needs to drive the reply path.
+                    if not is_last:
+                        continue
 
                 # Auto-send gate: if PULSE has auto_send_enabled=false for this
                 # account, the daemon stops here. The doctrine draft is already
@@ -1224,7 +1246,32 @@ def _check_dms_on_page(env_vars, args, page):
                     intent = "CONVO"
 
                 if should_reply:
-                    reply_text = build_reply(intent, last_msg=last_msg, convo_context=convo_text)
+                    # PRIMARY PATH: PULSE doctrine. The webhook just told us
+                    # what to send — it built the reply with the last 30
+                    # messages from dm_messages, brand context, and the
+                    # current stage. This is the context-aware reply CC
+                    # configured. Use it.
+                    reply_text = ""
+                    doctrine_resp = (
+                        webhook_resp.get("doctrine") if isinstance(webhook_resp, dict) else None
+                    )
+                    if isinstance(doctrine_resp, dict) and doctrine_resp.get("draft"):
+                        reply_text = (doctrine_resp["draft"] or "").strip()
+                        # Doctrine sets the canonical stage; reflect it
+                        # downstream so booking/intent gating is consistent.
+                        doctrine_stage = (doctrine_resp.get("stage") or "").strip()
+                        if doctrine_stage in ("book_call", "booked"):
+                            intent = "BOOKING"
+
+                    # FALLBACK only if PULSE/doctrine is unavailable (offline,
+                    # no Anthropic key configured, transient error). Local
+                    # build_reply is keyword-based and context-blind — it's a
+                    # safety net, not the primary path.
+                    if not reply_text:
+                        reply_text = build_reply(
+                            intent, last_msg=last_msg, convo_context=convo_text
+                        )
+
                     if not reply_text:
                         should_reply = False
                         skip_reason = "empty_reply"
@@ -2233,6 +2280,49 @@ def cmd_log_dm(env_vars, args):
 
 
 # -- Auto-reply helpers -------------------------------------------------------
+
+def extract_all_inbound_since_last_outbound(convo_text: str) -> list[str]:
+    """Return EVERY inbound prospect message since CC's most recent outbound.
+
+    When the daemon is offline mid-conversation and the prospect sends 3 more
+    DMs, we must push all 3 to PULSE so dm_messages reflects the truth and
+    the next doctrine call has full history. Returns chronological order.
+    """
+    if not convo_text:
+        return []
+    import re
+    lines = [l.strip() for l in convo_text.split("\n") if l.strip()]
+    skip_patterns = {
+        "seen", "delivered", "active", "typing", "liked a message",
+        "liked a photo", "sent an attachment", "sent a voice message",
+        "this message was unsent", "unsent",
+    }
+    time_pattern = re.compile(
+        r"^\d{1,2}:\d{2}\s*(am|pm)?$|^\d{1,2}[mhdw]$|^just now$|^yesterday$",
+        re.I,
+    )
+
+    # Walk backwards collecting inbound lines until we hit an outbound ("You")
+    inbound_buffer: list[str] = []
+    for line in reversed(lines):
+        lower = line.lower()
+        if lower in skip_patterns or time_pattern.match(lower):
+            continue
+        if len(line) < 2:
+            continue
+        if lower.startswith("you:") or lower.startswith("you ") or lower == "you":
+            break
+        inbound_buffer.append(line)
+
+    inbound_buffer.reverse()
+    # De-dup adjacent identical lines (IG sometimes renders the same line
+    # twice in compact view)
+    out: list[str] = []
+    for line in inbound_buffer:
+        if not out or out[-1] != line:
+            out.append(line)
+    return out
+
 
 def extract_last_incoming_message(convo_text: str) -> str:
     """Pull out the last message that ISN'T from CC (i.e. not starting with 'You').

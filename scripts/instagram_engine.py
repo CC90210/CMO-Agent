@@ -570,11 +570,12 @@ def get_browser_context(playwright):
         "viewport": {"width": 1440, "height": 900},
         "locale": "en-US",
         "timezone_id": "America/New_York",
+        # Minimal args — only what's needed to defeat IG's webdriver fingerprint.
+        # Chrome warns yellow-bar on broader flags like --disable-features or
+        # --no-sandbox; the AutomationControlled flag alone is enough.
         "args": [
             "--disable-blink-features=AutomationControlled",
-            "--disable-infobars",
             "--no-default-browser-check",
-            "--disable-features=IsolateOrigins,site-per-process",
         ],
         "ignore_default_args": ["--enable-automation"],
     }

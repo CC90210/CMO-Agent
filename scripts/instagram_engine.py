@@ -478,17 +478,36 @@ def _return_to_inbox(page, env_vars: dict) -> bool:
 
 
 def get_browser_context(playwright):
-    """Launch persistent Chromium context (maintains login session).
+    """Get a Playwright context for IG automation.
 
-    Headless detection bypass: Instagram refuses to render the conversation
-    panel in our browser when navigator.webdriver is true and several other
-    Chromium fingerprints are present. We:
-      - Disable AutomationControlled feature so navigator.webdriver = undefined
-      - Match a realistic recent Chrome on Windows
-      - Spoof plugins/languages on every new page via init scripts
-      - Allow IG_HEADLESS=0 env override to run with a visible window when
-        debugging from the user's desktop session
+    PRIMARY (recommended): connect to YOUR REAL CHROME via CDP. Set
+    IG_CDP_URL=http://localhost:9222 in env. You launch Chrome once with
+    --remote-debugging-port=9222 and log into IG manually. Daemon then
+    drives that real browser — IG can't fingerprint it as automation
+    because it's a normal Chrome instance with all the right WebGL,
+    canvas, font, plugin, etc. signatures.
+
+    FALLBACK: launch Playwright's own Chromium. Works for new accounts
+    that haven't been flagged, but mature IG accounts with bot-detection
+    flags will silently degrade (conversation panel won't render).
     """
+    cdp_url = (os.environ.get("IG_CDP_URL") or "").strip()
+    if cdp_url:
+        safe_print(f"[ig-browser] Connecting to existing Chrome via CDP at {cdp_url}")
+        browser = playwright.chromium.connect_over_cdp(cdp_url)
+        contexts = browser.contexts
+        if contexts:
+            context = contexts[0]
+        else:
+            context = browser.new_context(
+                viewport={"width": 1440, "height": 900},
+                locale="en-US",
+                timezone_id="America/New_York",
+            )
+        # CDP browsers may not support add_init_script on existing contexts;
+        # skip stealth shim since real Chrome doesn't need it.
+        return context
+
     os.makedirs(BROWSER_DIR, exist_ok=True)
     headless_env = (os.environ.get("IG_HEADLESS") or "1").strip().lower()
     headless = headless_env not in ("0", "false", "no")

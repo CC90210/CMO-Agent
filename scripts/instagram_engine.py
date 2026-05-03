@@ -845,19 +845,85 @@ def _send_dm_reply(page, reply_text: str, recipient: str | None = None) -> bool:
         safe_print("  [send_gateway UNAVAILABLE] refusing to send DM")
         return False
 
-    msg_input = (
-        page.query_selector('div[role="textbox"]')
-        or page.query_selector('div[contenteditable="true"]')
-    )
+    msg_input = _locate_message_input(page)
     if not msg_input:
+        # Capture state for debugging instead of silently failing
+        try:
+            page.screenshot(path=os.path.join(SCREENSHOT_DIR, f"ig_no_input_{recipient or 'unknown'}.png"))
+            safe_print(
+                f"  [_send_dm_reply] No textbox for @{recipient}. URL={page.url}. "
+                "Screenshot saved to tmp/."
+            )
+        except Exception:
+            pass
         return False
-    msg_input.click()
-    time.sleep(0.3)
-    page.keyboard.type(reply_text, delay=15)
-    time.sleep(0.5)
-    page.keyboard.press("Enter")
+
+    try:
+        msg_input.scroll_into_view_if_needed(timeout=3000)
+    except Exception:
+        pass
+    try:
+        msg_input.click()
+    except Exception as exc:
+        log_exception(f"[_send_dm_reply] click failed for @{recipient}", exc)
+        return False
+
+    time.sleep(0.4)
+    try:
+        page.keyboard.type(reply_text, delay=18)
+        time.sleep(0.6)
+        page.keyboard.press("Enter")
+    except Exception as exc:
+        log_exception(f"[_send_dm_reply] type/press failed for @{recipient}", exc)
+        return False
+
     time.sleep(3)
     return True
+
+
+def _locate_message_input(page):
+    """Find IG's DM textbox, with retry, modal dismissal, and multiple selectors.
+
+    IG ships at least 3 different layouts for the conversation panel; the
+    textbox can land as div[role='textbox'], div[contenteditable='true'],
+    or inside a form whose first contenteditable child is the input. We
+    also dismiss the 'Allow notifications' modal that pops up over the
+    conversation panel and steals focus.
+    """
+    selectors = [
+        'div[role="textbox"][contenteditable="true"]',
+        'div[role="textbox"]',
+        'div[contenteditable="true"][aria-label*="essage"]',
+        'div[contenteditable="true"]',
+        'p[contenteditable="true"]',
+        'textarea[placeholder*="essage"]',
+    ]
+
+    for attempt in range(3):
+        # Dismiss any modal that may be eating focus / hiding the textbox
+        _dismiss_ig_prompts(page)
+
+        for sel in selectors:
+            try:
+                el = page.query_selector(sel)
+                if el and el.is_visible():
+                    return el
+            except Exception:
+                continue
+
+        # Wait for any selector to appear (up to 4s on first pass, decay after)
+        try:
+            page.wait_for_selector(
+                'div[role="textbox"], div[contenteditable="true"]',
+                timeout=4000 if attempt == 0 else 2000,
+                state="visible",
+            )
+        except Exception:
+            pass
+
+        time.sleep(1)
+
+    return None
 
 
 def _handle_booking_confirmation(
@@ -2927,28 +2993,38 @@ def read_conversation_text(page, username: str) -> str:
     """Open a DM conversation by clicking the matching button in the inbox list
     and return the visible message text (last ~3000 chars).
 
-    Uses the same div[role='button'] approach as read_dm_list to reliably
-    find and click the correct conversation.
+    PRIORITY MATCHING (because display names like 'Cc' match many threads):
+      1. Exact display name match on an UNREAD button (the one we want)
+      2. Exact display name match on any button
+      3. Partial substring match (last resort)
+
+    After clicking, verifies the URL transitioned to /direct/t/<thread_id>
+    so we know the conversation actually opened.
     """
-    # Escape single quotes in username for JS string
     safe_name = username.replace("'", "\\'").replace("\\", "\\\\")
     found = page.evaluate(f"""() => {{
-        const btns = document.querySelectorAll('div[role="button"]');
-        for (const btn of btns) {{
-            const text = btn.innerText.trim();
+        const target = '{safe_name}';
+        const btns = Array.from(document.querySelectorAll('div[role="button"]'));
+        const score = (btn) => {{
+            const text = (btn.innerText || '').trim();
             const firstLine = text.split(String.fromCharCode(10))[0].trim();
-            if (firstLine === '{safe_name}') {{
-                btn.click();
-                return true;
-            }}
+            if (firstLine !== target) return -1;
+            // Prioritise unread buttons (contain "Unread" anywhere in text)
+            return text.includes('Unread') ? 100 : 50;
+        }};
+        let best = null, bestScore = -1;
+        for (const btn of btns) {{
+            const s = score(btn);
+            if (s > bestScore) {{ bestScore = s; best = btn; }}
         }}
-        // Fallback: partial match (display names can be truncated)
+        if (best && bestScore >= 50) {{ best.click(); return 'exact'; }}
+        // Last resort: partial substring match
         for (const btn of btns) {{
-            const text = btn.innerText.trim();
+            const text = (btn.innerText || '').trim();
             const firstLine = text.split(String.fromCharCode(10))[0].trim();
-            if (firstLine.includes('{safe_name}') || '{safe_name}'.includes(firstLine)) {{
+            if (firstLine.includes(target) || target.includes(firstLine)) {{
                 btn.click();
-                return true;
+                return 'partial';
             }}
         }}
         return false;
@@ -2956,6 +3032,33 @@ def read_conversation_text(page, username: str) -> str:
     if not found:
         return ""
     time.sleep(5)
+
+    # Verify the conversation actually opened. IG's URL changes from
+    # /direct/inbox/ to /direct/t/<thread_id>/. If the URL didn't move,
+    # the click missed and we'd otherwise scrape garbage.
+    current_url = (page.url or "")
+    if "/direct/t/" not in current_url:
+        # One retry: click any visible conversation button matching the
+        # name with a slight delay, in case IG was still rendering.
+        time.sleep(2)
+        page.evaluate(f"""() => {{
+            const target = '{safe_name}';
+            const btns = document.querySelectorAll('div[role="button"]');
+            for (const btn of btns) {{
+                const t = (btn.innerText || '').trim();
+                const first = t.split(String.fromCharCode(10))[0].trim();
+                if (first === target) {{ btn.click(); return true; }}
+            }}
+            return false;
+        }}""")
+        time.sleep(4)
+        current_url = (page.url or "")
+        if "/direct/t/" not in current_url:
+            safe_print(
+                f"  [read_convo] click on '{username}' didn't navigate to a "
+                f"thread URL (still at {current_url}). Skipping scrape."
+            )
+            return ""
 
     # Scrape ONLY the conversation thread (right panel), NOT the sidebar.
     # The sidebar contains "You: ..." previews from other conversations

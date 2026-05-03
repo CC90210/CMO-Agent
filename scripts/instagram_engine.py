@@ -218,10 +218,16 @@ def send_to_ig_setter_pro(env_vars: dict, username: str, message_text: str, dire
             try:
                 data = resp.json()
                 if data.get("ok") is False:
-                    safe_print(f"ig-setter-pro webhook rejected payload: {data}")
-                    return False
+                    # Webhook hit an internal error but still returned the
+                    # auto_send_enabled flag so the daemon can decide whether
+                    # to use local fallback. Don't drop the response.
+                    safe_print(
+                        f"  [ig-setter-pro] webhook reported failure: "
+                        f"{data.get('message') or data.get('error')}"
+                    )
                 # Return the parsed response so callers can read
-                # auto_send_enabled + the generated doctrine draft.
+                # auto_send_enabled + the generated doctrine draft (which may
+                # be null on internal error → daemon falls back to build_reply).
                 return data
             except ValueError:
                 pass

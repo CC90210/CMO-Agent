@@ -239,6 +239,46 @@ def send_to_ig_setter_pro(env_vars: dict, username: str, message_text: str, dire
     return False
 
 
+DAEMON_VERSION = "1.0.0"
+
+
+def send_daemon_heartbeat(
+    env_vars: dict,
+    pid: int,
+    poll_count: int,
+    browser_channel: str,
+    hostname: str,
+) -> None:
+    """Fire-and-forget heartbeat to PULSE every poll. Dashboard sidebar
+    reads /api/python/heartbeat to render daemon status (online / degraded
+    / offline). Failure here NEVER breaks the poll cycle."""
+    try:
+        import requests
+    except ImportError:
+        return
+    secret = get_pulse_secret(env_vars)
+    if not secret:
+        return
+    account_id = get_env_value(env_vars, "PULSE_ACCOUNT_ID", "IG_SETTER_PRO_ACCOUNT_ID")
+    try:
+        requests.post(
+            f"{get_pulse_api_base(env_vars)}/api/python/heartbeat",
+            json={
+                "account_id": account_id or None,
+                "pid": pid,
+                "poll_count": poll_count,
+                "browser_channel": browser_channel,
+                "version": DAEMON_VERSION,
+                "hostname": hostname,
+            },
+            headers={"x-webhook-secret": secret, "Content-Type": "application/json"},
+            timeout=5,
+        )
+    except Exception:
+        # Silent: heartbeat failure should not pollute the log every poll.
+        pass
+
+
 def fetch_archived_handles(env_vars: dict) -> set[str]:
     """Return the set of @handles whose PULSE thread.status == 'closed'.
 
@@ -2303,6 +2343,13 @@ def cmd_monitor_dms(env_vars, args):
 
     last_result = None
     pass_count = 0
+    daemon_pid = os.getpid()
+    daemon_channel = (os.environ.get("IG_BROWSER_CHANNEL") or "chrome").lower()
+    try:
+        import socket
+        daemon_hostname = socket.gethostname()
+    except Exception:
+        daemon_hostname = "unknown"
     with sync_playwright() as p:
         context, page = _open_ig_page(p)
         try:
@@ -2311,6 +2358,15 @@ def cmd_monitor_dms(env_vars, args):
                 safe_print(
                     f"[ig-daemon] Poll #{pass_count} at "
                     f"{datetime.now(timezone.utc).isoformat()}"
+                )
+                # Heartbeat to PULSE so the dashboard can show daemon status.
+                # Fire-and-forget; failure must never break the poll.
+                send_daemon_heartbeat(
+                    env_vars,
+                    pid=daemon_pid,
+                    poll_count=pass_count,
+                    browser_channel=daemon_channel,
+                    hostname=daemon_hostname,
                 )
                 try:
                     last_result = _check_dms_on_page(env_vars, args, page)

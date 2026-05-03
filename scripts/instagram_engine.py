@@ -478,18 +478,60 @@ def _return_to_inbox(page, env_vars: dict) -> bool:
 
 
 def get_browser_context(playwright):
-    """Launch persistent Chromium context (maintains login session)."""
+    """Launch persistent Chromium context (maintains login session).
+
+    Headless detection bypass: Instagram refuses to render the conversation
+    panel in our browser when navigator.webdriver is true and several other
+    Chromium fingerprints are present. We:
+      - Disable AutomationControlled feature so navigator.webdriver = undefined
+      - Match a realistic recent Chrome on Windows
+      - Spoof plugins/languages on every new page via init scripts
+      - Allow IG_HEADLESS=0 env override to run with a visible window when
+        debugging from the user's desktop session
+    """
     os.makedirs(BROWSER_DIR, exist_ok=True)
-    return playwright.chromium.launch_persistent_context(
+    headless_env = (os.environ.get("IG_HEADLESS") or "1").strip().lower()
+    headless = headless_env not in ("0", "false", "no")
+
+    context = playwright.chromium.launch_persistent_context(
         user_data_dir=BROWSER_DIR,
-        headless=True,
-        viewport={"width": 1280, "height": 900},
+        headless=headless,
+        viewport={"width": 1440, "height": 900},
         user_agent=(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
+            "Chrome/131.0.0.0 Safari/537.36"
         ),
+        locale="en-US",
+        timezone_id="America/New_York",
+        args=[
+            "--disable-blink-features=AutomationControlled",
+            "--disable-infobars",
+            "--no-default-browser-check",
+            "--disable-features=IsolateOrigins,site-per-process",
+        ],
+        ignore_default_args=["--enable-automation"],
     )
+    # Inject a stealth shim into every new page BEFORE any IG JS runs.
+    context.add_init_script(
+        """
+        Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+        Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] });
+        Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+        window.chrome = window.chrome || { runtime: {} };
+        const originalQuery = window.navigator.permissions
+            ? window.navigator.permissions.query
+            : null;
+        if (originalQuery) {
+            window.navigator.permissions.query = (parameters) => (
+                parameters.name === 'notifications'
+                    ? Promise.resolve({ state: Notification.permission })
+                    : originalQuery(parameters)
+            );
+        }
+        """
+    )
+    return context
 
 
 def _open_ig_page(playwright):

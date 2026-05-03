@@ -961,6 +961,52 @@ def _send_dm_reply(page, reply_text: str, recipient: str | None = None) -> bool:
         except Exception as exc:
             log_exception(f"[_send_dm_reply] native-click retry failed for @{recipient}", exc)
 
+    # FINAL FALLBACK: when inbox-based open consistently fails (IG sometimes
+    # refuses to render the conversation panel from inbox click), open the
+    # conversation by navigating to the user's profile and clicking Message.
+    # That's a completely different code path that bypasses the inbox panel
+    # entirely — same flow we use for outbound first-touch sends. We can ONLY
+    # do this when we have a real @handle (not a display name with spaces).
+    import re as _re
+    if not msg_input and recipient and _re.match(r"^[A-Za-z0-9._]{1,32}$", recipient):
+        safe_print(
+            f"  [_send_dm_reply] Inbox-open failed for @{recipient}; trying "
+            "profile→Message bypass."
+        )
+        try:
+            profile_url = f"https://www.instagram.com/{recipient.lstrip('@')}/"
+            page.goto(profile_url, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+            time.sleep(5)
+            _dismiss_ig_prompts(page)
+            # Find the Message button via JS, click via Playwright mouse for
+            # real pointer events.
+            btn_box = page.evaluate("""() => {
+                const els = document.querySelectorAll('button, div[role="button"], a');
+                for (const el of els) {
+                    const t = (el.textContent || '').trim().toLowerCase();
+                    if (t === 'message') {
+                        el.scrollIntoView({block: 'center'});
+                        const r = el.getBoundingClientRect();
+                        return {x: r.x + r.width/2, y: r.y + r.height/2};
+                    }
+                }
+                return null;
+            }""")
+            if btn_box and isinstance(btn_box, dict):
+                page.mouse.click(btn_box["x"], btn_box["y"])
+                try:
+                    page.wait_for_selector(
+                        'div[role="textbox"][contenteditable="true"], div[role="textbox"]',
+                        timeout=10000,
+                        state="visible",
+                    )
+                except Exception:
+                    pass
+                _dismiss_ig_prompts(page)
+                msg_input = _locate_message_input(page)
+        except Exception as exc:
+            log_exception(f"[_send_dm_reply] profile→Message bypass failed for @{recipient}", exc)
+
     if not msg_input:
         # Capture state for debugging instead of silently failing
         try:

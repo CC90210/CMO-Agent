@@ -852,6 +852,27 @@ def _send_dm_reply(page, reply_text: str, recipient: str | None = None) -> bool:
         return False
 
     msg_input = _locate_message_input(page)
+
+    # IG's React app sometimes navigates to the thread URL but fails to
+    # render the conversation panel — leaves the empty state ("Your messages
+    # — Send a message to start a chat") in the right panel. URL says we're
+    # in the thread, but textbox can't exist because the panel never loaded.
+    # Recovery: reload the thread URL once and retry textbox locate.
+    if not msg_input:
+        current_url = (page.url or "")
+        if "/direct/t/" in current_url:
+            safe_print(
+                f"  [_send_dm_reply] Thread URL loaded but panel empty for "
+                f"@{recipient}; reloading and retrying."
+            )
+            try:
+                page.reload(wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+                time.sleep(6)
+                _dismiss_ig_prompts(page)
+                msg_input = _locate_message_input(page)
+            except Exception as exc:
+                log_exception(f"[_send_dm_reply] reload retry failed for @{recipient}", exc)
+
     if not msg_input:
         # Capture state for debugging instead of silently failing
         try:

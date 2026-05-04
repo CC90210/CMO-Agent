@@ -44,3 +44,20 @@ brain/operator.profile.json
 !brain/operator.profile.example.json
 brain/USER.md
 !brain/USER.template.md
+
+# ─── Vendor (third-party clones — track via brain/integrations/ docs, not source) ─
+vendor/claude-video/
+vendor/open-design/
+# (vendor/copycat and vendor/mcp-google-ads remain tracked — they're legacy submodule-style)
+
+# ─── Rendered video output (huge, regenerate-able) ──────────────────
+media/videos/**/working/
+media/videos/**/final/*-MASTER.mp4
+media/videos/**/final/*-UPLOAD.mp4
+media/videos/**/final/*-LATE.mp4
+# Keep preview PNGs and thumbnails — small and useful for reference
+
+# ─── Misc build artifacts ───────────────────────────────────────────
+*.tmp
+*.tmp.*
+ffmpeg2pass-*.log*

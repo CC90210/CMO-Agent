@@ -5,6 +5,8 @@ import { UGCTestimonial, UGCTestimonialSchema } from "./compositions/UGCTestimon
 import { CountdownSale, CountdownSaleSchema } from "./compositions/CountdownSale";
 import { ComparisonAd, ComparisonAdSchema } from "./compositions/ComparisonAd";
 import { CinematicReveal, CinematicRevealSchema } from "./compositions/CinematicReveal";
+import { OasisIntroCard, OasisIntroCardSchema } from "./compositions/OasisIntroCard";
+import { OasisOutroCard, OasisOutroCardSchema } from "./compositions/OasisOutroCard";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -141,6 +143,39 @@ export const RemotionRoot: React.FC = () => {
             ],
             ctaText: "See The Difference",
             brandColor: "#2ECC71",
+          }}
+        />
+      </Folder>
+
+      <Folder name="OASIS-YouTube">
+        {/* Animated intro card — 5 seconds */}
+        <Composition
+          id="OasisIntroCard"
+          component={OasisIntroCard}
+          schema={OasisIntroCardSchema}
+          durationInFrames={150}
+          fps={30}
+          width={1920}
+          height={1080}
+          defaultProps={{
+            line1: "Calm waters.",
+            line2: "Intelligent tides.",
+          }}
+        />
+
+        {/* Animated outro card — 8 seconds */}
+        <Composition
+          id="OasisOutroCard"
+          component={OasisOutroCard}
+          schema={OasisOutroCardSchema}
+          durationInFrames={240}
+          fps={30}
+          width={1920}
+          height={1080}
+          defaultProps={{
+            tagline: "built for the ones who refuse to stay asleep.",
+            cta: "Book a 30-min strategy call",
+            bookingUrl: "calendar.app.google/tpfvJYBGircnGu8G8",
           }}
         />
       </Folder>

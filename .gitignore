@@ -61,3 +61,12 @@ media/videos/**/final/*-LATE.mp4
 *.tmp
 *.tmp.*
 ffmpeg2pass-*.log*
+
+# Runtime/private state (local only; public repos ship templates/contracts)
+brain/USER.md
+memory/ACTIVE_TASKS.md
+memory/SESSION_LOG.md
+data/pulse/*.json
+!brain/USER.template.md
+!memory/*.template.md
+!data/pulse/README.md

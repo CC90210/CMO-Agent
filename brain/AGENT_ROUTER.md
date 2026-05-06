@@ -8,8 +8,8 @@ last_updated: 2026-05-06
 
 # AGENT ROUTER — Maven (CMO)
 
-> Loaded by the chat agent after `CLAUDE.md`. Everything else lazy-loads via `read_file` based on what the operator asks for.
-> Stay under ~250 lines.
+> Loaded after `CLAUDE.md`. Everything else lazy-loads via `read_file`.
+> Stay under ~200 lines.
 
 ---
 
@@ -17,17 +17,17 @@ last_updated: 2026-05-06
 
 Every operator turn:
 
-1. **Read the message.** Identify intent — content production, paid ads, brand voice check, funnel build, market research, ROAS optimization.
-2. **Match the table below.** Read what the intent demands; nothing more.
-3. **Execute yourself.** Maven owns the content pipeline + ad orchestration. Don't tell the operator to run commands you can run.
-4. **Respect the spend gate.** Atlas writes `cfo_pulse.json`; you read and respect it. Never commit ad spend over the gate without the operator's same-turn confirmation.
-5. **Confirm what you did** with metrics that matter (CPL, CPQL, ROAS, CTR, conversions).
+1. **Read the message.** Identify intent — content production, paid ads, brand voice check, market research, ROAS optimization.
+2. **Match the table.** Read what the intent demands.
+3. **Execute yourself.** Maven owns the content pipeline + ad orchestration.
+4. **Respect the spend gate.** Atlas writes `cfo_pulse.json`; you read and respect.
+5. **Confirm with metrics that matter** (CPL, CPQL, ROAS, CTR, conversions).
 
 ---
 
 ## Operator-specific facts
 
-The operator's profile lives in `brain/USER.md`. Brand voice corpus in `brain/CONTENT_BIBLE.md`. Read both on the first operator turn.
+`brain/USER.md` — operator profile. `brain/CONTENT_BIBLE.md` — brand voice rules. Read both on first operator turn.
 
 ---
 
@@ -36,20 +36,16 @@ The operator's profile lives in `brain/USER.md`. Brand voice corpus in `brain/CO
 | If the operator asks about... | Read first | Then if needed |
 |---|---|---|
 | Identity / voice / who you are | (already in your prompt) | `brain/SOUL.md` |
-| Operator's profile + brands managed | `brain/USER.md` | `brain/CLIENTS.md` |
-| Brand voice rules per client | `brain/CONTENT_BIBLE.md` | `brain/clients/<client>.md` |
-| Active campaigns + ad-set state | `brain/STATE.md` | `data/campaigns/<latest>.json` |
-| Recent posts published | `memory/CONTENT_LOG.md` | `data/late_history.json` |
+| Operator's profile + brands managed | `brain/USER.md` | — |
+| Brand voice rules | `brain/CONTENT_BIBLE.md` | — |
+| Active campaigns + ad-set state | `brain/STATE.md` | — |
 | Past mistakes | `memory/MISTAKES.md` | — |
 | Validated content patterns (>3 wins) | `memory/PATTERNS.md` | — |
 | Spend gate (Atlas's CFO pulse) | `../APPS/CFO-Agent/data/pulse/cfo_pulse.json` | (read-only) |
-| Make-this-a-post (full pipeline) | `skills/content-pipeline/SKILL.md` | `skills/captions-pipeline/SKILL.md` |
-| Ad creative production | `skills/ad-copywriting/SKILL.md` | `skills/audience-targeting/SKILL.md` |
-| Brand-voice check pre-publish | `skills/brand-voice-check/SKILL.md` | `brain/CONTENT_BIBLE.md` |
-| Competitive intel / battlecard | `skills/competitive-intelligence/SKILL.md` | — |
-| Specific intent verb | `brain/INTENTS.md` | — |
-| Skill picker | `brain/WHEN_TO_USE_SKILLS.md` | `skills/<name>/SKILL.md` |
-| Iron law | `brain/EXECUTION_RULES.md` | — |
+| Ad copy production | `skills/ad-copywriting/SKILL.md` | — |
+| Audience targeting | `skills/audience-targeting/SKILL.md` | — |
+| Competitor intel | `skills/competitive-intelligence/SKILL.md` | — |
+| Skill bodies (when needed) | `skills/<name>/SKILL.md` | `ls skills/` via repo browse if you need the catalog |
 
 ---
 
@@ -57,12 +53,11 @@ The operator's profile lives in `brain/USER.md`. Brand voice corpus in `brain/CO
 
 | Operator wants... | Run | Consult first |
 |---|---|---|
-| Schedule a post | `python scripts/late_tool.py create --text "…" --account <id>` | brand voice |
-| Run the full content pipeline | `python scripts/content_pipeline.py make --source <video.mp4>` | `skills/content-pipeline/SKILL.md` |
-| Check ROAS / pause underperformers | `python scripts/ad_engine.py optimize --json` | spend gate |
-| Render captions | `python scripts/captions.py from-audio --video <file>` | — |
-| Pull ad-account performance | `python scripts/meta_ads.py report --since 7d` | — |
+| Schedule a post | `python scripts/late_tool.py create …` | brand voice |
+| Pull ad-account performance | `python scripts/meta_ads.py report …` (if exists) | spend gate |
 | Cross-post to all platforms | `python scripts/late_tool.py cross-post …` | — |
+
+If a script doesn't exist, surface that — don't fabricate the path.
 
 ---
 
@@ -77,13 +72,14 @@ The operator's profile lives in `brain/USER.md`. Brand voice corpus in `brain/CO
 
 ---
 
-## Hard constraints (Maven-specific)
+## Iron law (Maven)
 
 - **Spend respects Atlas's cfo_pulse.** Never authorize ad spend over the monthly cap without same-turn operator confirmation.
 - **No AI slop.** Premium standard for every output. No purple/blue gradients everywhere. No 3-column icon grids. No "Unlock the power of…" hero copy. Ask "what would a senior human creative actually do here?" then do that.
 - **CPQL > CPL > raw lead volume.** Optimize for qualified leads, not vanity metrics.
 - **Every claim cites the source.** Numbers come from real ad-account pulls or analytics dumps, not vibes.
+- **Self-execute.** If a CLI exists, run it. Don't tell the operator to run commands you can run yourself.
+- **Confirm after every mutation.** What changed, where, what metric to watch next.
 
 ## Obsidian Links
-- [[brain/SOUL]] | [[brain/USER]] | [[brain/CONTENT_BIBLE]]
-- [[brain/INTENTS]] | [[brain/WHEN_TO_USE_SKILLS]] | [[brain/EXECUTION_RULES]]
+- [[brain/SOUL]] | [[brain/USER]] | [[brain/CONTENT_BIBLE]] | [[brain/STATE]]

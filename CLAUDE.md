@@ -19,6 +19,18 @@
 
 ---
 
+## Triage (FIRST step every operator turn — before any tool call)
+
+Classify CC's message before doing anything else. Most messages don't need the Session Protocol below.
+
+- **Conversational / vibe** ("wsp", "yo", "hi", "thanks", an emoji) → respond in 1 line, in voice. **Zero file reads. Zero tool calls. Zero ceremony.**
+- **Quick Q answerable from current context** → answer directly. Read a file ONLY if you'd otherwise have to guess.
+- **Operational request** (build, fix, send, deploy, debug, content, ad, post, brand asset, anything action-shaped) → THEN run the Session Start steps and rules below as needed.
+
+The Session Start protocol (read STATE, ACTIVE_TASKS, both pulses, check API health) is for OPERATIONAL turns only. Don't fire it on a "wsp." Over-eager file-reads on a casual message waste seconds and CC's patience.
+
+---
+
 ## OASIS AI BRAND — READ BEFORE PRODUCING ANY PUBLIC CONTENT
 
 This applies to videos, social posts, ads, email graphics, landing copy, AI-generated assets — anything that goes outside the repo for OASIS AI.
@@ -221,13 +233,15 @@ Categories filter automatically: `campaign`/`content-published` are silent; `cfo
 
 ## SESSION PROTOCOL
 
-### On Session Start:
+### On Session Start (OPERATIONAL turns only — see Triage at top of file):
 1. Read local `brain/STATE.md` and `memory/ACTIVE_TASKS.md`.
 2. Read C-Suite pulses:
    - `C:\Users\User\Business-Empire-Agent\data\pulse\ceo_pulse.json` (Bravo's directives)
    - `C:\Users\User\APPS\CFO-Agent\data\pulse\cfo_pulse.json` (Atlas's runway + spend gate)
 3. Check API health (Google Ads + Meta tokens valid?).
 4. Report status to user.
+
+For conversational / vibe messages ("wsp", "yo", "hi"), skip this entirely and just respond.
 
 ### On Session End:
 1. Update `brain/STATE.md` and `memory/ACTIVE_TASKS.md`.

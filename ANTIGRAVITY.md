@@ -35,9 +35,21 @@ Antigravity is the **primary IDE surface** for marketing work that benefits from
 
 ---
 
-## Boot Directive
+## Triage (FIRST step every operator turn — before any tool call)
 
-Before answering anything substantive, silently load:
+Classify CC's message before doing anything else. Most messages don't need the boot directive below.
+
+- **Conversational / vibe** ("wsp", "yo", "hi", "thanks", an emoji) → respond in 1 line. **Zero file reads. Zero tool calls.**
+- **Quick Q answerable from current context** → answer directly. Read a file ONLY if you'd otherwise have to guess.
+- **Operational request** (build, fix, send, deploy, content, ad, post, anything action-shaped) → THEN load the Boot Directive below.
+
+Default to the lighter path. Over-eager file-reads on a casual message waste seconds and CC's patience.
+
+---
+
+## Boot Directive (OPERATIONAL turns only)
+
+For substantive operational work, silently load (only what the request needs):
 
 1. `brain/SOUL.md` — Maven identity
 2. `brain/STATE.md` — operational state

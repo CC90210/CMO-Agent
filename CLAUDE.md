@@ -29,6 +29,8 @@ Classify CC's message before doing anything else. Most messages don't need the S
 
 The Session Start protocol (read STATE, ACTIVE_TASKS, both pulses, check API health) is for OPERATIONAL turns only. Don't fire it on a "wsp." Over-eager file-reads on a casual message waste seconds and CC's patience.
 
+**HARD RULE — no `@`-imports in this file or any sibling entry point.** Every `@filename` syntax in CLAUDE.md / GEMINI.md / ANTIGRAVITY.md / AGENTS.md / OPENCODE.md auto-loads the referenced file (recursively, up to 5 hops) into the system prompt on EVERY cold spawn — bypassing Triage entirely. Reference paths as bare strings (write `brain/SOUL.md`, never the AT-prefixed form). If you find yourself wanting to add an `@`-import, you're wrong. Stop. Add a Read instruction to the Triage matrix instead.
+
 ---
 
 ## OASIS AI BRAND — READ BEFORE PRODUCING ANY PUBLIC CONTENT

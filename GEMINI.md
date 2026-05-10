@@ -48,6 +48,8 @@ Classify CC's message before doing anything else. Most messages don't need the b
 
 Default to the lighter path. Over-eager file-reads on a casual message waste seconds and CC's patience.
 
+**HARD RULE — no `@`-imports in this file.** `@filename` auto-loads the referenced file recursively into the system prompt on every spawn. Reference paths as bare strings (write `brain/SOUL.md`, never the AT-prefixed form). If you want a file always-available, you're wrong — add it to Triage as a conditional read.
+
 ---
 
 ## Boot Directive (OPERATIONAL turns only)

@@ -34,6 +34,9 @@ Maven writes only to `data/pulse/cmo_pulse.json`.
 - [[INTERACTION_PROTOCOL]] — How Maven talks to CC + sibling agents
 - [[RESPONSIBILITY_BOUNDARIES]] — Maven/Bravo/Atlas/Aura ownership matrix + grey-zone routing (V1.1)
 - [[CFO_GATE_CONTRACT]] — cfo_pulse.json schema + every fail-closed condition (V1.2)
+- [[AGENTIC_OS_REFERENCE]] — V6.7 canonical logic spec (5-layer cross-section, Pantry/Prep Table/Plate). Shared across Bravo, Maven, Atlas, Hermes.
+- [[DATA_TAXONOMY]] — Maven's Pantry/Prep Table/Plate manifest. Audit target for silver-platter skill.
+- [[INTENTS]] — Verb-by-verb playbook for Maven (V6.7)
 
 ---
 

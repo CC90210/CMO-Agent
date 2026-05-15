@@ -5,6 +5,7 @@ canon_references: [hormozi-lead-flows, godin-permission, miner-nepq, ross-predic
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["send an email blast", "bulk outreach email", "email campaign to the list", "send marketing emails", "CASL-compliant bulk send"]
 ---
 
 # SKILL: Email Outbound (Gmail Blast System)

@@ -1,20 +1,6 @@
+"""self_audit — Maven's automated health-check script: scans the capability graph for orphans, drift, and undocumented scripts, then emits a numeric health score and action list."""
 #!/usr/bin/env python3
-"""
-Self-Audit — Maven's automated health check.
-
-Scans the knowledge graph for orphans, broken wiring, stale docs, and
-undocumented scripts. Runs fast (seconds), emits a health score + action list.
-
-Usage:
-    python scripts/self_audit.py              # human-readable report
-    python scripts/self_audit.py --json       # agent-readable JSON
-    python scripts/self_audit.py --fix-links  # auto-add reconnection TODOs to orphans
-
-Exit codes:
-    0 = healthy (score >= 85)
-    1 = warnings (score 70-84)
-    2 = degraded (score < 70)
-"""
+# Runs fast (seconds). Exit: 0=healthy(>=85), 1=warnings(70-84), 2=degraded(<70).
 
 from __future__ import annotations
 

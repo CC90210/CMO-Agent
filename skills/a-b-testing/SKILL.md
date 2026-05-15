@@ -5,6 +5,7 @@ canon_references: [sharp-how-brands-grow, ritson-diagnosis, hormozi-value-equati
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["run an A/B test", "split test this ad", "test two headlines", "which variant wins", "ab test campaign"]
 ---
 
 # SKILL: A/B Testing

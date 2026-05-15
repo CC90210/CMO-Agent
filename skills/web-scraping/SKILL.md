@@ -2,6 +2,7 @@
 name: web-scraping
 description: Web scraping and structured data extraction. Activate when CC needs to pull content from competitor sites, extract pricing/contacts/listings, harvest data for research, scrape pages that don't have an API, or operate a site under CC's logged-in account.
 tags: [skill, scraping, data-extraction, research, browser-harness]
+triggers: ["scrape a website", "extract competitor pricing", "pull data from this page", "crawl this site for content", "harvest leads from web"]
 ---
 
 # Web Scraping — Firecrawl, Playwright, and Browser Harness

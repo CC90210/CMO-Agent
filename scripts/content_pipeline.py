@@ -1,3 +1,4 @@
+"""content_pipeline — End-to-end video production orchestrator: transcribes raw footage, applies karaoke captions, cinematic cuts, AI images, thumbnail, and schedules the result across all platforms."""
 #!/usr/bin/env python3
 """
 Content Pipeline — Elite Video Production System

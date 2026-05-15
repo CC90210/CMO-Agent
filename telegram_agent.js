@@ -499,13 +499,20 @@ ${pulses}
 
 ${buildMavenToolBlock()}
 ${history}
+TELEGRAM REPLY FORMAT (HARD RULES — CC is reading on his phone):
+- NEVER use markdown: no asterisks, no #, no backticks, no [text](link). Telegram renders them as raw characters.
+- Max 4 short lines for normal replies. Only go longer if CC explicitly asks for detail or the task needs it.
+- No headers, no bullet lists with stars, no multi-section answers. Use line breaks, not structure.
+- Plain text only. Use UPPERCASE for one or two words of emphasis if absolutely needed. Otherwise no emphasis.
+- Lead with the answer in the first line. Save anything else for follow-up only if asked.
+- Never list "options" with numbered choices unless CC asked for options.
+
 RULES:
-(1) Answer in 1-5 sentences unless task requires more.
-(2) Brand voice: ${readMavenRepo('media/brand/BRAND_GUIDE.md', 8) || 'see BRAND_GUIDE'}
-(3) Cite at least one framework from MARKETING_CANON when recommending creative or strategy.
-(4) Paid launches go through the bridge's CFO gate — DO NOT bypass.
-(5) Refer to CC by name. Direct, no filler.
-(6) Address user as CC. ${KILLSWITCH_ENGAGED() ? 'KILLSWITCH ENGAGED — no real sends.' : ''}
+(1) Brand voice: ${readMavenRepo('media/brand/BRAND_GUIDE.md', 8) || 'see BRAND_GUIDE'}
+(2) Cite MARKETING_CANON only when CC asks for strategy reasoning. Don't pad chat replies with citations.
+(3) Paid launches go through the bridge's CFO gate — DO NOT bypass.
+(4) Refer to CC by name. Direct, no filler.
+(5) ${KILLSWITCH_ENGAGED() ? 'KILLSWITCH ENGAGED — no real sends.' : ''}
 
 CC's message:`;
     }
@@ -520,15 +527,22 @@ Sibling repos are reachable from this machine — see SIBLING REACHABILITY block
 
 ${context}
 ${history}
+TELEGRAM REPLY FORMAT (HARD RULES — CC is reading on his phone):
+- NEVER use markdown: no asterisks, no #, no backticks, no [text](link). Telegram renders them as raw characters, not formatting.
+- Max 4 short lines for normal chat replies. Go longer only if CC explicitly asks for detail or the task genuinely needs depth.
+- No headers, no bullet lists with stars, no multi-section "Here's your status" walls. Use line breaks, not structure.
+- Plain text only. UPPERCASE for one or two words of emphasis if absolutely needed.
+- Lead with the answer in line 1. Hold the rest unless CC asks.
+- Don't volunteer "options 1/2/3" lists unless CC asked what to do.
+
 RULES:
-(1) Answer directly in 1-5 sentences unless task requires depth.
-(2) Use the tool routing above. ${PYTHON} for all script calls.
-(3) Cite MARKETING_CANON entries when making creative or strategy recommendations.
-(4) Paid launches: bridge has already gated cfo_pulse if this prompt got through; you may proceed.
-(5) After significant work, update memory/SESSION_LOG.md and brain/STATE.md (state_sync runs after T1+ runs).
-(6) Output "⚠️ CONFIRM: <description>" before destructive actions and STOP — bridge intercepts and asks CC.
-(7) Speak like CC's BRAND_GUIDE: confident-not-arrogant, direct-not-corporate. NO hustle/synergy/leverage/10x language.
-(8) ${KILLSWITCH_ENGAGED() ? 'MAVEN_FORCE_DRY_RUN engaged — DO NOT execute real sends.' : 'Killswitch off; real sends OK if other gates pass.'}
+(1) Use the tool routing above. ${PYTHON} for all script calls.
+(2) Cite MARKETING_CANON only when CC asks for strategy reasoning, not in every chat reply.
+(3) Paid launches: bridge has already gated cfo_pulse if this prompt got through; you may proceed.
+(4) After significant work, update memory/SESSION_LOG.md and brain/STATE.md.
+(5) Output "⚠️ CONFIRM: <description>" before destructive actions and STOP — bridge intercepts and asks CC.
+(6) Speak like CC's BRAND_GUIDE: confident-not-arrogant, direct-not-corporate. NO hustle/synergy/leverage/10x language.
+(7) ${KILLSWITCH_ENGAGED() ? 'MAVEN_FORCE_DRY_RUN engaged — DO NOT execute real sends.' : 'Killswitch off; real sends OK if other gates pass.'}
 
 CC's message:`;
 };
@@ -890,6 +904,8 @@ bot.on('message', async (msg) => {
             '  /tests  — run all 6 test files, report pass/fail',
             '  /inbox  — unread agent_inbox messages addressed to maven',
             '  /post bravo|atlas|aura subject || body — cross-repo post',
+            '  /idea <text> — capture a content idea to the backlog',
+            '  /ideas [raw|sharpened|filmed|posted|all] — list captured ideas',
             '  /clear  — clear conversation history',
             '  /whoami — show your Telegram user ID',
             '',
@@ -1117,6 +1133,45 @@ bot.on('message', async (msg) => {
                 { cwd: __dirname, windowsHide: true, timeout: 15000 },
                 (err, out, errOut) => {
                     bot.sendMessage(chatId, ((out || errOut || '(no unread)').substring(0, 3500)))
+                        .then(resolve).catch(() => resolve());
+                });
+        });
+    }
+
+    // /idea <text> — friction-free content capture. CC sends a thought, it lands
+    // in data/content/idea_backlog.md tagged source=telegram. He picks up his
+    // phone later and pulls the list with /ideas.
+    const ideaMatch = text.match(/^\/idea\s+(.+)/s);
+    if (ideaMatch) {
+        const ideaText = ideaMatch[1].trim();
+        if (!ideaText) {
+            return bot.sendMessage(chatId, 'format: /idea <your thought, hook, observation, anything>');
+        }
+        return new Promise((resolve) => {
+            execFile(PYTHON, ['scripts/capture_idea.py', 'add', ideaText, '--source', 'telegram', '--json'],
+                { cwd: __dirname, windowsHide: true, timeout: 10000 },
+                (err, out, errOut) => {
+                    let reply = '✅ captured';
+                    try {
+                        const parsed = JSON.parse((out || '').trim());
+                        if (parsed.ok) reply = `✅ captured  id=${parsed.id}  (raw)`;
+                    } catch (_) {
+                        reply = (out || errOut || err?.message || 'capture failed').substring(0, 500);
+                    }
+                    bot.sendMessage(chatId, reply).then(resolve).catch(() => resolve());
+                });
+        });
+    }
+
+    // /ideas [raw|sharpened|filmed|posted|all] — list captured ideas.
+    const ideasMatch = text.match(/^\/ideas(?:\s+(\S+))?$/);
+    if (ideasMatch) {
+        const status = (ideasMatch[1] || 'raw').toLowerCase();
+        return new Promise((resolve) => {
+            execFile(PYTHON, ['scripts/capture_idea.py', 'list', '--status', status],
+                { cwd: __dirname, windowsHide: true, timeout: 10000 },
+                (err, out, errOut) => {
+                    bot.sendMessage(chatId, ((out || errOut || '(no ideas)').substring(0, 3500)))
                         .then(resolve).catch(() => resolve());
                 });
         });

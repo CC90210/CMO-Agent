@@ -1,30 +1,12 @@
-# -*- coding: utf-8 -*-
-"""
-SunBiz Funding - AI Ad Copy Generator
-=======================================
-Generates MCA-compliant ad copy for SunBiz Funding campaigns.
+"""AI-powered MCA-compliant ad copy generator for Meta and Google Ads — uses Gemini API with template-bank fallback, enforcing lending-industry language rules on all output.
 
 Primary path:  Gemini API (via GEMINI_API_KEY in .env.agents) — generative copy.
 Fallback path: Built-in template banks — no API key required, always works.
 
-Compliance rules enforced on ALL output:
-  - Forbidden: "loan", "MCA", "merchant cash advance", "guaranteed approval",
-               "hard credit pull", "guarantee", "guaranteed"
-  - Required CTAs: "See if you qualify", "Apply now", "Check your options"
-  - Amounts always preceded by "up to"
-  - No unlicensed claims about approval rates or timelines
-
-Campaign types:
-  growth_capital, consolidation, fast_funding, industry, social_proof
-
-Usage:
-    from scripts.ad_copy_generator import AdCopyGenerator
-
-    gen = AdCopyGenerator()
-    copy = gen.generate_ad_copy("growth_capital", tone="confident", num_variations=3)
-    print(gen.validate_compliance(copy[0]["headline"]))
+Compliance rules enforced: no "loan", "guaranteed approval", or specific approval-rate claims.
+Campaign types: growth_capital, consolidation, fast_funding, industry, social_proof.
 """
-
+# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import io

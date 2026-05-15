@@ -4,6 +4,7 @@ description: Systematic competitor tracking, battlecard generation, market monit
 tags: [skill, competitive-intelligence, market-research, strategy]
 canon_references: [ritson-diagnosis, dunford-positioning, fishkin-sparktoro]
 canon_source: brain/MARKETING_CANON.md
+triggers: ["research a competitor", "what are competitors running", "generate a battlecard", "competitive analysis", "who else is in this space"]
 ---
 # Competitive Intelligence
 

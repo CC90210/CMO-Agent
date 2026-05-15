@@ -5,6 +5,7 @@ canon_references: [sutherland-signalling, dunford-positioning, godin-permission]
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["generate an ad image", "create campaign creative", "make a social media graphic", "AI image for Meta ad", "generate ad visuals"]
 ---
 
 # SKILL: AI Image Generation (Production-Grade)

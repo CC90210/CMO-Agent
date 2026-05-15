@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
+"""A/B testing and Bayesian budget-optimization engine for Meta and Google Ads campaigns — allocates spend across creative variants and ad sets based on performance signals.
+
 SunBiz Funding - A/B Testing & Budget Optimization Engine
-==========================================================
 Bayesian optimization via Facebook's Ax platform (ax-platform).
 Falls back to heuristic-based optimization when ax-platform is not installed.
 
@@ -13,14 +12,8 @@ Capabilities:
 
 Dependencies (optional — fallback activates automatically):
     pip install ax-platform torch
-
-Usage:
-    from scripts.ab_testing_engine import ABTestingEngine
-
-    engine = ABTestingEngine()
-    recs = engine.get_optimization_recommendations(campaigns_data)
 """
-
+# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import io

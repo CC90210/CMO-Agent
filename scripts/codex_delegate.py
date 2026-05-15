@@ -1,33 +1,7 @@
+"""codex_delegate — Maven-side CLI wrapper for delegating backend marketing tasks (ad-copy variants, attribution math, A/B significance) to OpenAI Codex via codex-companion.mjs."""
 #!/usr/bin/env python3
-"""
-codex_delegate — Maven-side wrapper for delegating backend marketing work
-to OpenAI Codex via the codex-companion.mjs bridge.
-
-When to delegate from Maven:
-  - Ad-copy variant generation at scale (50+ headlines/descriptions per
-    campaign for Andromeda diversity)
-  - Performance-data math (LTV/CAC, multi-touch attribution, A/B significance)
-  - Landing-page copy A/B variants
-  - Competitive ad-library transcript analysis
-  - Any backend Python that's primarily algorithmic vs creative
-
-When NOT to delegate (stays in Maven):
-  - Brand voice / strategic positioning
-  - Creative direction / image-generation prompts
-  - Any task touching MCP tools (Playwright, Late, Supabase)
-  - Anything requiring CFO spend-gate consultation
-
-Usage:
-    python scripts/codex_delegate.py task --write "Generate 50 Meta headline
-        variants for OASIS AI's lead-gen campaign. Avoid AI slop. Cite the
-        Schwartz breakthrough framework."
-
-    python scripts/codex_delegate.py review     # adversarial review
-    python scripts/codex_delegate.py status     # check current Codex job
-    python scripts/codex_delegate.py result     # fetch last result
-
-Wraps: $CLAUDE_PLUGIN_ROOT/scripts/codex-companion.mjs
-"""
+# Wraps $CLAUDE_PLUGIN_ROOT/scripts/codex-companion.mjs.
+# Never delegates: brand voice, creative direction, MCP-dependent tasks.
 
 from __future__ import annotations
 

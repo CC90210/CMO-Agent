@@ -6,9 +6,7 @@ owner: maven
 risk: low
 status: '[VALIDATED]'
 disable-model-invocation: true
-triggers:
-  - synthesize
-  - new auto-generated skill
+triggers: ["synthesize a new skill", "new auto-generated skill", "promote auto-generated skill", "runtime skill creation", "skill synthesizer"]
 ---
 
 # Auto-Generated Skills Container

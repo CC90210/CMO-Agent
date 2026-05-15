@@ -156,8 +156,9 @@ Every edit touches ONLY what was requested. No drive-by refactoring. No "while I
 - **claude-video** at `vendor/claude-video/` — open `vendor/claude-video/SKILL.md`. Use as pre-publish QA gate on Remotion ad output before it goes to Late. NOT a Remotion replacement.
 - **open-design** at `vendor/open-design/` — lift `skills/<name>/` into `skills/oasis-<name>/` and brand-adapt. Don't run the daemon.
 - **graphify** — Bravo-owned. Read his Obsidian vault export at `Business-Empire-Agent/graphify-out/obsidian/` directly in this IDE for visual concept browsing.
+- **Higgsfield director skills** at `skills/cinema-worldbuilder/` + `skills/banana-pro-director/` — AI cinematic video (Seedance) and image generation (Banana Pro / Soul Cinema / GPT-2) prompt grammars. Five cinema modes, locked photoreal stack, character gate, pre-prompt confirmation. Open the SKILL.md files in the editor when CC asks for a Seedance prompt or a character sheet. **Subscription gated** until CC's GPU upgrade — check `memory/project_deferred_ai_capabilities.md` before assuming live Higgsfield access.
 
-Full docs: `brain/integrations/{claude-video,open-design,graphify}.md`. YouTube pipeline now includes a step 11 QA pass.
+Full docs: `brain/integrations/{claude-video,open-design,graphify}.md`. YouTube pipeline includes step 11 (claude-video QA) and step 3.5 (AI-generated primary content via cinema-worldbuilder → Seedance).
 
 ---
 

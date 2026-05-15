@@ -56,17 +56,20 @@ This applies to videos, social posts, ads, email graphics, landing copy, AI-gene
 
 ## EXTERNAL INTEGRATIONS
 
-Three external repos wired into Maven as of 2026-05-03. Full docs in `brain/integrations/`.
+External repos + AI-platform director skills wired into Maven. Full docs in `brain/integrations/`.
 
 | Tool | Vendor path | Role | Trigger |
 |---|---|---|---|
 | `claude-video` | `vendor/claude-video/` | Video understanding (frames + transcript). Pre-publish QA, competitive teardowns, bug-repro. NOT a Remotion replacement. | "Watch this video" / "QA this ad" / "what's the hook on this Reel" |
 | `open-design` | `vendor/open-design/` | Claude-Design alternative. 58 skills + 129 design systems. Lift skills like `social-carousel`, `magazine-poster`, `email-marketing`. | "Make a social card" / "build a deck" / "lead magnet" |
 | `graphify` | (Bravo-owned, runs from `Business-Empire-Agent/`) | Knowledge graph + Obsidian vault export. Maven reads outputs at `Business-Empire-Agent/graphify-out/`. | "What playbooks touch X" / "Obsidian graph" |
+| Higgsfield director skills | `skills/cinema-worldbuilder/` + `skills/banana-pro-director/` | AI cinematic video (Seedance) + image generation (Banana Pro / Soul Cinema / GPT-2) prompt grammars. Five cinema modes, locked photoreal stack, character gate, pre-prompt confirmation. Pair with Remotion brand cards for full asset pipeline. **Subscription gated** — see `memory/project_deferred_ai_capabilities.md`. | "make a Seedance prompt" / "build a character sheet" / "scene plate" / "ref sheet" |
 
-The YouTube pipeline now includes a **step 11** — optional claude-video QA pass before Late upload. See `brain/playbooks/youtube_video_pipeline.md`.
+The YouTube pipeline now includes a **step 11** — optional claude-video QA pass before Late upload — and a **step 3.5** for AI-generated primary content via Cinema Worldbuilder → Seedance when there's no raw footage. See `brain/playbooks/youtube_video_pipeline.md`.
 
 **Lift-and-adapt rule for open-design skills:** copy from `vendor/open-design/skills/<name>/` → into `skills/oasis-<name>/` → swap colors to `#0A1525` + `#1FE3F0`, fonts to Fraunces + Inter, voice rules from `BRAND_SYSTEM.md`. Retain Apache-2.0 attribution.
+
+**Higgsfield pairing rule:** stills built via `banana-pro-director` (Mode 3 scene plates) feed directly into `cinema-worldbuilder` Seedance prompts as visual references — same five-mode camera grammar, shared visual DNA between still and video.
 
 ---
 

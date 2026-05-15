@@ -1,3 +1,4 @@
+"""pulse_client — Reads and writes cross-agent C-suite pulse files (CMO/CEO/CFO) so Maven can broadcast its status and consume Bravo/Atlas health snapshots."""
 import json
 import datetime
 from pathlib import Path

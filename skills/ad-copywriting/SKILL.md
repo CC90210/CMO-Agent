@@ -5,6 +5,7 @@ canon_references: [dunford-positioning, hormozi-value-equation, miner-nepq, suth
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["write ad copy", "draft a headline", "generate Meta ad creative", "rewrite this ad", "ad variants for split test"]
 ---
 
 # SKILL: Ad Copywriting for MCA / Business Funding

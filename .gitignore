@@ -2,6 +2,12 @@ node_modules/
 .next/
 dist/
 tmp/
+# ─── Windows reserved-name accidents ────────────────────────────────
+# Bash on Windows writes literal files named 'nul' when scripts redirect
+# to the Windows null device (e.g. `cmd > nul`). Block them at the root
+# so a copy of .env.agents never lands here again.
+/nul
+/NUL
 # ─── Credential files (NEVER commit values) ─────────────────────────
 .env
 .env.*

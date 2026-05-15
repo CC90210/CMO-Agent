@@ -10,6 +10,7 @@ metadata:
       skills: ["gws-docs", "gws-drive", "gws-gmail", "gws-chat", "gws-slides"]
 canon_references: [dunford-positioning, godin-tribes]
 canon_source: brain/MARKETING_CANON.md
+triggers: ["create content in Google Docs", "draft a post and organize it", "distribute content via workspace", "content calendar update", "share content with team via Drive"]
 ---
 # Content Creator
 

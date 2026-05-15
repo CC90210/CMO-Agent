@@ -5,6 +5,7 @@ canon_references: [ritson-diagnosis]
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["scrape the ad library", "automate the browser", "screenshot competitor ads", "check how the landing page looks", "verify ad is live"]
 ---
 
 # SKILL: Browser Automation

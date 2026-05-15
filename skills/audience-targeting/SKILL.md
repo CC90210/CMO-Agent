@@ -5,6 +5,7 @@ canon_references: [sharp-mental-availability, godin-smallest-viable-audience, ho
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["define audience", "who should we target", "build a custom audience", "lookalike audience setup", "targeting strategy for this campaign"]
 ---
 
 # SKILL: Audience Targeting

@@ -5,6 +5,7 @@ canon_references: [ritson-diagnosis]
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["MCA compliance check", "is this ad copy legal", "lending regulations for ads", "SunBiz compliance language", "what can we say about merchant cash advances"]
 ---
 
 # SKILL: MCA Industry Knowledge

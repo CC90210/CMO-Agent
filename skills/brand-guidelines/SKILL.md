@@ -78,3 +78,4 @@ To access Anthropic's official brand identity and style resources, use this skil
 
 ## Obsidian Links
 - [[skills/INDEX]] | [[brain/CAPABILITIES]]
+- [[brain/brand-assets/oasis-ai/BRAND_SYSTEM]] | [[brain/integrations/open-design]] | [[brain/integrations/graphify]]

@@ -5,6 +5,7 @@ canon_references: [sharp-reach-over-frequency, hormozi-lead-flows, ritson-diagno
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["reallocate ad budget", "we're overspending on this campaign", "shift budget to better performer", "optimize ad spend", "reduce CPL by adjusting budget"]
 ---
 
 # SKILL: Budget Optimization

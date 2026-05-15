@@ -213,13 +213,14 @@ scripts/                             ← Python CLI tools (render, sync, post pi
 
 ## External Integrations
 
-Three repos wired in (full docs in `brain/integrations/`):
+External repos + AI-platform director skills (full docs in `brain/integrations/`):
 
 - **claude-video** (`vendor/claude-video/`) — video understanding, pre-publish QA, hook research. NOT a Remotion replacement.
 - **open-design** (`vendor/open-design/`) — 58 skills + 129 design systems. Lift `social-carousel` / `magazine-poster` / `email-marketing` / `html-ppt-pitch-deck` and brand-adapt with BRAND_SYSTEM.md.
 - **graphify** — Bravo-owned. Read outputs at `Business-Empire-Agent/graphify-out/`. Don't run independently.
+- **Higgsfield director skills** (`skills/cinema-worldbuilder/` + `skills/banana-pro-director/`) — AI cinematic video (Seedance) + image generation (Banana Pro / Soul Cinema / GPT-2) prompt grammars. Five cinema modes (Narrative / Studio / Action / Performance / Atmospheric), locked photoreal stack, character gate, pre-prompt confirmation. Pair scene plates from Banana Pro with Seedance video for shared visual DNA. **Subscription gated** until CC's GPU upgrade — see `memory/project_deferred_ai_capabilities.md`.
 
-YouTube pipeline now has a step-11 QA pass via claude-video — see `brain/playbooks/youtube_video_pipeline.md`.
+YouTube pipeline now has a **step 11** claude-video QA pass and a **step 3.5** for AI-generated primary content via cinema-worldbuilder → Seedance when no raw footage exists — see `brain/playbooks/youtube_video_pipeline.md`.
 
 ---
 

@@ -150,7 +150,7 @@ Pause video 0.5-1.5 seconds while audio continues. Use for reactions, data point
 
 **Word-by-word highlight beats full-sentence display** — guides the eye at speech pace, never ahead or behind.
 
-### OASIS / Kona Makana Brand Standard (Default)
+### OASIS / Conaugh McKenna Brand Standard (Default)
 
 | Property | Value |
 |----------|-------|
@@ -634,3 +634,4 @@ Before delivering any output, verify all of the following:
 ## Obsidian Links
 - [[skills/content-engine/SKILL]] | [[brain/CAPABILITIES]] | [[memory/content-strategy]]
 - `memory/content_pipeline_vision.md` | [[skills/INDEX]]
+- [[brain/playbooks/youtube_video_pipeline]] | [[brain/integrations/claude-video]]

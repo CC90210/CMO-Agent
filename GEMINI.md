@@ -149,8 +149,9 @@ Quick references for the speed layer:
 - **claude-video** (`vendor/claude-video/`) — for QA / hook research, but defer to Claude-Maven for actual reading of frame outputs (visual judgment matters here).
 - **open-design** (`vendor/open-design/skills/`) — browse 58 skills if CC asks for a fast deck/social card. Lift template, hand to Claude-Maven for brand adaptation.
 - **graphify** — Bravo-owned. Read outputs at `Business-Empire-Agent/graphify-out/`.
+- **Higgsfield director skills** (`skills/cinema-worldbuilder/` + `skills/banana-pro-director/`) — Seedance video + Banana Pro/Soul Cinema/GPT-2 image prompt grammars. **Defer to Claude-Maven for actual prompt composition** (cinema-mode picking + character gate + reference-image reading needs visual judgment). Speed layer can scaffold the pre-prompt confirmation but final code blocks go through Claude. **Subscription gated** — check `memory/project_deferred_ai_capabilities.md`.
 
-Full docs: `brain/integrations/{claude-video,open-design,graphify}.md`.
+Full docs: `brain/integrations/{claude-video,open-design,graphify}.md`. YouTube pipeline (`brain/playbooks/youtube_video_pipeline.md`) has step 11 (claude-video QA) and step 3.5 (AI-generated primary content).
 
 ---
 

@@ -2,6 +2,7 @@
 name: codex-delegation
 description: Intelligent routing between Bravo and Codex — decides when to delegate tasks to Codex vs handle internally
 tags: [skill]
+triggers: ["delegate to Codex", "send this to Codex", "get Codex to build", "run Codex in background", "Codex adversarial review"]
 ---
 
 # Codex Delegation — Intelligent Dual-AI Routing

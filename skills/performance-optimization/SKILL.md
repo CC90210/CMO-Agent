@@ -5,6 +5,7 @@ canon_references: [sharp-mental-availability, ritson-diagnosis, hormozi-value-eq
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["optimize campaign performance", "CPL is too high fix it", "improve ROAS", "campaign not delivering", "scale the winning ad set"]
 ---
 
 # SKILL: Performance Optimization

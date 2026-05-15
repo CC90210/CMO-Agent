@@ -1,6 +1,6 @@
 ---
 brand: Conaugh McKenna (personal brand)
-aka: CC, Kona Makana (DJ alias)
+aka: CC, Conaugh McKenna (DJ alias)
 tags: [client, personal-brand, content, top-of-funnel]
 ---
 
@@ -9,7 +9,7 @@ tags: [client, personal-brand, content, top-of-funnel]
 ## Identity
 - **Legal name for B2B:** Conaugh McKenna
 - **Internal nickname:** CC (NEVER use with clients or in paid ads)
-- **DJ alias:** Kona Makana (for music/entertainment content)
+- **DJ alias:** Conaugh McKenna (for music/entertainment content)
 - **Age:** 22, Collingwood ON, international background (lived in Osaka, Dublin, Oslo, Spain, Portugal)
 
 ## Why This Matters (Strategic)
@@ -40,7 +40,7 @@ The personal brand is the **top-of-funnel for OASIS AI**. Every reel, every post
 
 ## Non-Negotiable Rules
 - **External comms (professional/B2B):** Use "Conaugh McKenna"
-- **Internal / DJ / entertainment:** "CC" or "Kona Makana" is fine
+- **Internal / DJ / entertainment:** "CC" or "Conaugh McKenna" is fine
 - **NEVER** sign emails "CC" when prospecting for OASIS — that's "Conaugh McKenna"
 
 ## What Maven Does for This Brand

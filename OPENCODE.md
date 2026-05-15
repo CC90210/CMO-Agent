@@ -185,9 +185,14 @@ cp -r vendor/open-design/skills/social-carousel skills/oasis-social-carousel/
 
 # graphify — Bravo's territory; read his outputs
 ls /c/Users/User/Business-Empire-Agent/graphify-out/  # when Bravo has run it
+
+# Higgsfield director skills — AI cinematic video + image prompt grammars
+cat skills/cinema-worldbuilder/SKILL.md   # Seedance video prompt grammar (5 cinema modes)
+cat skills/banana-pro-director/SKILL.md   # Banana Pro / Soul Cinema / GPT-2 image prompts
+# Subscription gated — see memory/project_deferred_ai_capabilities.md before assuming Higgsfield access
 ```
 
-Full docs: `brain/integrations/{claude-video,open-design,graphify}.md`.
+Full docs: `brain/integrations/{claude-video,open-design,graphify}.md`. YouTube pipeline (`brain/playbooks/youtube_video_pipeline.md`) now has step 3.5 for AI-generated primary content via cinema-worldbuilder → Seedance, and step 11 for claude-video QA.
 
 ---
 

@@ -5,6 +5,7 @@ canon_references: [ritson-diagnosis]
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["automation is broken fix it", "token expired auto-recover", "campaign stopped delivering fix", "retry failed sends", "run self-healing check"]
 ---
 
 # SKILL: Self-Healing
@@ -88,7 +89,7 @@ note: Examples in this skill may reference SunBiz (legacy client); the skill its
 ## Self-Healing Checklist (Run at Session End)
 - [ ] Memory files consistent? (no contradictions)
 - [ ] Campaign data fresh? (within 24 hours)
-- [ ] API tokens valid?
+- [ ] API tokens valid? (`scripts/token_expiry_check.py` — run weekly to detect expiry drift)
 - [ ] All MCP servers responding?
 - [ ] Any rejected ads?
 - [ ] Any campaigns with unusual performance?

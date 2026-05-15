@@ -1,6 +1,7 @@
 ---
 name: verticals
 description: Vertical-pack registry for Maven. Routes a brand to its industry-specific marketing playbook (SaaS, agency, coaching, e-commerce, local-service, creator).
+triggers: ["which vertical does this brand belong to", "apply the SaaS playbook", "agency marketing strategy", "local service vertical campaign", "creator brand marketing approach"]
 ---
 
 # SKILL: Verticals — Per-Industry Marketing Packs

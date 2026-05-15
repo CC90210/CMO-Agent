@@ -5,6 +5,7 @@ canon_references: [ritson-diagnosis, sharp-mental-availability]
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["generate performance report", "weekly campaign recap", "pull analytics across platforms", "how are the ads doing", "ROAS report for client"]
 ---
 
 # SKILL: Reporting & Analytics
@@ -122,3 +123,8 @@ insights = Campaign(id).get_insights(
 - **Weekly:** Full performance review with recommendations
 - **Monthly:** Executive summary for client
 - **Quarterly:** Strategy review and planning
+
+## CLI Tools
+- `scripts/performance_reporter.py` — pull cross-platform metrics and generate report JSON
+- `scripts/content_backlog_audit.py` — audit Maven's content working directories for pipeline health
+- `scripts/pulse_publish.py` — write Maven's CMO pulse snapshot for cross-agent consumption

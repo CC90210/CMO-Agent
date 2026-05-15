@@ -5,6 +5,7 @@ canon_references: [hormozi-lead-flows, holmes-buyer-pyramid, miner-nepq]
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["build a lead funnel", "capture more leads", "set up lead gen", "create a lead magnet", "qualify inbound leads"]
 ---
 
 # SKILL: Lead Generation Funnel (SunBiz Funding)

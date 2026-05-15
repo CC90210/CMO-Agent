@@ -7,6 +7,7 @@ description: >
   unclear which agent should handle work. Skip when: trivial single-file edits, CC explicitly
   names the agent to use.
 tags: [orchestration, routing, agents]
+triggers: ["which agent should handle this", "route this task", "who owns this work", "classify task complexity", "assign this to the right agent"]
 ---
 
 # Task Routing — Complexity-Based Agent Assignment

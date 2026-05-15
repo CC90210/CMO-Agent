@@ -5,6 +5,7 @@ canon_references: [dunford-positioning, ritson-diagnosis, hormozi-value-equation
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["launch a new campaign", "set up a Meta campaign", "create Google Ads campaign", "build a campaign from scratch", "start a lead gen campaign"]
 ---
 
 # SKILL: Campaign Creation

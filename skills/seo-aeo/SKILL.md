@@ -5,6 +5,7 @@ canon_references: [sharp-mental-availability, godin-permission, fishkin-sparktor
 canon_source: brain/MARKETING_CANON.md
 universal: true
 note: Examples in this skill may reference SunBiz (legacy client); the skill itself is brand-agnostic. Per-brand context lives in brain/clients/<brand>.md.
+triggers: ["improve SEO for this page", "keyword research for campaign", "optimize for AI search answers", "schema markup for the landing page", "what keywords should we target"]
 ---
 
 # SKILL: SEO & AEO (Search Engine + Answer Engine Optimization)

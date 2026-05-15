@@ -136,6 +136,7 @@ When Supabase is available:
 
 ## Obsidian Links
 - [[skills/INDEX]] | [[brain/CAPABILITIES]]
+- [[memory/ACTIVE_TASKS.template]] | [[memory/SESSION_LOG.template]]
 
 ---
 

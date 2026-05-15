@@ -1,31 +1,8 @@
+"""agent_inbox — Async agent-to-agent messaging inbox for cross-agent coordination (Maven, Bravo, Atlas, Codex) using a file-based queue in tmp/agent_inbox/."""
 #!/usr/bin/env python3
-"""
-agent_inbox — Async agent-to-agent messaging (mcp_agent_mail-inspired pattern).
-
-Closes Bravo's coordination gap: sibling agents (Atlas, Maven, Aura, Codex)
-can post structured messages that the orchestrator picks up at checkpoints
-instead of blocking on synchronous polls.
-
-Usage:
-    # Post a message
-    python scripts/agent_inbox.py post --from codex --to bravo \
-        --subject "Task complete" --body "Refactor landed" --priority normal
-
-    # List unread for a recipient
-    python scripts/agent_inbox.py list --to bravo
-
-    # Read + mark read (moves to read/)
-    python scripts/agent_inbox.py read <message_id>
-
-    # Reply in thread
-    python scripts/agent_inbox.py reply --in-reply-to <msg_id> \
-        --from bravo --body "Received, reviewing"
-
-    # JSON output for agent consumption
-    python scripts/agent_inbox.py list --to bravo --json
-
-Storage: tmp/agent_inbox/ (gitignored). inbox/ unread, read/ acknowledged.
-"""
+# Closes Bravo's coordination gap: sibling agents post structured messages that the
+# orchestrator picks up at checkpoints instead of blocking on synchronous polls.
+# Storage: tmp/agent_inbox/ (gitignored). inbox/ = unread, read/ = acknowledged.
 
 from __future__ import annotations
 

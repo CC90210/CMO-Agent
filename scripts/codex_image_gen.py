@@ -1,3 +1,4 @@
+"""codex_image_gen — Delegates image generation to OpenAI via Codex CLI, producing branded ad creatives and thumbnails without a separate image API key."""
 #!/usr/bin/env python3
 """
 Codex Image Generation Bridge — Generate images via OpenAI through Codex CLI.
@@ -26,7 +27,7 @@ EXPORT_DIR = PROJECT_ROOT / "media" / "exports"
 
 # Brand context for image generation
 BRAND_CONTEXT = """
-Brand: OASIS AI Solutions / Kona Makana
+Brand: OASIS AI Solutions / Conaugh McKenna
 Colors: Pearl White (#FAF9F5), Obsidian (#141413), OASIS Blue (#0A84FF), Signal Green (#30D158)
 Style: Dark backgrounds, clean modern tech aesthetic, minimal but impactful
 Font: Inter (bold for headlines)

@@ -85,6 +85,26 @@ Notes:
 
 ---
 
+## 3.5 (Optional) AI-generated primary content via Higgsfield
+
+When there is **no raw footage to grade** (talking-head ideas, abstract OASIS spots, atmospheric brand moments, B-roll Maven can write but CC didn't shoot), skip step 3 entirely and generate the primary content with Higgsfield:
+
+1. **Pick the cinema mode** (M1 Narrative / M2 Studio / M3 Action / M4 Performance / M5 Atmospheric). Most OASIS spots are M2 Studio/Editorial (white-void brand register) or M5 Atmospheric (mood/manifesto plates with the `#0A1525` + `#1FE3F0` palette baked in).
+2. **Lock characters/wardrobe first if recurring.** Open `skills/banana-pro-director/SKILL.md`. Step 0 (character gate) → Mode 1A or 1B (single-image base on white seamless) → Mode 2 (6-panel sheet) for any persona that will appear across multiple shots.
+3. **Write the Seedance prompt.** Open `skills/cinema-worldbuilder/SKILL.md`. Run the session-opener character gate (once), then the 5-line pre-prompt confirmation, then deliver the title-line + code block.
+4. **Paste into Seedance in the Higgsfield UI.** Upload any reference images (character lock or scene plate from Banana Pro) directly in the UI — the prompt itself is text-only.
+5. **Download the MP4.** Place at `/c/Users/User/CMO-Agent/media/videos/youtube/<slug>/source/seedance_main.mp4`.
+6. **Skip step 3 entirely** — Higgsfield output is already graded (Kodak Vision3 emulation, anamorphic flares, film grain are baked in by the cinema-mode camera block). Re-grading would muddy the look.
+7. **Proceed to step 4** (Remotion intro/outro wrap) with the Seedance MP4 as the main body.
+
+**Subscription gate.** Higgsfield (Seedance + Banana Pro + Soul Cinema + GPT-2) is currently gated by CC's GPU upgrade decision per `memory/project_deferred_ai_capabilities.md`. Confirm subscription status before assuming Seedance is available. The skill files themselves are valuable as prompt-craft training even before subscribe — write the prompt, save it, run it the moment Higgsfield is live.
+
+**Brand-lock for OASIS content.** Before composing M2 or M5 prompts for OASIS, pull the palette from `brain/brand-assets/oasis-ai/BRAND_SYSTEM.md` and bake hex values directly into the prompt (`#0A1525`, `#1FE3F0`, `#11202F`, `#F0F4F8`). Never blend OASIS palette with a Hollywood teal-amber unless CC explicitly asks for a remix.
+
+**Step 11 claude-video QA still applies.** Higgsfield output gets the same pre-publish frame-extraction pass as any other video. Watch for brand color drift, hallucinated text, character identity slippage across cuts.
+
+---
+
 ## 4. Render branded intro/outro cards
 
 The Remotion compositions are already brand-aligned. Just adjust the props.

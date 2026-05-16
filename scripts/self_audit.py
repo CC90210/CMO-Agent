@@ -81,6 +81,8 @@ class AuditResult:
     cmo_pulse_fresh: bool = False
     cmo_pulse_age_hours: float = -1.0
     capability_drift_count: int = 0
+    v67_substrate_missing: list[str] = field(default_factory=list)
+    v67_snapshot_stale_h: float = -1.0
     health_score: int = 0
     warnings: list[str] = field(default_factory=list)
 
@@ -275,7 +277,41 @@ def compute_health_score(r: AuditResult) -> int:
         score -= 5
     # Capability graph drift: capped penalty so it surfaces but doesn't crush.
     score -= min(int(r.capability_drift_count * 0.05), 5)
+    # V6.7 substrate: 3 points per missing piece, capped at 15.
+    score -= min(len(r.v67_substrate_missing) * 3, 15)
+    if r.v67_snapshot_stale_h > 36:
+        score -= 2
     return max(0, score)
+
+
+def check_v67_substrate(r: AuditResult) -> None:
+    """V6.7 Apex parity gate: verify state DB, retrieval index, exec_guard,
+    stealth scripts, settings.json hooks, and snapshot scaffolding are all
+    present. Missing pieces deduct from health score."""
+    required = [
+        "state/empire_state.db",
+        "state/memory_index.db",
+        "scripts/state_manager.py",
+        "scripts/memory_retriever.py",
+        "scripts/exec_guard.py",
+        "scripts/cloak_browser_tool.py",
+        "scripts/research_fetch.py",
+        ".claude/settings.json",
+        "scripts/snapshots/cmo_briefing_snapshot.py",
+    ]
+    for rel in required:
+        if not (REPO_ROOT / rel).exists():
+            r.v67_substrate_missing.append(rel)
+            r.warnings.append(f"V6.7 substrate missing: {rel}")
+    snap = REPO_ROOT / "state" / "snapshots" / "latest_cmo_briefing.json"
+    if snap.exists():
+        import time
+        r.v67_snapshot_stale_h = (time.time() - snap.stat().st_mtime) / 3600
+        if r.v67_snapshot_stale_h > 36:
+            r.warnings.append(
+                f"V6.7 briefing snapshot stale: {r.v67_snapshot_stale_h:.1f}h "
+                "(re-run scripts/snapshots/cmo_briefing_snapshot.py)"
+            )
 
 
 def check_capability_graph(r: AuditResult) -> None:
@@ -327,6 +363,7 @@ def run_audit() -> AuditResult:
     check_send_gateway(result)
     check_cmo_pulse(result)
     check_capability_graph(result)
+    check_v67_substrate(result)
     result.health_score = compute_health_score(result)
     return result
 

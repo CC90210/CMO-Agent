@@ -131,8 +131,10 @@ Every edit touches ONLY what was requested. No drive-by refactoring. No "while I
 
 ## Session Protocol
 
+**V6.7 Apex substrate (since 2026-05-16):** `brain/STATE.md` / `memory/SESSION_LOG.md` / `memory/ACTIVE_TASKS.md` are AUTO-GENERATED mirrors of `state/empire_state.db`. Source of truth: `python scripts/state_manager.py status`. Use `python scripts/memory_retriever.py query "<topic>"` instead of whole-file reads. Full docs in CLAUDE.md § "V6.7 Apex substrate".
+
 **Start:** Load boot directive. First line: `"Maven online via Antigravity + [model]. [answer]"`
-**During:** Sync after every meaningful action (RULE 0).
+**During:** Sync via `state_manager log` (RULE 0).
 **End:** Final sync.
 
 ---

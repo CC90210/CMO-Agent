@@ -146,8 +146,10 @@ If an MCP call or API operation fails: report error → diagnose → suggest fix
 
 ## Session Protocol
 
-**Start:** Read STATE.md, ACTIVE_TASKS.md, SESSION_LOG.md, ceo_pulse.json, cfo_pulse.json. Report status.
-**End:** Update STATE.md, ACTIVE_TASKS.md, cmo_pulse.json. Append SESSION_LOG.md.
+**V6.7 Apex substrate (since 2026-05-16):** STATE/SESSION_LOG/ACTIVE_TASKS markdown are now AUTO-GENERATED mirrors of `state/empire_state.db` (SQLite WAL). Source of truth: `python scripts/state_manager.py status`. Use `python scripts/memory_retriever.py query "<topic>"` for snippet retrieval instead of whole-file reads. Bash commands gate through `scripts/exec_guard.py`. Full docs in CLAUDE.md § "V6.7 Apex substrate".
+
+**Start:** `state_manager status` + `memory_retriever query <topic>` + ceo_pulse.json + cfo_pulse.json + `state/snapshots/latest_cmo_briefing.json`. Report status.
+**End:** `state_manager log --note "..."` (mirrors auto-export). Update cmo_pulse.json.
 **First message format:** `"Maven online via [runtime]. [your answer]"`
 
 ---

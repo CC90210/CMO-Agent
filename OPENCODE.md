@@ -154,9 +154,11 @@ echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [OpenCode + <model>] <description>" >> me
 
 ## Session Protocol
 
-**Start:** Load boot directive files. Output: `"Maven online via OpenCode + [model]. [answer to question if asked]"`
-**During:** After each meaningful action, sync STATE.md / ACTIVE_TASKS.md / SESSION_LOG.md / cmo_pulse.json.
-**End:** Final sync. Don't leave the next agent guessing.
+**V6.7 Apex substrate (since 2026-05-16):** STATE/SESSION_LOG/ACTIVE_TASKS markdown are now AUTO-GENERATED mirrors of `state/empire_state.db` (SQLite WAL). Source of truth: `python scripts/state_manager.py status`. Use `python scripts/memory_retriever.py query "<topic>"` instead of whole-file reads. Full docs in CLAUDE.md § "V6.7 Apex substrate".
+
+**Start:** Load boot directive + `state_manager status` + `state/snapshots/latest_cmo_briefing.json`. Output: `"Maven online via OpenCode + [model]. [answer]"`
+**During:** After each meaningful action, `state_manager log` (mirrors auto-export). Update cmo_pulse.json separately.
+**End:** Final sync.
 
 ---
 

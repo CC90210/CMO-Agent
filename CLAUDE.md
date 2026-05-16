@@ -239,12 +239,13 @@ Categories filter automatically: `campaign`/`content-published` are silent; `cfo
 ## SESSION PROTOCOL
 
 ### On Session Start (OPERATIONAL turns only — see Triage at top of file):
-1. Read local `brain/STATE.md` and `memory/ACTIVE_TASKS.md`.
-2. Read C-Suite pulses:
+1. `python scripts/state_manager.py status` — live state from SQLite (faster than reading STATE.md). Markdown mirrors auto-export but the DB is the source.
+2. `python scripts/memory_retriever.py query "<topic>"` — snippet-based retrieval. Use this BEFORE whole-file Read on any `brain/`, `memory/`, or `skills/` markdown.
+3. Read C-Suite pulses (cross-agent IPC, NOT in the SQLite DB):
    - `C:\Users\User\Business-Empire-Agent\data\pulse\ceo_pulse.json` (Bravo's directives)
    - `C:\Users\User\APPS\CFO-Agent\data\pulse\cfo_pulse.json` (Atlas's runway + spend gate)
-3. Check API health (Google Ads + Meta tokens valid?).
-4. Report status to user.
+4. Check `state/snapshots/latest_cmo_briefing.json` — last night's prep table (content inventory, ad performance, blockers).
+5. Report status to user.
 
 For conversational / vibe messages ("wsp", "yo", "hi"), skip this entirely and just respond.
 
@@ -253,6 +254,17 @@ For conversational / vibe messages ("wsp", "yo", "hi"), skip this entirely and j
 2. Append to `memory/SESSION_LOG.md`.
 3. Update `data/pulse/cmo_pulse.json` (in THIS repo — never write to Bravo's or Atlas's pulse files).
 4. Commit: `maven: sync — session YYYY-MM-DD`
+
+## V6.7 Apex substrate (mechanical truth layer)
+
+Ported from Bravo on 2026-05-16 — the four mechanical guarantees that turn Maven from a "reactive executor" into a proactive autonomous engine. Every script `--help` clean, `--json` where it matters.
+
+- **State engine** — `scripts/state_manager.py` (SQLite/WAL at `state/empire_state.db`). Source of truth for heartbeats, session logs, active tasks. `brain/STATE.md` + `memory/SESSION_LOG.md` + `memory/ACTIVE_TASKS.md` are AUTO-GENERATED mirrors. CLI: `heartbeat`, `log`, `task add/close/list`, `export`, `status`, `import-from-files`.
+- **Hybrid retrieval** — `scripts/memory_retriever.py` (FTS5 + LanceDB + ONNX MiniLM-L6-v2 embeddings, RRF fusion). Snippet-based retrieval over 135+ markdown files across `brain/`, `skills/`, `memory/`, `brain/playbooks/`, `brain/brand-assets/`. Use `query "<topic>"` instead of reading whole files.
+- **Exec guard** — `scripts/exec_guard.py` (wired as PreToolUse Bash hook in `.claude/settings.json`). Hard-blocklist regex + sqlglot SQL AST + irreversible-op allowlist. Killswitch: `EMPIRE_HOOK_EXEC_GUARD=enforce|report|off` (shared with Bravo on purpose — one toggle, two agents).
+- **Stealth tier** — `scripts/research_fetch.py` + `scripts/cloak_browser_tool.py`. Firecrawl → CloakBrowser escalation ladder for Cloudflare/Akamai/DataDome-protected scraping. Site-reputation memory at `state/site_reputation.db` remembers which tier each domain needs.
+- **Daily prep table** — `scripts/snapshots/cmo_briefing_snapshot.py` writes `state/snapshots/latest_cmo_briefing.json` every 06:00 (n8n cron). Aggregates 3-agent pulse, Late inventory, ad performance, brand health, open/blocked tasks, V6.7 substrate health, and the May 30 MRR target ($5,000).
+- **Hooks** — `.claude/settings.json`. SessionStart: heartbeat + export. PreToolUse(Bash): exec_guard. PreToolUse(file edits): claudekit file-guard. Stop: claudekit create-checkpoint.
 
 ## V6 superintelligence stack (operational scripts)
 

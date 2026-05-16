@@ -1,0 +1,53 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/state_manager.py heartbeat --agent maven --status booting --focus 'session-start'"
+          },
+          {
+            "type": "command",
+            "command": "python scripts/state_manager.py export"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/exec_guard.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "claudekit-hooks run file-guard"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "claudekit-hooks run create-checkpoint"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [],
+    "UserPromptSubmit": []
+  }
+}

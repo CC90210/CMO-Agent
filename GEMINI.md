@@ -123,8 +123,10 @@ Max 3 attempts on any failing operation.
 
 ## Session Protocol
 
-**Start:** Boot directive → `"Maven online via Gemini CLI. [answer]"`
-**During:** Sync after each meaningful action (RULE 0).
+**V6.7 Apex substrate (since 2026-05-16):** State files are AUTO-GENERATED mirrors of `state/empire_state.db`. Read via `python scripts/state_manager.py status`. Use `python scripts/memory_retriever.py query "<topic>"` for snippet retrieval. Full docs in CLAUDE.md § "V6.7 Apex substrate".
+
+**Start:** Boot directive + `state_manager status` → `"Maven online via Gemini CLI. [answer]"`
+**During:** Sync via `state_manager log` (RULE 0).
 **End:** Final sync.
 
 ---

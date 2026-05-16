@@ -1,3 +1,7 @@
+  <img width="1254" height="1254" alt="image" src="https://github.com/user-attachments/assets/c65ad3cf-c082-426e-8ec0-2e019b8ce02b" />
+
+
+
 # Maven — Autonomous AI CMO
 
 > Maven is CC's Chief Marketing Officer agent — brand, content, ads, funnels, distribution, growth, research. One third of a 3-agent AI C-Suite. Paired with Bravo (CEO) for strategy and Atlas (CFO) for spend approval.

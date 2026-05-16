@@ -76,3 +76,18 @@ data/pulse/*.json
 !brain/USER.template.md
 !memory/*.template.md
 !data/pulse/README.md
+
+# ─── V6.7 Apex substrate — runtime state (never commit) ─────────────
+state/empire_state.db
+state/empire_state.db-shm
+state/empire_state.db-wal
+state/memory_index.db
+state/memory_index.db-shm
+state/memory_index.db-wal
+state/memory_lance/
+state/site_reputation.db
+state/exec_guard.log
+state/logs/
+# Snapshots are generated daily, regen on next cron tick
+state/snapshots/cmo_briefing_*.json
+state/snapshots/latest_cmo_briefing.json

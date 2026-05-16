@@ -1,16 +1,16 @@
 {
   "schema_version": "1.0",
   "agent": "maven",
-  "generated_at": "2026-05-16T06:22:34.009414+00:00",
+  "generated_at": "2026-05-16T19:28:47.686054+00:00",
   "totals": {
     "skills": 60,
-    "scripts": 70,
+    "scripts": 72,
     "agents": 19,
     "mcp_servers": 6,
     "workflows": 11,
-    "nodes_total": 166,
+    "nodes_total": 168,
     "edges_total": 11,
-    "drift_count": 1
+    "drift_count": 0
   },
   "nodes": [
     {
@@ -1473,10 +1473,10 @@
       "kind": "script",
       "name": "capture_idea",
       "path": "scripts/capture_idea.py",
-      "description": "(no docstring)",
+      "description": "capture_idea.py \u2014 friction-free content idea capture for Maven.",
       "tier": "tool",
       "owner": "maven",
-      "discovery": "auto-filename"
+      "discovery": "auto-docstring"
     },
     {
       "id": "script:casl_compliance",
@@ -1614,6 +1614,26 @@
       "name": "exec_guard",
       "path": "scripts/exec_guard.py",
       "description": "PreToolUse Bash hook \u2014 layered policy gate against destructive commands.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:exec_override",
+      "kind": "script",
+      "name": "exec_override",
+      "path": "scripts/exec_override.py",
+      "description": "V6 BUILD 4 \u2014 operator-approval CLI for the override flow.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:firecrawl_tool",
+      "kind": "script",
+      "name": "firecrawl_tool",
+      "path": "scripts/firecrawl_tool.py",
+      "description": "Firecrawl CLI Tool -- Web Scraping & Structured Extraction Fallback to the Firecrawl MCP server. Reads FIRECRAWL_API_KEY from .env.agents. All credentials loaded from .env.agents (never hardcoded).",
       "tier": "tool",
       "owner": "maven",
       "discovery": "auto-docstring"
@@ -2469,10 +2489,5 @@
       "kind": "uses"
     }
   ],
-  "drift": [
-    {
-      "node": "script:capture_idea",
-      "issue": "script missing module docstring"
-    }
-  ]
+  "drift": []
 }

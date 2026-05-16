@@ -48,13 +48,22 @@ def _read_json(path: str | Path) -> dict:
         return {"_error": f"{type(e).__name__}: {e}"}
 
 
-def gather_pulse() -> dict:
+def gather_pulse(allow_missing: bool = False) -> dict:
     home = Path(os.environ.get("USERPROFILE") or os.path.expanduser("~"))
     bravo = Path(os.environ.get("BRAVO_REPO") or (home / "Business-Empire-Agent"))
     atlas = Path(os.environ.get("ATLAS_REPO") or (home / "APPS" / "CFO-Agent"))
+    ceo_path = bravo / "data" / "pulse" / "ceo_pulse.json"
+    cfo_path = atlas / "data" / "pulse" / "cfo_pulse.json"
+    missing = [str(p) for p in (ceo_path, cfo_path, CMO_PULSE) if not p.exists()]
+    if missing and not allow_missing:
+        raise FileNotFoundError(
+            "Required pulse files missing: " + ", ".join(missing)
+            + ". Set BRAVO_REPO / ATLAS_REPO env vars to override the discovery,"
+              " or pass --allow-missing-pulse to degrade silently."
+        )
     return {
-        "ceo": _read_json(bravo / "data" / "pulse" / "ceo_pulse.json"),
-        "cfo": _read_json(atlas / "data" / "pulse" / "cfo_pulse.json"),
+        "ceo": _read_json(ceo_path),
+        "cfo": _read_json(cfo_path),
         "cmo": _read_json(CMO_PULSE),
     }
 
@@ -121,13 +130,13 @@ def gather_substrate() -> dict:
     }
 
 
-def build() -> dict:
+def build(allow_missing_pulse: bool = False) -> dict:
     now = datetime.now(timezone.utc)
     return {
         "generated_at":  now.isoformat(timespec="seconds"),
         "day_of_week":   now.strftime("%A"),
         "target_mrr_2026_05_30_usd": 5000,
-        "pulse":         gather_pulse(),
+        "pulse":         gather_pulse(allow_missing=allow_missing_pulse),
         "content":       gather_content(),
         "ads":           gather_ads(),
         "brand_health":  gather_brand_health(),
@@ -139,9 +148,15 @@ def build() -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Daily CMO briefing snapshot")
     parser.add_argument("--json", action="store_true", help="Emit JSON to stdout")
+    parser.add_argument("--allow-missing-pulse", action="store_true",
+                        help="Degrade gracefully when sibling repo pulses are missing")
     args = parser.parse_args()
 
-    snap = build()
+    try:
+        snap = build(allow_missing_pulse=args.allow_missing_pulse)
+    except FileNotFoundError as e:
+        print(f"FATAL  {e}", file=sys.stderr)
+        return 2
     SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
     day = snap["generated_at"][:10]
     dated = SNAPSHOT_DIR / f"cmo_briefing_{day}.json"

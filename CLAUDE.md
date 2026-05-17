@@ -29,6 +29,8 @@ Classify CC's message before doing anything else. Most messages don't need the S
 
 The Session Start protocol (read STATE, ACTIVE_TASKS, both pulses, check API health) is for OPERATIONAL turns only. Don't fire it on a "wsp." Over-eager file-reads on a casual message waste seconds and CC's patience.
 
+**Canonical vocabulary (V6.8, 2026-05-16):** Reference `CONTEXT.md` at repo root when a domain term needs disambiguation (Sobriety Log, Quote Drop, CEO Log, Brand asset, Pulse, Drop, Pillar pacing). Empire-wide terms (CC, Bravo, Atlas, OASIS, PropFlow, North Star) live in `~/Business-Empire-Agent/CONTEXT.md`. See `docs/adr/0001-context-md-canonical-vocabulary.md`.
+
 **HARD RULE — no `@`-imports in this file or any sibling entry point.** Every `@filename` syntax in CLAUDE.md / GEMINI.md / ANTIGRAVITY.md / AGENTS.md / OPENCODE.md auto-loads the referenced file (recursively, up to 5 hops) into the system prompt on EVERY cold spawn — bypassing Triage entirely. Reference paths as bare strings (write `brain/SOUL.md`, never the AT-prefixed form). If you find yourself wanting to add an `@`-import, you're wrong. Stop. Add a Read instruction to the Triage matrix instead.
 
 ---

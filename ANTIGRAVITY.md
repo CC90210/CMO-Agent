@@ -59,6 +59,7 @@ For substantive operational work, silently load (only what the request needs):
 4. `memory/SESSION_LOG.md` (last 5 entries)
 5. `C:\Users\User\Business-Empire-Agent\data\pulse\ceo_pulse.json`
 6. `C:\Users\User\APPS\CFO-Agent\data\pulse\cfo_pulse.json`
+7. `CONTEXT.md` — canonical Maven vocabulary (V6.8, 2026-05-16). Read when a domain term needs disambiguation. Empire-wide terms live in `~/Business-Empire-Agent/CONTEXT.md`. See `docs/adr/0001-context-md-canonical-vocabulary.md`.
 
 ---
 

@@ -47,6 +47,7 @@ For substantive operational work, silently load (only what the request needs):
 4. `memory/SESSION_LOG.md` (last 5 entries) — what other runtimes have done recently
 5. `C:\Users\User\Business-Empire-Agent\data\pulse\ceo_pulse.json` — CEO directive
 6. `C:\Users\User\APPS\CFO-Agent\data\pulse\cfo_pulse.json` — CFO spend gate
+7. `CONTEXT.md` — canonical Maven vocabulary (V6.8, 2026-05-16). Read when a domain term needs disambiguation. Empire-wide terms live in `~/Business-Empire-Agent/CONTEXT.md`. See `docs/adr/0001-context-md-canonical-vocabulary.md`.
 
 ---
 
@@ -154,9 +155,11 @@ echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [OpenCode + <model>] <description>" >> me
 
 ## Session Protocol
 
-**Start:** Load boot directive files. Output: `"Maven online via OpenCode + [model]. [answer to question if asked]"`
-**During:** After each meaningful action, sync STATE.md / ACTIVE_TASKS.md / SESSION_LOG.md / cmo_pulse.json.
-**End:** Final sync. Don't leave the next agent guessing.
+**V6.7 Apex substrate (since 2026-05-16):** STATE/SESSION_LOG/ACTIVE_TASKS markdown are now AUTO-GENERATED mirrors of `state/empire_state.db` (SQLite WAL). Source of truth: `python scripts/state_manager.py status`. Use `python scripts/memory_retriever.py query "<topic>"` instead of whole-file reads. Full docs in CLAUDE.md § "V6.7 Apex substrate".
+
+**Start:** Load boot directive + `state_manager status` + `state/snapshots/latest_cmo_briefing.json`. Output: `"Maven online via OpenCode + [model]. [answer]"`
+**During:** After each meaningful action, `state_manager log` (mirrors auto-export). Update cmo_pulse.json separately.
+**End:** Final sync.
 
 ---
 

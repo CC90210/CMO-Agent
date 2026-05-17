@@ -28,6 +28,16 @@ STATE_FILE = PROJECT_ROOT / "brain" / "STATE.md"
 SESSION_LOG = PROJECT_ROOT / "memory" / "SESSION_LOG.md"
 PULSE_FILE = PROJECT_ROOT / "data" / "pulse" / "cmo_pulse.json"
 
+# V6.7 delegation: state_manager.py owns brain/STATE.md and memory/SESSION_LOG.md.
+# state_sync stays as the caller-friendly CLI entry point (telegram_agent.js,
+# n8n cron, and humans all call it), but heartbeat + log writes go through
+# the SQLite transactional layer to prevent races with the daemon.
+sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
+try:
+    import state_manager as _state_manager  # noqa: E402
+except Exception:
+    _state_manager = None  # fail-soft: legacy flat-file path still works
+
 # Force UTF-8 stdout/stderr on Windows so emoji status glyphs (✅ ❌ ⚠️)
 # don't crash the "MANDATORY end-of-session sync" with UnicodeEncodeError
 # under cp1252. Cheap to do, safe on every platform.
@@ -74,9 +84,23 @@ def get_agent_label() -> str:
 
 
 def update_state_heartbeat(note: str):
-    """Update the Last Heartbeat section in STATE.md."""
-    content = STATE_FILE.read_text(encoding="utf-8")
+    """Update the Last Heartbeat section in STATE.md.
 
+    V6.7: writes through state_manager (SQLite WAL) when available — markdown
+    mirror is auto-generated. Falls back to direct regex-write only if the
+    state_manager port is missing (defensive; shouldn't happen post-V6.7).
+    """
+    if _state_manager is not None:
+        try:
+            _state_manager.heartbeat(agent="maven", status="working", focus=note)
+            _state_manager.export()
+            return True
+        except Exception as e:
+            # Mirror the original behavior on transactional failure so nothing
+            # is dropped silently — fall through to the legacy regex path.
+            print(f"[state_sync] state_manager write failed ({e!r}); falling back to flat-file", file=sys.stderr)
+
+    content = STATE_FILE.read_text(encoding="utf-8")
     new_heartbeat = (
         f"## Last Heartbeat\n\n"
         f"- **Date:** {now_str()}\n"
@@ -84,15 +108,10 @@ def update_state_heartbeat(note: str):
         f"- **Result:** {note}\n\n"
         f"*Last updated: {now_str()}*"
     )
-
-    # Replace existing heartbeat block
     pattern = r"## Last Heartbeat\n.*?\*Last updated:.*?\*"
     updated = re.sub(pattern, new_heartbeat, content, flags=re.DOTALL)
-
     if updated == content:
-        # Append if pattern not found
         updated = content.rstrip() + "\n\n" + new_heartbeat + "\n"
-
     STATE_FILE.write_text(updated, encoding="utf-8")
     return True
 
@@ -100,11 +119,20 @@ def update_state_heartbeat(note: str):
 def append_session_log(note: str) -> str:
     """Append a compact entry to SESSION_LOG.md.
 
-    Dedupe guard: if the most recent Auto-sync entry (same day, same note)
-    matches, skip the append and return "deduped". This prevents the
-    fragmentation CC has seen when state_sync is called multiple times
-    from cron or parallel sessions with the same note.
+    V6.7: delegates to state_manager.append_session_log (SQLite UNIQUE
+    constraint handles the dedupe — no more race-prone "scan recent block"
+    logic when two writers fire at the same second). Returns 'appended' /
+    'deduped' to preserve the existing caller contract.
     """
+    if _state_manager is not None:
+        try:
+            result = _state_manager.append_session_log(note, agent="maven")
+            _state_manager.export()
+            return "deduped" if result == "deduped" else "appended"
+        except Exception as e:
+            print(f"[state_sync] state_manager log failed ({e!r}); falling back to flat-file", file=sys.stderr)
+
+    # Legacy flat-file path (fallback only)
     today = now_str()
     entry = (
         f"\n### {today} — Auto-sync\n"
@@ -112,17 +140,12 @@ def append_session_log(note: str) -> str:
         f"**Note:** {note}\n"
     )
     content = SESSION_LOG.read_text(encoding="utf-8")
-
-    # Dedupe: scan the first ~3 existing entries; if one matches date+note exactly, skip.
-    # This is cheap and handles the "scheduler calls me every cron tick with same note" case.
     dedupe_marker = f"### {today} — Auto-sync"
     note_marker = f"**Note:** {note}"
-    recent_block_end = content.find("\n### ", content.find("\n### ") + 1)  # end of first entry
+    recent_block_end = content.find("\n### ", content.find("\n### ") + 1)
     recent_block = content[: recent_block_end if recent_block_end > 0 else len(content)]
     if dedupe_marker in recent_block and note_marker in recent_block:
         return "deduped"
-
-    # Insert after the header block (before first ### entry)
     insert_at = content.find("\n### ")
     if insert_at == -1:
         SESSION_LOG.write_text(content.rstrip() + entry + "\n", encoding="utf-8")

@@ -59,6 +59,7 @@ For substantive operational work, silently load (only what the request needs):
 4. `memory/SESSION_LOG.md` (last 5 entries)
 5. `C:\Users\User\Business-Empire-Agent\data\pulse\ceo_pulse.json`
 6. `C:\Users\User\APPS\CFO-Agent\data\pulse\cfo_pulse.json`
+7. `CONTEXT.md` — canonical Maven vocabulary (V6.8, 2026-05-16). Read when a domain term needs disambiguation. Empire-wide terms live in `~/Business-Empire-Agent/CONTEXT.md`. See `docs/adr/0001-context-md-canonical-vocabulary.md`.
 
 ---
 
@@ -131,8 +132,10 @@ Every edit touches ONLY what was requested. No drive-by refactoring. No "while I
 
 ## Session Protocol
 
+**V6.7 Apex substrate (since 2026-05-16):** `brain/STATE.md` / `memory/SESSION_LOG.md` / `memory/ACTIVE_TASKS.md` are AUTO-GENERATED mirrors of `state/empire_state.db`. Source of truth: `python scripts/state_manager.py status`. Use `python scripts/memory_retriever.py query "<topic>"` instead of whole-file reads. Full docs in CLAUDE.md § "V6.7 Apex substrate".
+
 **Start:** Load boot directive. First line: `"Maven online via Antigravity + [model]. [answer]"`
-**During:** Sync after every meaningful action (RULE 0).
+**During:** Sync via `state_manager log` (RULE 0).
 **End:** Final sync.
 
 ---

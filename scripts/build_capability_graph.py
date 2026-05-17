@@ -141,16 +141,21 @@ def _read_frontmatter(path: Path) -> tuple[dict[str, Any], str]:
 
 
 def _python_docstring(path: Path) -> str:
-    """Extract the module-level docstring's first paragraph."""
+    """Extract the module-level docstring's first paragraph.
+
+    Skips a leading shebang and any leading comment lines before looking for
+    the docstring, so files like `capture_idea.py` that start with
+    `#!/usr/bin/env python3` don't get flagged as missing a docstring.
+    """
     try:
         text = path.read_text(encoding="utf-8", errors="ignore")
     except Exception:  # noqa: BLE001
         return ""
-    m = re.match(r'^\s*("""|\'\'\')(.*?)\1', text, re.DOTALL)
+    pruned = re.sub(r'^(#![^\n]*\n)?(?:#[^\n]*\n)*', "", text, count=1)
+    m = re.match(r'^\s*("""|\'\'\')(.*?)\1', pruned, re.DOTALL)
     if not m:
         return ""
     doc = m.group(2).strip()
-    # First paragraph
     return doc.split("\n\n", 1)[0].strip().replace("\n", " ")[:280]
 
 

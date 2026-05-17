@@ -51,6 +51,7 @@ Before answering any operational question, silently read — only what the reque
 4. `memory/SESSION_LOG.md` (last 5 entries) — what every agent (including you) has done recently
 5. `C:\Users\User\Business-Empire-Agent\data\pulse\ceo_pulse.json` — Bravo's current strategy/priorities
 6. `C:\Users\User\APPS\CFO-Agent\data\pulse\cfo_pulse.json` — Atlas's spend gate. **Cannot launch any paid campaign without explicit approval here.**
+7. `CONTEXT.md` — canonical Maven vocabulary (V6.8, 2026-05-16). Read when a domain term needs disambiguation. Empire-wide terms live in `~/Business-Empire-Agent/CONTEXT.md`. See `docs/adr/0001-context-md-canonical-vocabulary.md`.
 
 Do **not** dump these files to the user. Read silently, then answer the actual question.
 
@@ -146,8 +147,10 @@ If an MCP call or API operation fails: report error → diagnose → suggest fix
 
 ## Session Protocol
 
-**Start:** Read STATE.md, ACTIVE_TASKS.md, SESSION_LOG.md, ceo_pulse.json, cfo_pulse.json. Report status.
-**End:** Update STATE.md, ACTIVE_TASKS.md, cmo_pulse.json. Append SESSION_LOG.md.
+**V6.7 Apex substrate (since 2026-05-16):** STATE/SESSION_LOG/ACTIVE_TASKS markdown are now AUTO-GENERATED mirrors of `state/empire_state.db` (SQLite WAL). Source of truth: `python scripts/state_manager.py status`. Use `python scripts/memory_retriever.py query "<topic>"` for snippet retrieval instead of whole-file reads. Bash commands gate through `scripts/exec_guard.py`. Full docs in CLAUDE.md § "V6.7 Apex substrate".
+
+**Start:** `state_manager status` + `memory_retriever query <topic>` + ceo_pulse.json + cfo_pulse.json + `state/snapshots/latest_cmo_briefing.json`. Report status.
+**End:** `state_manager log --note "..."` (mirrors auto-export). Update cmo_pulse.json.
 **First message format:** `"Maven online via [runtime]. [your answer]"`
 
 ---

@@ -1408,66 +1408,144 @@ try {
 }
 
 // ---- STARTUP HEALTH CHECK ----
-// Telegram getMe (must return 200) + Anthropic API key (must return 200 from
-// a tiny ping). Fails fast on 401 with a clear log + Telegram alert.
-setTimeout(() => {
+// Classifies HTTP errors so we only page CC when there's something CC can
+// actually fix. Transient upstream errors (529 overload, 5xx, 429, timeouts)
+// retry quietly with exponential backoff and never page on their own. Real
+// credential errors (401/403) and bad-request errors (400) page with the
+// correct remediation. All Telegram alerts are deduplicated to ~6h per kind
+// via tmp/maven_health_alerts.json so a pm2 restart loop can't spam CC.
+setTimeout(async () => {
     const https = require('https');
+    const fsHC = require('fs');
+    const pathHC = require('path');
 
-    // 1. Telegram getMe
-    https.get(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/getMe`, (res) => {
-        let body = '';
-        res.on('data', d => body += d.toString());
-        res.on('end', () => {
-            if (res.statusCode === 200) {
-                try {
-                    const j = JSON.parse(body);
-                    log(`[HEALTH] Telegram getMe: OK (bot @${j.result?.username || '?'} id=${j.result?.id || '?'})`);
-                } catch (_) { log('[HEALTH] Telegram getMe: OK (parse fail)'); }
-            } else {
-                log(`[HEALTH] Telegram getMe FAILED HTTP ${res.statusCode} — check MAVEN_TELEGRAM_BOT_TOKEN`);
-                if (ALLOWED_USERS.length > 0) {
-                    bot.sendMessage(ALLOWED_USERS[0],
-                        `⚠️ Maven startup: Telegram auth failed (HTTP ${res.statusCode}). Check MAVEN_TELEGRAM_BOT_TOKEN in .env.agents, then: pm2 restart maven-telegram`)
-                        .catch(() => {});
-                }
-            }
+    const ALERT_STATE_PATH = pathHC.join(__dirname, 'tmp', 'maven_health_alerts.json');
+    const ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
+    const TRANSIENT_STATUSES = new Set([0, 408, 425, 429, 500, 502, 503, 504, 520, 522, 524, 529]);
+    const MAX_ATTEMPTS = 5;
+
+    function loadAlertState() {
+        try { return JSON.parse(fsHC.readFileSync(ALERT_STATE_PATH, 'utf8')); }
+        catch { return {}; }
+    }
+    function shouldAlert(kind) {
+        const state = loadAlertState();
+        const last = state[kind] || 0;
+        if (Date.now() - last < ALERT_COOLDOWN_MS) return false;
+        state[kind] = Date.now();
+        try { fsHC.writeFileSync(ALERT_STATE_PATH, JSON.stringify(state, null, 2)); }
+        catch (e) { log(`[HEALTH] alert-state write failed: ${e.message}`); }
+        return true;
+    }
+    function alertOnce(kind, message) {
+        if (ALLOWED_USERS.length === 0) return;
+        if (!shouldAlert(kind)) {
+            log(`[HEALTH] alert suppressed (${kind} within 6h cooldown)`);
+            return;
+        }
+        bot.sendMessage(ALLOWED_USERS[0], message).catch((e) => log(`[HEALTH] alert send failed: ${e.message || e}`));
+    }
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+    function httpsRequestWithBody(options, body) {
+        return new Promise((resolve) => {
+            const req = https.request(options, (res) => {
+                let buf = '';
+                res.on('data', d => buf += d.toString());
+                res.on('end', () => resolve({ status: res.statusCode, body: buf }));
+            });
+            req.setTimeout(15000, () => { req.destroy(new Error('timeout')); });
+            req.on('error', (e) => resolve({ status: 0, body: `err: ${e.message}` }));
+            if (body) req.write(body);
+            req.end();
         });
-    }).on('error', (e) => log(`[HEALTH] Telegram check error: ${e.message}`));
+    }
 
-    // 2. Anthropic ping
+    // 1. Telegram getMe — auth check. Single attempt; transient on network err only.
+    try {
+        const tg = await new Promise((resolve) => {
+            const r = https.get(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/getMe`, (res) => {
+                let body = '';
+                res.on('data', d => body += d.toString());
+                res.on('end', () => resolve({ status: res.statusCode, body }));
+            });
+            r.setTimeout(10000, () => { r.destroy(new Error('timeout')); });
+            r.on('error', (e) => resolve({ status: 0, body: `err: ${e.message}` }));
+        });
+        if (tg.status === 200) {
+            try {
+                const j = JSON.parse(tg.body);
+                log(`[HEALTH] Telegram getMe: OK (bot @${j.result?.username || '?'} id=${j.result?.id || '?'})`);
+            } catch (_) { log('[HEALTH] Telegram getMe: OK (parse fail)'); }
+        } else if (tg.status === 401 || tg.status === 403) {
+            log(`[HEALTH] Telegram getMe FAILED HTTP ${tg.status} (auth)`);
+            alertOnce('telegram-auth',
+                `⚠️ Maven: Telegram bot token rejected (HTTP ${tg.status}). MAVEN_TELEGRAM_BOT_TOKEN is invalid or revoked — update .env.agents then: pm2 restart maven-telegram`);
+        } else if (TRANSIENT_STATUSES.has(tg.status)) {
+            log(`[HEALTH] Telegram getMe transient HTTP ${tg.status} — no alert`);
+        } else {
+            log(`[HEALTH] Telegram getMe unexpected HTTP ${tg.status}`);
+            alertOnce(`telegram-${tg.status}`,
+                `⚠️ Maven: Telegram getMe returned HTTP ${tg.status}.`);
+        }
+    } catch (e) {
+        log(`[HEALTH] Telegram check error: ${e.message || e}`);
+    }
+
+    // 2. Anthropic ping — retry transient errors with exponential backoff.
+    //    Only alerts on a real credential issue (401/403) or persistent 400.
+    //    529/5xx/429/timeouts = upstream weather, log and move on.
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-        log('[HEALTH] ANTHROPIC_API_KEY missing — Claude will fail');
+        log('[HEALTH] ANTHROPIC_API_KEY missing — Claude calls will fail');
+        alertOnce('anthropic-missing',
+            `⚠️ Maven: ANTHROPIC_API_KEY missing from .env.agents. Bot is online but Claude calls will fail. Add the key then: pm2 restart maven-telegram`);
         return;
     }
-    const body = JSON.stringify({
+    const reqBody = JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 5,
         messages: [{ role: 'user', content: 'ping' }],
     });
-    const req = https.request({
-        hostname: 'api.anthropic.com',
-        path: '/v1/messages',
-        method: 'POST',
-        headers: {
-            'x-api-key': apiKey,
-            'anthropic-version': '2023-06-01',
-            'content-type': 'application/json',
-            'content-length': Buffer.byteLength(body),
-        },
-    }, (res) => {
-        if (res.statusCode === 200) {
-            log('[HEALTH] Anthropic API: OK');
-        } else {
-            log(`[HEALTH] Anthropic API FAILED HTTP ${res.statusCode}`);
-            if (ALLOWED_USERS.length > 0) {
-                bot.sendMessage(ALLOWED_USERS[0],
-                    `⚠️ Maven startup: Anthropic API check failed (HTTP ${res.statusCode}). Update ANTHROPIC_API_KEY then: pm2 restart maven-telegram`)
-                    .catch(() => {});
-            }
+    let lastStatus = 0, lastBody = '';
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+        const r = await httpsRequestWithBody({
+            hostname: 'api.anthropic.com',
+            path: '/v1/messages',
+            method: 'POST',
+            headers: {
+                'x-api-key': apiKey,
+                'anthropic-version': '2023-06-01',
+                'content-type': 'application/json',
+                'content-length': Buffer.byteLength(reqBody),
+            },
+        }, reqBody);
+        lastStatus = r.status;
+        lastBody = r.body;
+        if (r.status === 200) {
+            log(`[HEALTH] Anthropic API: OK${attempt > 0 ? ` (after ${attempt + 1} attempts)` : ''}`);
+            return;
         }
-    });
-    req.on('error', (e) => log(`[HEALTH] Anthropic check error: ${e.message}`));
-    req.write(body);
-    req.end();
+        if (!TRANSIENT_STATUSES.has(r.status)) break;
+        const delay = Math.min(60000, 2000 * Math.pow(2, attempt));
+        log(`[HEALTH] Anthropic API HTTP ${r.status} (transient, attempt ${attempt + 1}/${MAX_ATTEMPTS}); backing off ${delay}ms`);
+        await sleep(delay);
+    }
+    const isTransient = TRANSIENT_STATUSES.has(lastStatus);
+    log(`[HEALTH] Anthropic API ${isTransient ? 'TRANSIENT-EXHAUSTED' : 'FAILED'} HTTP ${lastStatus}`);
+    if (lastStatus === 401 || lastStatus === 403) {
+        alertOnce('anthropic-auth',
+            `⚠️ Maven: Anthropic API auth failed (HTTP ${lastStatus}). ANTHROPIC_API_KEY is invalid or expired — update .env.agents then: pm2 restart maven-telegram`);
+    } else if (lastStatus === 400) {
+        const snippet = (lastBody || '').toString().slice(0, 240).replace(/\s+/g, ' ');
+        alertOnce('anthropic-400',
+            `⚠️ Maven: Anthropic API rejected the startup ping (HTTP 400). Body: ${snippet}`);
+    } else if (isTransient) {
+        // Upstream weather — do NOT page CC. Bot stays online; first real prompt
+        // will retry via the Direct API path. Only escalate if it's chronic.
+        log(`[HEALTH] Anthropic transient (HTTP ${lastStatus}) — bot online, alert suppressed (upstream issue, not credentials)`);
+    } else {
+        alertOnce(`anthropic-${lastStatus}`,
+            `⚠️ Maven: Anthropic API failed (HTTP ${lastStatus}). Check status.anthropic.com.`);
+    }
 }, 5000);

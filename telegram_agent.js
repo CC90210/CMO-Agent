@@ -1360,26 +1360,51 @@ process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 
 // ---- POLLING ERROR HANDLING ----
+// On 409 Conflict: do NOT exit. Telegram's long-poll connection (≤50s timeout)
+// from the previous process / our own previous getUpdates is still considered
+// alive on Telegram's side. Exiting and letting pm2 restart re-creates the
+// same ghost on every cycle and produces a perpetual restart loop (Maven hit
+// 512 restarts on 2026-05-18 from this). Instead, stay alive, stop polling,
+// wait for the ghost to expire with exponential backoff (60s → 90s → 120s →
+// 180s → 300s, capped 600s), then resume polling in-process. Counter resets
+// after 5 minutes of successful polling. 401 still exits (real bad token).
 let pollErrorCount = 0;
-let pollingDormant = false;
+let pollConflictCount = 0;
+let pollResumeTimer = null;
+let lastPollOkAt = Date.now();
+function scheduleResumeAfterConflict() {
+    if (pollResumeTimer) return;
+    const baseDelays = [60000, 90000, 120000, 180000, 300000];
+    const delay = pollConflictCount <= baseDelays.length
+        ? baseDelays[Math.min(pollConflictCount - 1, baseDelays.length - 1)]
+        : 600000;
+    log(`[POLL] 409 conflict #${pollConflictCount}: pausing polling for ${Math.round(delay/1000)}s ` +
+        `to let the stale long-poll connection expire on Telegram's side. ` +
+        `(staying online — no pm2 restart)`);
+    pollResumeTimer = setTimeout(async () => {
+        pollResumeTimer = null;
+        try { await bot.stopPolling(); } catch (_) {}
+        try {
+            await bot.startPolling({ restart: true });
+            log('[POLL] Resumed polling after 409 backoff.');
+            setTimeout(() => {
+                if (Date.now() - lastPollOkAt > 4.5 * 60 * 1000) {
+                    pollConflictCount = 0;
+                    log('[POLL] 5 min stable since last 409 — backoff counter reset.');
+                }
+            }, 5 * 60 * 1000);
+        } catch (err) {
+            log(`[POLL] startPolling after backoff failed: ${err.message || err}. Will retry on next polling_error.`);
+        }
+    }, delay);
+}
 bot.on('polling_error', (e) => {
     pollErrorCount++;
     const msg = e.message || String(e);
-    // 409 Conflict — another bridge owns this token. Same fix as Bravo:
-    // stop polling, wait 30s for the conflicting process to release the token,
-    // then exit non-zero so PM2 autorestarts. Old "dormant until restart"
-    // behavior left bridges silently broken for days because PM2 saw "online".
     if (msg.includes('409') || msg.includes('Conflict')) {
-        if (!pollingDormant) {
-            pollingDormant = true;
-            log('[POLL] 409 conflict: another Maven bridge owns this token. ' +
-                'Stopping polling and exiting in 30s so PM2 can restart cleanly.');
-        }
+        pollConflictCount++;
         bot.stopPolling().catch(() => {});
-        setTimeout(() => {
-            log('[POLL] 30s elapsed after 409, exiting with code 1 to trigger PM2 restart.');
-            process.exit(1);
-        }, 30000);
+        scheduleResumeAfterConflict();
         return;
     }
     if (msg.includes('401')) {
@@ -1391,6 +1416,9 @@ bot.on('polling_error', (e) => {
         log(`[POLL] Error: ${msg} (count: ${pollErrorCount})`);
     }
 });
+// Track successful polls so the conflict counter can reset after sustained
+// healthy polling. node-telegram-bot-api emits 'message' for any update.
+bot.on('message', () => { lastPollOkAt = Date.now(); });
 
 process.on('unhandledRejection', (err) => {
     log(`[UNHANDLED] ${err.message || err}`);

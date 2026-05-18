@@ -1416,16 +1416,14 @@ try {
 // via tmp/maven_health_alerts.json so a pm2 restart loop can't spam CC.
 setTimeout(async () => {
     const https = require('https');
-    const fsHC = require('fs');
-    const pathHC = require('path');
 
-    const ALERT_STATE_PATH = pathHC.join(__dirname, 'tmp', 'maven_health_alerts.json');
+    const ALERT_STATE_PATH = path.join(__dirname, 'tmp', 'maven_health_alerts.json');
     const ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
     const TRANSIENT_STATUSES = new Set([0, 408, 425, 429, 500, 502, 503, 504, 520, 522, 524, 529]);
     const MAX_ATTEMPTS = 5;
 
     function loadAlertState() {
-        try { return JSON.parse(fsHC.readFileSync(ALERT_STATE_PATH, 'utf8')); }
+        try { return JSON.parse(fs.readFileSync(ALERT_STATE_PATH, 'utf8')); }
         catch { return {}; }
     }
     function shouldAlert(kind) {
@@ -1433,7 +1431,7 @@ setTimeout(async () => {
         const last = state[kind] || 0;
         if (Date.now() - last < ALERT_COOLDOWN_MS) return false;
         state[kind] = Date.now();
-        try { fsHC.writeFileSync(ALERT_STATE_PATH, JSON.stringify(state, null, 2)); }
+        try { fs.writeFileSync(ALERT_STATE_PATH, JSON.stringify(state, null, 2)); }
         catch (e) { log(`[HEALTH] alert-state write failed: ${e.message}`); }
         return true;
     }

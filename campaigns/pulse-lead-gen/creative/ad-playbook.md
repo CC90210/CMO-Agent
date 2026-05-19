@@ -182,7 +182,7 @@ Budget: **$10/day per ad set**, 4 ad sets (one per hook variant) = **$40/day** t
 
 1. **Pre-flight.** Meta Pixel + Conversions API firing on `/book` page view and `/book/confirmed`. UTMs on every ad (`utm_source=meta&utm_campaign=pulse-lead-gen&utm_content={{hook_variant}}`). Repo kept private until call booked — sent via confirmation email. If the repo is public the offer collapses.
 
-2. **Audience stack.** One Advantage+ campaign, one ad set per hook variant. Custom interests: ManyChat, n8n, Zapier, Claude, OpenAI, Next.js, Supabase, Turso, Make.com. Lookalike 1% from OASIS email list (250+ contacts minimum, seed with the primary retainer's community if allowed). Exclude: existing OASIS customers, anyone who's booked in last 60 days.
+2. **Audience stack.** One Advantage+ campaign, one ad set per hook variant. Custom interests: ManyChat, n8n, Zapier, Claude, OpenAI, Next.js, Supabase, Turso, Make.com. Lookalike 1% from OASIS email list (250+ contacts minimum). Exclude: existing OASIS customers, anyone who's booked in last 60 days.
 
 3. **Creative upload.** Four Reels (one per hook), eight statics (two per hook). All creatives tagged in naming convention `pulse_{hook}_{format}_v1` — e.g., `pulse_authority_reel_v1`, `pulse_proof_static_bold_v1`. Always leave room for `_v2` etc.
 

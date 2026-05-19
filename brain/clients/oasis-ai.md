@@ -38,7 +38,7 @@ Meta Reels (PULSE hook)
 
 ## Current Campaigns
 - **pulse-lead-gen** — Free GitHub repo as lead magnet. Playbook in `campaigns/pulse-lead-gen/creative/ad-playbook.md`
-- **skool-community** — 158 members, 63% engagement, 15% rev share with primary retainer. Lead source.
+- ~~**skool-community**~~ — 158 members, 63% engagement, 15% rev share with primary retainer. **ENDED 2026-05-18** — retainer terminated; this is no longer a lead source.
 
 ## Metrics (North Star)
 1. **Net MRR target:** $5,000 USD by 2026-05-15 (goal). Currently ~$3,322.

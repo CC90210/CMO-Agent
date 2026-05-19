@@ -31,7 +31,7 @@ Usage
     python scripts/script_ideation.py generate --count 20      # more ideas
     python scripts/script_ideation.py generate --pillar ceo_log
     python scripts/script_ideation.py generate --format short_video
-    python scripts/script_ideation.py generate --topic "primary retainer rev share"
+    python scripts/script_ideation.py generate --topic "operator rev share"
     python scripts/script_ideation.py generate --json          # JSON output for agents
     python scripts/script_ideation.py list                     # list past ideation runs
     python scripts/script_ideation.py view <timestamp>         # view a past run
@@ -414,7 +414,7 @@ def main() -> None:
     gen.add_argument("--format", choices=list(FORMAT_OPTIONS.keys()), default="any",
                      help="lock format (default 'any' — model picks per idea)")
     gen.add_argument("--topic", type=str, default=None,
-                     help="anchor topic (e.g. 'primary retainer rev share', 'tax season')")
+                     help="anchor topic (e.g. 'operator rev share', 'tax season')")
 
     lst = sub.add_parser("list", help="List past ideation runs")
     lst.add_argument("--limit", type=int, default=20)

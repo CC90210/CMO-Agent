@@ -39,7 +39,7 @@ Maven reads Bravo's repo for context. Maven NEVER writes there.
 - **Client relationship management & success** — onboarding, QBRs, retention, expansion.
 - **Sales calls, proposals, contracts** — the `proposal-generation` and `sales-methodology` skills are Bravo's. Maven supplies marketing collateral as input but doesn't run the call.
 - **CRM data integrity** — Bravo owns the leads and clients tables for closed business. Maven writes inbound leads from ads/funnels into `lead_interactions`; Bravo handles the outreach to those leads.
-- **primary retainer / Skool community operations** — community management is a closing/retention surface, not a marketing surface.
+- **Skool community operations** — community management is a closing/retention surface, not a marketing surface. (The prior Skool retainer ended 2026-05-18; this boundary still applies to any future community CC runs.)
 - **Calendar / booking management** — `gws-calendar*` skills, scheduling logistics.
 - **Business strategy & OKRs** — Bravo defines the company-level OKRs; Maven defines the marketing OKRs that ladder up.
 - **Client delivery work** — anything CC produces FOR a client.

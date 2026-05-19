@@ -36,7 +36,7 @@ The personal brand is the **top-of-funnel for OASIS AI**. Every reel, every post
 - **LinkedIn** (professional B2B angle — use full "Conaugh McKenna" name)
 - **X/Twitter** (short-form thoughts)
 - **YouTube** (long-form + Shorts)
-- **Skool community** (158 members, engaged audience, rev share with primary retainer)
+- ~~Skool community~~ (158 members, engaged audience, rev share with primary retainer — retainer ENDED 2026-05-18)
 
 ## Non-Negotiable Rules
 - **External comms (professional/B2B):** Use "Conaugh McKenna"
@@ -53,7 +53,7 @@ The personal brand is the **top-of-funnel for OASIS AI**. Every reel, every post
 ## What Maven Does NOT Do
 - Write CC's long-form posts (CC owns — he won't publish something that doesn't sound like him)
 - Book DJ gigs (CC handles)
-- Handle Skool community directly (primary retainer manages, Bravo tracks revenue)
+- ~~Handle Skool community directly~~ (community ownership was external; retainer ended 2026-05-18 — no longer Maven's concern)
 
 ---
 

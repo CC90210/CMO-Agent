@@ -21,7 +21,7 @@ What gets replaced:
   - Location         ("Collingwood, Ontario")
 
 What stays as-is (historical context the new operator inherits):
-  - Past client names (primary retainer, Adon, Alejandro, etc.) — agent's experience
+  - Past client names (Adon, Alejandro, etc.) — agent's experience
   - Specific past dates / events
   - Code-level repo names that are public on GitHub
   - Marketing canon references (Dunford, Hormozi, etc.) — methodology, not identity

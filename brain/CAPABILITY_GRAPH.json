@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0",
   "agent": "maven",
-  "generated_at": "2026-05-16T19:28:47.686054+00:00",
+  "generated_at": "2026-05-18T18:16:15.311448+00:00",
   "totals": {
     "skills": 60,
-    "scripts": 72,
+    "scripts": 73,
     "agents": 19,
     "mcp_servers": 6,
     "workflows": 11,
-    "nodes_total": 168,
+    "nodes_total": 169,
     "edges_total": 11,
     "drift_count": 0
   },
@@ -2064,6 +2064,16 @@
       "name": "token_expiry_check",
       "path": "scripts/token_expiry_check.py",
       "description": "token_expiry_check.py \u2014 Watch Maven's external API tokens for expiry drift.",
+      "tier": "tool",
+      "owner": "maven",
+      "discovery": "auto-docstring"
+    },
+    {
+      "id": "script:update_readme_stats",
+      "kind": "script",
+      "name": "update_readme_stats",
+      "path": "scripts/update_readme_stats.py",
+      "description": "update_readme_stats.py \u2014 keep README.md (and any other doc) honest about what's actually in this repo.",
       "tier": "tool",
       "owner": "maven",
       "discovery": "auto-docstring"

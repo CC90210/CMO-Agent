@@ -111,7 +111,7 @@ tags: [risk, register, governance, marketing]
 - **Google Ads financial services policy updates** — affects SunBiz + any OASIS campaigns touching money
 - **iOS privacy / signal loss** — attribution becomes harder, last-click becomes even less reliable
 - **AI-generated content detection by platforms** — ship too much AI slop and platforms may throttle
-- **Skool community growth plateau** — if the primary retainer's community flatlines, a revenue stream stalls
+- ~~**Skool community growth plateau**~~ — N/A as of 2026-05-18, primary retainer ended; community is no longer CC's revenue stream
 
 ---
 

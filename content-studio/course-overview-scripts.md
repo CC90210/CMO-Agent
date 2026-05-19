@@ -1,9 +1,11 @@
 ---
-tags: [content-studio, courses, scripts, primary_retainer]
+tags: [content-studio, courses, scripts, archived]
 ---
 
-# Course Overview Scripts — the primary retainer's Agency Accelerator
+# Course Overview Scripts — Skool Community Walkthroughs (ARCHIVED 2026-05-18)
 ## Skool Module Walkthrough Videos (CC On Camera + Screen Share)
+
+> **Archived 2026-05-18:** These scripts were authored for the primary retainer's Skool community. That retainer ended 2026-05-18. Scripts preserved as IP — CC retains full ownership per contract Section 4 — and can be revived for CC's own community in the future.
 
 ---
 
@@ -308,7 +310,7 @@ Go build something. Only good things from now on.
 
 ---
 
-*Scripts written for the primary retainer's Agency Accelerator — Skool Course 3, 4, and 5 module overview videos.*
+*Scripts originally written for the primary-retainer Skool community — Course 3, 4, and 5 module overview videos. Retainer ended 2026-05-18; scripts preserved as CC's IP.*
 *CC on camera + screen share. Estimated runtime per video: 7-9 minutes.*
 
 ## Obsidian Links

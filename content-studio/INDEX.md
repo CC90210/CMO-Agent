@@ -11,5 +11,5 @@ tags: [content-studio, video, remotion, hub]
 > 39 Remotion reference docs available in `content-studio/.claude/rules/` (excluded from Obsidian graph, loaded by Claude Code on-demand).
 
 ## Course Content
-- [[content-studio/course-overview-scripts]] — the primary retainer's Agency Accelerator module walkthrough scripts
+- [[content-studio/course-overview-scripts]] — Skool community module walkthrough scripts (ARCHIVED 2026-05-18)
 - [[content-studio/skool-live-2026-03-23]] — Skool live session recording and notes 2026-03-23

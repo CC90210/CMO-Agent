@@ -79,7 +79,7 @@ Send each from Telegram and verify the response:
 
 **Expect:** Maven reads `data/pulse/cfo_pulse.json` (Atlas's spend gate), shows status + age, lists approvals per channel/brand. Optionally pulls Meta/Google insights via `performance_reporter.py` if asked. Does NOT launch anything.
 
-### 3. "Post a tweet about today's primary retainer win"
+### 3. "Post a tweet about today's biggest win"
 
 **Expect:** Maven drafts via `script_ideation.py` or directly via Claude, runs `draft_critic`, shows preview. If destructive, outputs `⚠️ CONFIRM: ...` — bridge intercepts and shows ✅/❌ buttons. Only on ✅ does the actual `late_publisher.py` / `late_tool.py` call fire.
 

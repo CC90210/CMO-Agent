@@ -190,12 +190,12 @@ class TestBuildPrompt(unittest.TestCase):
             foundation=self._foundation(),
             signal=self._signal(),
             count=15, pillar="ceo_log", fmt="short_video",
-            topic="primary retainer rev share",
+            topic="operator rev share",
         )
         self.assertIn("Count: 15", prompt)
         self.assertIn("ceo_log", prompt)
         self.assertIn("short_video", prompt)
-        self.assertIn("primary retainer rev share", prompt)
+        self.assertIn("operator rev share", prompt)
 
     def test_includes_sibling_pulse_summaries(self):
         prompt = script_ideation.build_prompt(

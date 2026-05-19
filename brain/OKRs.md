@@ -11,7 +11,7 @@ tags: [brain, okrs, strategy, quarterly, marketing]
 
 ## Objective 1 — Hit OASIS new-client quota via paid + organic pipeline
 
-**Why:** 94% revenue concentration on primary retainer is existential risk (per Bravo's OKRs). Maven's job is to build the marketing-generated pipeline that diversifies. 4+ new OASIS clients at $500-$2K/mo = $2-8K incremental MRR, closes most of the gap to $5K.
+**Why:** Primary retainer ENDED 2026-05-18 (R-001 materialized — 94% concentration risk realized). Confirmed MRR collapsed to ~$371. Maven's job is to build the marketing-generated pipeline that diversifies. 4+ new OASIS clients at $500-$2K/mo = $2-8K incremental MRR, closes most of the gap to $5K (deadline extended to 2026-06-18).
 
 | # | Key Result | Target | Current | Confidence | Status |
 |---|-----------|--------|---------|------------|--------|
